@@ -4,160 +4,185 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JNFAM Weekly Operation Review</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:#0a0e17; --navy:#111827; --surface:#1a2234; --surface2:#1e2a3a;
-  --border:#1e3a5f; --accent:#00d4ff; --green:#00e676; --yellow:#ffd600;
-  --red:#ff4444; --orange:#ff6b35; --white:#e8f4fd; --dim:#7a9bbf; --muted:#2a3a4a;
+  --bg:#f5f6fa; --white:#fff; --border:#e2e6ef; --border2:#d0d5e8;
+  --accent:#2563eb; --accent-l:#eff4ff;
+  --green:#16a34a; --green-l:#f0fdf4;
+  --red:#dc2626; --red-l:#fef2f2;
+  --orange:#ea580c; --orange-l:#fff7ed;
+  --yellow:#d97706; --yellow-l:#fffbeb;
+  --purple:#7c3aed; --purple-l:#f5f3ff;
+  --text:#1e2533; --text2:#5a6478; --text3:#9aa3b5;
+  --shadow:0 1px 4px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.05);
+  --shadow-lg:0 4px 12px rgba(0,0,0,.10),0 8px 28px rgba(0,0,0,.08);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--white);font-family:'Noto Sans KR',sans-serif;min-height:100vh;}
-body::before{content:'';position:fixed;inset:0;
-  background-image:linear-gradient(rgba(0,212,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03) 1px,transparent 1px);
-  background-size:40px 40px;pointer-events:none;z-index:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;min-height:100vh;}
 
 /* HEADER */
-.header{position:relative;z-index:1;background:var(--navy);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
-.logo{font-family:'Bebas Neue',cursive;font-size:24px;letter-spacing:4px;color:var(--accent);text-shadow:0 0 20px rgba(0,212,255,.4);}
-.logo-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:3px;margin-top:2px;}
+header{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.logo{font-size:16px;font-weight:900;color:var(--accent);letter-spacing:.02em;display:flex;align-items:center;gap:8px;}
+.logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;}
+.logo-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.1em;margin-top:2px;}
 .header-right{display:flex;gap:10px;align-items:center;}
-.sync-status{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--dim);}
+.sync-status{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--text3);}
 .sync-dot.connected{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
 .sync-dot.syncing{background:var(--yellow);animation:pulse .5s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.week-badge{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);}
+.week-badge{background:var(--accent-l);border:1px solid #bfdbfe;border-radius:20px;padding:5px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);font-weight:600;}
 
 /* TABS */
-.tabs{position:relative;z-index:1;display:flex;background:var(--navy);border-bottom:1px solid var(--border);padding:0 24px;}
-.tab{padding:11px 18px;border:none;background:transparent;color:var(--dim);font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
-.tab:hover{color:var(--white);}
+.tabs{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;display:flex;}
+.tab{padding:12px 18px;border:none;background:transparent;color:var(--text3);font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;font-weight:500;}
+.tab:hover{color:var(--text);}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700;}
 
 /* MAIN */
-.main{position:relative;z-index:1;padding:20px 24px;}
+.main{padding:24px 28px;}
 
 /* KPI CARDS */
-.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:22px;}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;}
-.kpi-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:2px;margin-bottom:8px;}
-.kpi-value{font-family:'Bebas Neue',cursive;font-size:32px;letter-spacing:2px;}
-.kpi-sub{font-size:11px;color:var(--dim);margin-top:4px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
+.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--shadow);}
+.kpi-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.1em;margin-bottom:8px;text-transform:uppercase;}
+.kpi-value{font-size:30px;font-weight:900;letter-spacing:-.02em;}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* STATUS BADGE */
+.sbadge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap;}
+.s-inprog{background:var(--accent-l);color:var(--accent);border:1px solid #bfdbfe;}
+.s-done{background:var(--green-l);color:var(--green);border:1px solid #bbf7d0;}
+.s-pending{background:var(--yellow-l);color:var(--yellow);border:1px solid #fde68a;}
+.s-other{background:var(--bg);color:var(--text3);border:1px solid var(--border);}
+
+/* PRIORITY */
+.p-high{color:var(--red);font-weight:700;}
+.p-med{color:var(--yellow);font-weight:700;}
+.p-low{color:var(--text3);}
+
+/* PROGRESS */
+.pbar-wrap{width:100%;background:var(--border);border-radius:4px;height:6px;}
+.pbar-fill{height:6px;border-radius:4px;transition:width .3s;}
 
 /* FILTER ROW */
 .filter-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
-.filter-select{background:var(--surface);border:1px solid var(--border);color:var(--white);border-radius:6px;padding:7px 11px;font-family:'Noto Sans KR',sans-serif;font-size:12px;cursor:pointer;}
-.filter-select:focus{outline:none;border-color:var(--accent);}
-.search-input{background:var(--surface);border:1px solid var(--border);color:var(--white);border-radius:6px;padding:7px 11px;font-family:'Noto Sans KR',sans-serif;font-size:12px;width:200px;}
-.search-input::placeholder{color:var(--dim);}
-.search-input:focus{outline:none;border-color:var(--accent);}
-.btn-new{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:6px;padding:7px 16px;font-family:'Noto Sans KR',sans-serif;font-size:12px;cursor:pointer;margin-left:auto;}
-.btn-new:hover{background:#33ddff;}
+.fsel{background:var(--white);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-family:'Noto Sans KR',sans-serif;font-size:12px;cursor:pointer;outline:none;}
+.fsel:focus{border-color:var(--accent);}
+.fsearch{background:var(--white);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-family:'Noto Sans KR',sans-serif;font-size:12px;width:200px;outline:none;}
+.fsearch::placeholder{color:var(--text3);}
+.fsearch:focus{border-color:var(--accent);}
+.btn-new{background:var(--accent);color:#fff;font-weight:700;border:none;border-radius:8px;padding:8px 18px;font-family:'Noto Sans KR',sans-serif;font-size:12px;cursor:pointer;margin-left:auto;}
+.btn-new:hover{background:#1d4ed8;}
 
 /* TABLE */
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
-.table-header{display:grid;grid-template-columns:60px 110px 100px 90px 90px 1fr 90px 130px 80px 80px;gap:0;background:var(--surface2);border-bottom:1px solid var(--border);}
-.th{padding:10px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:1px;border-right:1px solid var(--border);}
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);}
+.table-head{display:grid;grid-template-columns:60px 110px 100px 90px 110px 1fr 80px 140px 80px 90px;background:var(--bg);border-bottom:1px solid var(--border);}
+.th{padding:10px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.05em;text-transform:uppercase;border-right:1px solid var(--border);}
 .th:last-child{border-right:none;}
 .table-body{max-height:calc(100vh - 340px);overflow-y:auto;}
-.tr{display:grid;grid-template-columns:60px 110px 100px 90px 90px 1fr 90px 130px 80px 80px;gap:0;border-bottom:1px solid var(--border);transition:background .15s;cursor:pointer;}
-.tr:hover{background:rgba(0,212,255,.04);}
+.tr{display:grid;grid-template-columns:60px 110px 100px 90px 110px 1fr 80px 140px 80px 90px;border-bottom:1px solid var(--border);transition:background .15s;cursor:pointer;}
+.tr:hover{background:var(--accent-l);}
 .tr:last-child{border-bottom:none;}
 .td{padding:10px 10px;font-size:12px;border-right:1px solid var(--border);display:flex;align-items:center;overflow:hidden;}
 .td:last-child{border-right:none;}
-.td-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-/* STATUS BADGE */
-.status-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
-.s-inprog{background:rgba(0,212,255,.15);color:var(--accent);border:1px solid rgba(0,212,255,.3);}
-.s-done{background:rgba(0,230,118,.15);color:var(--green);border:1px solid rgba(0,230,118,.3);}
-.s-pending{background:rgba(255,214,0,.15);color:var(--yellow);border:1px solid rgba(255,214,0,.3);}
-.s-other{background:rgba(122,155,191,.1);color:var(--dim);border:1px solid var(--border);}
-
-/* PRIORITY */
-.prio-high{color:var(--red);}
-.prio-med{color:var(--yellow);}
-.prio-low{color:var(--dim);}
-
-/* PROGRESS BAR */
-.progress-wrap{width:100%;background:var(--muted);border-radius:4px;height:6px;margin-top:3px;}
-.progress-fill{height:6px;border-radius:4px;transition:width .3s;}
-.progress-text{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);}
-.progress-delta{font-family:'JetBrains Mono',monospace;font-size:10px;}
-.delta-pos{color:var(--green);}
-.delta-neg{color:var(--red);}
-.delta-zero{color:var(--dim);}
+.td-txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 /* D-DAY */
-.dday{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;}
-.dday-late{color:var(--red);}
-.dday-soon{color:var(--yellow);}
-.dday-ok{color:var(--dim);}
-.dday-done{color:var(--green);}
+.dday{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;}
+.dd-late{color:var(--red);}
+.dd-soon{color:var(--yellow);}
+.dd-ok{color:var(--text3);}
+.dd-done{color:var(--green);}
+
+/* DELTA */
+.delta-p{color:var(--green);font-weight:700;}
+.delta-n{color:var(--red);font-weight:700;}
+.delta-z{color:var(--text3);}
 
 /* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(30,37,51,.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
 .modal-overlay.show{display:flex;}
-.modal{background:var(--navy);border:1px solid var(--border);border-radius:16px;width:680px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:slideUp .2s ease;}
-@keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.modal-title{font-family:'Bebas Neue',cursive;font-size:20px;color:var(--accent);letter-spacing:2px;}
-.modal-close{background:none;border:none;color:var(--dim);font-size:22px;cursor:pointer;padding:2px 8px;border-radius:6px;}
-.modal-close:hover{color:var(--white);background:var(--surface);}
-.modal-body{padding:20px 22px;}
+.modal{background:var(--white);border:1px solid var(--border);border-radius:16px;width:700px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .2s ease;}
+@keyframes slideUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-hd{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:16px;font-weight:900;color:var(--text);}
+.modal-close{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;padding:2px 8px;border-radius:6px;}
+.modal-close:hover{color:var(--text);background:var(--bg);}
+.modal-bd{padding:20px 22px;}
 
 /* FORM */
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
-.form-full{grid-column:1/-1;}
-.form-label{font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:5px;font-family:'JetBrains Mono',monospace;}
-.form-input,.form-select,.form-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--white);border-radius:6px;padding:9px 11px;font-family:'Noto Sans KR',sans-serif;font-size:13px;transition:border-color .2s;}
-.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--accent);}
-.form-select option{background:var(--navy);}
-.form-textarea{resize:vertical;min-height:80px;}
-.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
-.btn-cancel{background:var(--surface);border:1px solid var(--border);color:var(--dim);border-radius:8px;padding:10px 20px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
-.btn-cancel:hover{color:var(--white);}
-.btn-save{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:10px 24px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
-.btn-save:hover{background:#33ddff;}
-.btn-delete{background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.3);color:var(--red);border-radius:8px;padding:10px 20px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
-.btn-delete:hover{background:rgba(255,68,68,.25);}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.fgrid.single{grid-template-columns:1fr;}
+.ff{grid-column:1/-1;}
+.flabel{font-size:10px;color:var(--text2);letter-spacing:.05em;margin-bottom:5px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;font-weight:600;}
+.finput,.fselect,.ftextarea{width:100%;background:var(--bg);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:9px 11px;font-family:'Noto Sans KR',sans-serif;font-size:13px;transition:border-color .2s;outline:none;}
+.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--accent);}
+.ftextarea{resize:vertical;min-height:72px;}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
+.btn-save{background:var(--accent);color:#fff;font-weight:700;border:none;border-radius:8px;padding:10px 22px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
+.btn-save:hover{background:#1d4ed8;}
+.btn-cancel{background:var(--white);border:1.5px solid var(--border);color:var(--text2);border-radius:8px;padding:10px 18px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
+.btn-cancel:hover{background:var(--bg);}
+.btn-del{background:var(--red-l);border:1px solid #fca5a5;color:var(--red);border-radius:8px;padding:10px 18px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
+.btn-del:hover{background:#fee2e2;}
 
-/* DETAIL VIEW */
-.detail-section{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;}
-.detail-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:1px;margin-bottom:6px;}
-.detail-value{font-size:14px;line-height:1.6;}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
-.progress-big{margin:10px 0;}
-.progress-big .progress-wrap{height:10px;border-radius:6px;}
+/* DETAIL */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px;}
+.detail-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+.detail-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.05em;margin-bottom:6px;text-transform:uppercase;}
+.detail-val{font-size:14px;font-weight:600;}
 
-/* WEEK SELECTOR */
+/* MEETING CARD */
+.meeting-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px;cursor:pointer;box-shadow:var(--shadow);transition:all .15s;}
+.meeting-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-1px);}
+.meeting-card.delayed{border-color:#fca5a5;background:var(--red-l);}
+.meeting-card.high{border-color:#bfdbfe;}
+.meeting-banner{background:linear-gradient(135deg,var(--accent-l),var(--green-l));border:1px solid #bfdbfe;border-radius:10px;padding:12px 18px;margin-bottom:18px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--accent);font-weight:600;}
+.meeting-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1s infinite;}
+
+/* WEEK NAV */
 .week-nav{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
-.week-nav-btn{width:32px;height:32px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--white);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.week-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
-.week-title{font-family:'Bebas Neue',cursive;font-size:20px;color:var(--accent);letter-spacing:2px;min-width:220px;}
+.wnav-btn{width:32px;height:32px;border-radius:8px;background:var(--white);border:1.5px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);}
+.wnav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.week-title{font-size:16px;font-weight:900;color:var(--text);}
 
-/* LOADING / EMPTY */
-.loading{display:flex;align-items:center;justify-content:center;padding:60px;gap:12px;color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:13px;}
+/* LOADING/EMPTY */
+.loading{display:flex;align-items:center;justify-content:center;padding:48px;gap:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:13px;}
 .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
-.empty{text-align:center;padding:48px;color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:13px;}
+.empty{text-align:center;padding:48px;color:var(--text3);font-size:13px;}
 
 /* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;background:var(--green);color:#000;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:700;transform:translateY(60px);opacity:0;transition:all .3s;z-index:200;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:700;transform:translateY(60px);opacity:0;transition:all .3s;z-index:300;box-shadow:var(--shadow-lg);}
 .toast.show{transform:translateY(0);opacity:1;}
-.toast.error{background:var(--red);color:#fff;}
+.toast.error{background:var(--red);}
 
-/* MEETING MODE */
-.meeting-banner{background:linear-gradient(135deg,rgba(0,212,255,.1),rgba(0,230,118,.1));border:1px solid rgba(0,212,255,.3);border-radius:10px;padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:13px;}
-.meeting-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1s infinite;}
+/* ADD PANEL */
+.add-panel{max-width:680px;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;box-shadow:var(--shadow);}
+.panel-title{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:.1em;margin-bottom:20px;text-transform:uppercase;}
+
+/* DASH SUMMARY */
+.dash-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--shadow);}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.urgent-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .15s;}
+.urgent-item:hover{background:var(--accent-l);}
+
+@media(max-width:768px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .fgrid{grid-template-columns:1fr;}
+  header{padding:0 16px;}
+  .main{padding:16px;}
+  .tabs{padding:0 16px;}
+}
 </style>
 </head>
 <body>
 
-<div class="header">
+<header>
   <div>
-    <div class="logo">JNFAM WEEKLY REVIEW</div>
+    <div class="logo"><div class="logo-dot"></div>JNFAM WEEKLY REVIEW</div>
     <div class="logo-sub">// OPERATION ACTION ITEMS · REAL-TIME SYNC</div>
   </div>
   <div class="header-right">
@@ -167,7 +192,7 @@ body::before{content:'';position:fixed;inset:0;
     </div>
     <div class="week-badge" id="weekBadge"></div>
   </div>
-</div>
+</header>
 
 <div class="tabs">
   <button class="tab active" onclick="switchTab('dashboard',this)">📊 대시보드</button>
@@ -181,52 +206,39 @@ body::before{content:'';position:fixed;inset:0;
   <!-- DASHBOARD -->
   <div id="tab-dashboard">
     <div class="week-nav">
-      <button class="week-nav-btn" onclick="changeWeek(-1)">‹</button>
-      <div class="week-title" id="weekTitle">로딩중...</div>
-      <button class="week-nav-btn" onclick="changeWeek(1)">›</button>
+      <button class="wnav-btn" onclick="changeWeek(-1)">‹</button>
+      <div class="week-title" id="weekTitle"></div>
+      <button class="wnav-btn" onclick="changeWeek(1)">›</button>
     </div>
     <div class="kpi-grid" id="kpiGrid">
-      <div class="loading" style="grid-column:1/-1"><div class="spinner"></div>데이터 로딩 중...</div>
+      <div class="loading" style="grid-column:1/-1"><div class="spinner"></div>로딩 중...</div>
     </div>
     <div id="dashSummary"></div>
   </div>
 
-  <!-- ACTION ITEMS LIST -->
+  <!-- ACTION ITEMS -->
   <div id="tab-items" style="display:none">
     <div class="filter-row">
-      <select class="filter-select" id="fStatus" onchange="renderItems()">
+      <select class="fsel" id="fStatus" onchange="renderItems()">
         <option value="">전체 상태</option>
-        <option value="In Progress">In Progress</option>
-        <option value="Completed">Completed</option>
-        <option value="Pending">Pending</option>
+        <option>In Progress</option><option>Completed</option><option>Pending</option>
       </select>
-      <select class="filter-select" id="fType" onchange="renderItems()">
+      <select class="fsel" id="fType" onchange="renderItems()">
         <option value="">전체 유형</option>
-        <option value="Customer">Customer</option>
-        <option value="Operation">Operation</option>
-        <option value="Management">Management</option>
-        <option value="EHS">EHS</option>
+        <option>Customer</option><option>Operation</option><option>Management</option><option>EHS</option>
       </select>
-      <select class="filter-select" id="fPriority" onchange="renderItems()">
+      <select class="fsel" id="fPriority" onchange="renderItems()">
         <option value="">전체 우선순위</option>
-        <option value="High">High</option>
-        <option value="Medium">Medium</option>
-        <option value="Low">Low</option>
+        <option>High</option><option>Medium</option><option>Low</option>
       </select>
-      <input class="search-input" id="fSearch" placeholder="🔍 검색..." oninput="renderItems()">
-      <button class="btn-new" onclick="openAddModal()">+ 신규 등록</button>
+      <input class="fsearch" id="fSearch" placeholder="🔍 검색..." oninput="renderItems()">
+      <button class="btn-new" onclick="switchTab('add',document.querySelectorAll('.tab')[3])">+ 신규 등록</button>
     </div>
     <div class="table-wrap">
-      <div class="table-header">
-        <div class="th">ID</div>
-        <div class="th">고객/대상</div>
-        <div class="th">유형</div>
-        <div class="th">우선순위</div>
-        <div class="th">상태</div>
-        <div class="th">Task</div>
-        <div class="th">D-DAY</div>
-        <div class="th">진행률</div>
-        <div class="th">담당</div>
+      <div class="table-head">
+        <div class="th">ID</div><div class="th">고객/대상</div><div class="th">유형</div>
+        <div class="th">우선순위</div><div class="th">상태</div><div class="th">Task</div>
+        <div class="th">D-DAY</div><div class="th">진행률</div><div class="th">담당</div>
         <div class="th">마감일</div>
       </div>
       <div class="table-body" id="itemsBody">
@@ -239,7 +251,7 @@ body::before{content:'';position:fixed;inset:0;
   <div id="tab-meeting" style="display:none">
     <div class="meeting-banner">
       <div class="meeting-dot"></div>
-      <strong>미팅 모드</strong> — 이번 주 주요 Action Items를 순서대로 리뷰합니다
+      미팅 모드 — Action Items와 동일한 데이터를 상세하게 표시합니다
     </div>
     <div class="kpi-grid" id="meetingKpi"></div>
     <div id="meetingItems"></div>
@@ -247,86 +259,42 @@ body::before{content:'';position:fixed;inset:0;
 
   <!-- ADD FORM -->
   <div id="tab-add" style="display:none">
-    <div style="max-width:680px">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);letter-spacing:2px;margin-bottom:18px">// NEW ACTION ITEM 등록</div>
-      <div class="form-grid">
-        <div>
-          <div class="form-label">WORK TYPE</div>
-          <select class="form-select" id="a-worktype">
-            <option>Customer</option><option>Management</option><option>Operation</option><option>EHS</option>
-          </select>
-        </div>
-        <div>
-          <div class="form-label">CUSTOMER / 대상</div>
-          <input class="form-input" id="a-customer" placeholder="고객사 또는 Internal">
-        </div>
-        <div>
-          <div class="form-label">STAGE</div>
-          <select class="form-select" id="a-stage">
-            <option>Execution</option><option>Proposal</option><option>Negotiation</option><option>Audit</option><option>Support</option>
-          </select>
-        </div>
-        <div>
-          <div class="form-label">CATEGORY</div>
-          <select class="form-select" id="a-category">
-            <option>Sales</option><option>Operation</option><option>EHS</option><option>Logistics</option><option>Quality</option><option>Finance</option>
-          </select>
-        </div>
-        <div class="form-full">
-          <div class="form-label">TASK 내용 *</div>
-          <textarea class="form-textarea" id="a-task" placeholder="Task 내용을 입력하세요"></textarea>
-        </div>
-        <div>
-          <div class="form-label">담당자 (OWNER)</div>
-          <input class="form-input" id="a-owner" placeholder="JNFAM">
-        </div>
-        <div>
-          <div class="form-label">우선순위</div>
-          <select class="form-select" id="a-priority">
-            <option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option>
-          </select>
-        </div>
-        <div>
-          <div class="form-label">시작일</div>
-          <input class="form-input" type="date" id="a-start">
-        </div>
-        <div>
-          <div class="form-label">마감일 *</div>
-          <input class="form-input" type="date" id="a-due">
-        </div>
-        <div>
-          <div class="form-label">상태</div>
-          <select class="form-select" id="a-status">
-            <option value="In Progress">In Progress</option><option value="Pending">Pending</option><option value="Completed">Completed</option>
-          </select>
-        </div>
-        <div>
-          <div class="form-label">진행률 (%)</div>
-          <input class="form-input" type="number" id="a-progress" min="0" max="100" value="0" placeholder="0~100">
-        </div>
-        <div class="form-full">
-          <div class="form-label">F/UP 내용</div>
-          <textarea class="form-textarea" id="a-followup" placeholder="이번 주 진행사항"></textarea>
-        </div>
-        <div class="form-full">
-          <div class="form-label">RISK / ISSUE</div>
-          <textarea class="form-textarea" id="a-risk" placeholder="리스크 또는 이슈사항"></textarea>
-        </div>
+    <div class="add-panel">
+      <div class="panel-title">// NEW ACTION ITEM 등록</div>
+      <div class="fgrid">
+        <div><div class="flabel">Work Type</div>
+          <select class="fselect" id="a-wtype"><option>Customer</option><option>Management</option><option>Operation</option><option>EHS</option></select></div>
+        <div><div class="flabel">Customer / 대상</div><input class="finput" id="a-cust" placeholder="고객사 또는 Internal"></div>
+        <div><div class="flabel">Stage</div>
+          <select class="fselect" id="a-stage"><option>Execution</option><option>Proposal</option><option>Negotiation</option><option>Audit</option><option>Support</option></select></div>
+        <div><div class="flabel">Category</div>
+          <select class="fselect" id="a-cat"><option>Sales</option><option>Operation</option><option>EHS</option><option>Logistics</option><option>Quality</option><option>Finance</option></select></div>
+        <div class="ff"><div class="flabel">Task 내용 *</div><textarea class="ftextarea" id="a-task" placeholder="Task 내용을 입력하세요"></textarea></div>
+        <div><div class="flabel">담당자 (Owner)</div><input class="finput" id="a-owner" placeholder="JNFAM"></div>
+        <div><div class="flabel">우선순위</div>
+          <select class="fselect" id="a-prio"><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></div>
+        <div><div class="flabel">시작일</div><input class="finput" type="date" id="a-start"></div>
+        <div><div class="flabel">마감일 *</div><input class="finput" type="date" id="a-due"></div>
+        <div><div class="flabel">상태</div>
+          <select class="fselect" id="a-status"><option>In Progress</option><option>Pending</option><option>Completed</option></select></div>
+        <div><div class="flabel">진행률 (%)</div><input class="finput" type="number" id="a-prog" min="0" max="100" value="0"></div>
+        <div class="ff"><div class="flabel">F/UP 내용</div><textarea class="ftextarea" id="a-fup" placeholder="이번 주 진행사항"></textarea></div>
+        <div class="ff"><div class="flabel">Risk / Issue</div><textarea class="ftextarea" id="a-risk" placeholder="리스크 또는 이슈사항"></textarea></div>
       </div>
-      <button class="btn-save" onclick="addItem()" style="width:100%;padding:12px">+ Action Item 등록</button>
+      <button class="btn-save" onclick="addItem()" style="width:100%;padding:12px;font-size:14px">+ Action Item 등록</button>
     </div>
   </div>
 
 </div>
 
-<!-- DETAIL/EDIT MODAL -->
+<!-- DETAIL MODAL -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
   <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-header">
+    <div class="modal-hd">
       <div class="modal-title" id="modalTitle">ACTION ITEM</div>
       <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('show')">×</button>
     </div>
-    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-bd" id="modalBody"></div>
   </div>
 </div>
 
@@ -334,7 +302,7 @@ body::before{content:'';position:fixed;inset:0;
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, push, update, remove, set }
+import { getDatabase, ref, onValue, push, update, remove }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
@@ -344,8 +312,7 @@ const firebaseConfig = {
   projectId: "jnfam-weekly",
   storageBucket: "jnfam-weekly.firebasestorage.app",
   messagingSenderId: "685753288571",
-  appId: "1:685753288571:web:7baaac23f5c1c9d0299fde",
-  measurementId: "G-E0EB665Y6Y"
+  appId: "1:685753288571:web:7baaac23f5c1c9d0299fde"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -356,64 +323,85 @@ let items = {};
 let curWeekOffset = 0;
 const today = new Date(); today.setHours(0,0,0,0);
 
-// ── 주간 계산 ─────────────────────────────────
-function getWeekRange(offset=0) {
-  const d = new Date(today);
-  const day = d.getDay(); // 0=Sun
-  const mon = new Date(d);
-  mon.setDate(d.getDate() - (day===0?6:day-1) + offset*7);
-  const sun = new Date(mon); sun.setDate(mon.getDate()+6);
-  return { mon, sun };
-}
-function fmtDate(d) {
-  if (!d) return '';
-  const dt = typeof d === 'string' ? new Date(d+'T00:00:00') : d;
-  return dt.toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
-}
+// ── 날짜 유틸 ─────────────────────────────────
 function diffDays(dl) {
   if (!dl) return 999;
   const d = new Date(dl+'T00:00:00'); d.setHours(0,0,0,0);
-  return Math.round((d-today)/86400000);
+  return Math.round((d - today) / 86400000);
 }
-
-// ── 동기화 상태 ───────────────────────────────
-function setSyncStatus(state) {
-  const dot = document.getElementById('syncDot');
-  const text = document.getElementById('syncText');
-  dot.className = 'sync-dot ' + state;
-  if (state==='connected') text.textContent = '실시간 동기화 중';
-  if (state==='syncing')   text.textContent = '저장 중...';
-  if (state==='')          text.textContent = '연결 끊김';
-}
-
-// ── 주 배지 ───────────────────────────────────
-function updateWeekBadge() {
-  const {mon,sun} = getWeekRange(curWeekOffset);
-  document.getElementById('weekBadge').textContent =
-    `W${getWeekNum(mon)} · ${fmtDate(mon)} ~ ${fmtDate(sun)}`;
-  document.getElementById('weekTitle').textContent =
-    `${mon.getFullYear()} W${getWeekNum(mon)}  ${fmtDate(mon)} ~ ${fmtDate(sun)}`;
+function fmtDate(d) {
+  if (!d) return '';
+  const dt = new Date(d+'T00:00:00');
+  return dt.toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
 }
 function getWeekNum(d) {
-  const start = new Date(d.getFullYear(),0,1);
-  return Math.ceil(((d-start)/86400000+start.getDay()+1)/7);
+  const s = new Date(d.getFullYear(),0,1);
+  return Math.ceil(((d-s)/86400000+s.getDay()+1)/7);
+}
+function getWeekRange(offset=0) {
+  const d = new Date(today);
+  const day = d.getDay();
+  const mon = new Date(d);
+  mon.setDate(d.getDate() - (day===0?6:day-1) + offset*7);
+  const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+  return {mon, sun};
+}
+
+// ── 동기화 ────────────────────────────────────
+function setSyncStatus(s) {
+  document.getElementById('syncDot').className = 'sync-dot '+s;
+  document.getElementById('syncText').textContent = s==='connected'?'실시간 동기화 중':s==='syncing'?'저장 중...':'연결 끊김';
+}
+
+function updateWeekBadge() {
+  const {mon,sun} = getWeekRange(curWeekOffset);
+  document.getElementById('weekBadge').textContent = `W${getWeekNum(mon)} · ${fmtDate(mon.toISOString().slice(0,10))} ~ ${fmtDate(sun.toISOString().slice(0,10))}`;
+  document.getElementById('weekTitle').textContent = `${mon.getFullYear()} W${getWeekNum(mon)}  ${fmtDate(mon.toISOString().slice(0,10))} ~ ${fmtDate(sun.toISOString().slice(0,10))}`;
 }
 
 // ── Firebase 리스너 ───────────────────────────
-onValue(itemsRef, (snap) => {
+onValue(itemsRef, snap => {
   items = snap.val() || {};
   setSyncStatus('connected');
   renderAll();
-}, (err) => {
-  setSyncStatus('');
-  showToast('연결 오류: '+err.message, true);
-});
+}, err => { setSyncStatus(''); showToast('연결 오류: '+err.message, true); });
 
 function renderAll() {
   updateWeekBadge();
   renderDashboard();
-  renderItems();
-  renderMeeting();
+  const activeTab = document.querySelector('.tab.active');
+  if (activeTab) {
+    const tabName = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+    if (tabName === 'items') renderItems();
+    if (tabName === 'meeting') renderMeeting();
+  }
+}
+
+// ── 공통: 필터된 리스트 가져오기 ─────────────
+// Action Items와 미팅 모드가 동일한 함수 사용
+function getFilteredList() {
+  const fs = document.getElementById('fStatus')?.value || '';
+  const ft = document.getElementById('fType')?.value || '';
+  const fp = document.getElementById('fPriority')?.value || '';
+  const fq = document.getElementById('fSearch')?.value?.toLowerCase() || '';
+
+  let list = Object.entries(items)
+    .filter(([,i]) => i && i.task)
+    .map(([k,i]) => ({...i, _key:k}));
+
+  if (fs) list = list.filter(i => i.status === fs);
+  if (ft) list = list.filter(i => i.workType === ft);
+  if (fp) list = list.filter(i => i.priority === fp);
+  if (fq) list = list.filter(i => (i.task+i.customer+i.owner+'').toLowerCase().includes(fq));
+
+  list.sort((a,b) => (a.id||'').localeCompare(b.id||''));
+  return list;
+}
+
+// ── 상태 배지 ─────────────────────────────────
+function sbadge(s) {
+  const cls = s==='In Progress'?'s-inprog':s==='Completed'?'s-done':s==='Pending'?'s-pending':'s-other';
+  return `<span class="sbadge ${cls}">${s||'-'}</span>`;
 }
 
 // ── 대시보드 ──────────────────────────────────
@@ -427,13 +415,12 @@ function renderDashboard() {
   const rate = total ? Math.round(done/total*100) : 0;
 
   const kpis = [
-    {label:'TOTAL',value:total,color:'var(--white)',sub:'전체 항목'},
+    {label:'TOTAL',value:total,color:'var(--text)',sub:'전체 항목'},
     {label:'IN PROGRESS',value:inprog,color:'var(--accent)',sub:'진행중'},
     {label:'COMPLETED',value:done,color:'var(--green)',sub:'완료'},
     {label:'PENDING',value:pending,color:'var(--yellow)',sub:'대기'},
     {label:'DELAYED',value:delayed,color:'var(--red)',sub:'지연'},
   ];
-
   document.getElementById('kpiGrid').innerHTML = kpis.map(k=>`
     <div class="kpi-card">
       <div class="kpi-label">${k.label}</div>
@@ -441,226 +428,196 @@ function renderDashboard() {
       <div class="kpi-sub">${k.sub}</div>
     </div>`).join('');
 
-  // 완료율 프로그레스
   const byType = {};
-  list.forEach(i=>{ if(i.workType) { if(!byType[i.workType]) byType[i.workType]={total:0,done:0}; byType[i.workType].total++; if(i.status==='Completed') byType[i.workType].done++; } });
+  list.forEach(i=>{ if(i.workType){if(!byType[i.workType])byType[i.workType]={total:0,done:0};byType[i.workType].total++;if(i.status==='Completed')byType[i.workType].done++;}});
 
   document.getElementById('dashSummary').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px">
-      <div class="kpi-card" style="text-align:left">
-        <div class="kpi-label" style="margin-bottom:10px">전체 완료율</div>
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-          <span style="font-family:'Bebas Neue',cursive;font-size:36px;color:var(--green)">${rate}%</span>
-          <span style="color:var(--dim);font-size:12px">${done} / ${total} 완료</span>
+    <div class="dash-grid">
+      <div class="dash-card">
+        <div class="flabel" style="margin-bottom:12px">전체 완료율</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <span style="font-size:36px;font-weight:900;color:var(--green)">${rate}%</span>
+          <span style="color:var(--text3);font-size:12px">${done} / ${total} 완료</span>
         </div>
-        <div class="progress-wrap"><div class="progress-fill" style="width:${rate}%;background:var(--green)"></div></div>
+        <div class="pbar-wrap"><div class="pbar-fill" style="width:${rate}%;background:var(--green)"></div></div>
       </div>
-      <div class="kpi-card" style="text-align:left">
-        <div class="kpi-label" style="margin-bottom:10px">유형별 현황</div>
+      <div class="dash-card">
+        <div class="flabel" style="margin-bottom:12px">유형별 현황</div>
         ${Object.entries(byType).map(([type,v])=>{
-          const r = v.total?Math.round(v.done/v.total*100):0;
-          return `<div style="margin-bottom:8px">
-            <div style="display:flex;justify-content:space-between;margin-bottom:3px">
-              <span style="font-size:11px;color:var(--dim)">${type}</span>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent)">${v.done}/${v.total}</span>
+          const r=v.total?Math.round(v.done/v.total*100):0;
+          return `<div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:12px;color:var(--text2)">${type}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent)">${v.done}/${v.total}</span>
             </div>
-            <div class="progress-wrap"><div class="progress-fill" style="width:${r}%;background:var(--accent)"></div></div>
+            <div class="pbar-wrap"><div class="pbar-fill" style="width:${r}%;background:var(--accent)"></div></div>
           </div>`;
         }).join('')}
       </div>
     </div>
-    <div style="margin-top:14px">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:2px;margin-bottom:10px">// 이번 주 마감 임박 (D-7 이내)</div>
+    <div class="dash-card">
+      <div class="flabel" style="margin-bottom:12px">마감 임박 (D-7 이내)</div>
       ${list.filter(i=>i.status!=='Completed'&&diffDays(i.dueDate)>=0&&diffDays(i.dueDate)<=7)
         .sort((a,b)=>diffDays(a.dueDate)-diffDays(b.dueDate))
         .slice(0,5).map(i=>`
-        <div style="background:var(--surface);border:1px solid ${diffDays(i.dueDate)<=3?'rgba(255,214,0,.3)':diffDays(i.dueDate)<=7?'rgba(255,107,53,.3)':'var(--border)'};border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openDetail('${Object.keys(items).find(k=>items[k]===i)}')">
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${diffDays(i.dueDate)<=3?'var(--yellow)':'var(--orange)'};min-width:40px">D-${diffDays(i.dueDate)}</span>
+        <div class="urgent-item" onclick="openDetail('${Object.keys(items).find(k=>items[k]===i)}')">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:${diffDays(i.dueDate)<=3?'var(--yellow)':'var(--orange)'};min-width:40px;font-weight:700">D-${diffDays(i.dueDate)}</span>
           <span style="flex:1;font-size:12px">${i.task}</span>
-          <span style="font-size:11px;color:var(--dim)">${i.customer||''}</span>
-          ${statusBadge(i.status)}
-        </div>`).join('') || '<div style="color:var(--dim);font-size:12px;padding:10px">마감 임박 항목 없음</div>'}
+          <span style="font-size:11px;color:var(--text3);margin-right:8px">${i.customer||''}</span>
+          ${sbadge(i.status)}
+        </div>`).join('') || '<div style="color:var(--text3);font-size:12px;padding:8px">마감 임박 항목 없음</div>'}
     </div>`;
 }
 
 // ── Action Items 목록 ─────────────────────────
 function renderItems() {
-  const fs = document.getElementById('fStatus').value;
-  const ft = document.getElementById('fType').value;
-  const fp = document.getElementById('fPriority').value;
-  const fq = document.getElementById('fSearch').value.toLowerCase();
-
-  let list = Object.entries(items)
-    .filter(([,i])=>i&&i.task)
-    .map(([k,i])=>({...i,_key:k}));
-
-  if(fs) list=list.filter(i=>i.status===fs);
-  if(ft) list=list.filter(i=>i.workType===ft);
-  if(fp) list=list.filter(i=>i.priority===fp);
-  if(fq) list=list.filter(i=>(i.task+i.customer+i.owner+'').toLowerCase().includes(fq));
-  list.sort((a,b)=>(a.id||'').localeCompare(b.id||''));
-
+  const list = getFilteredList();
   const body = document.getElementById('itemsBody');
-  if(!list.length){body.innerHTML='<div class="empty">항목이 없습니다</div>';return;}
+  if (!list.length) { body.innerHTML='<div class="empty">항목이 없습니다</div>'; return; }
 
-  body.innerHTML = list.map(i=>{
+  body.innerHTML = list.map(i => {
     const dd = diffDays(i.dueDate);
-    const ddClass = i.status==='Completed'?'dday-done':dd<0?'dday-late':dd<=3?'dday-soon':'dday-ok';
-    const ddText = i.status==='Completed'?'✓':dd<0?`-${-dd}d`:`D-${dd}`;
+    const ddCls = i.status==='Completed'?'dd-done':dd<0?'dd-late':dd<=3?'dd-soon':'dd-ok';
+    const ddTxt = i.status==='Completed'?'✓':dd<0?`-${-dd}d`:`D-${dd}`;
     const prog = Number(i.progress)||0;
     const delta = Number(i.weeklyDelta)||0;
-    const deltaHtml = delta>0?`<span class="delta-pos">+${Math.round(delta*100)}%</span>`:delta<0?`<span class="delta-neg">${Math.round(delta*100)}%</span>`:`<span class="delta-zero">-</span>`;
+    const deltaHtml = delta>0?`<span class="delta-p">▲+${Math.round(delta*100)}%</span>`:delta<0?`<span class="delta-n">▼${Math.round(delta*100)}%</span>`:`<span class="delta-z">-</span>`;
+    const pcolor = prog>=100?'var(--green)':prog>=70?'var(--accent)':prog>=30?'var(--yellow)':'var(--orange)';
     return `<div class="tr" onclick="openDetail('${i._key}')">
-      <div class="td"><span class="td-text" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim)">${i.id||'-'}</span></div>
-      <div class="td"><span class="td-text">${i.customer||'-'}</span></div>
-      <div class="td"><span class="td-text" style="font-size:11px;color:var(--dim)">${i.workType||'-'}</span></div>
-      <div class="td"><span class="td-text ${i.priority==='High'?'prio-high':i.priority==='Medium'?'prio-med':'prio-low'}" style="font-size:11px;font-weight:700">${i.priority||'-'}</span></div>
-      <div class="td">${statusBadge(i.status)}</div>
-      <div class="td"><span class="td-text">${i.task||''}</span></div>
-      <div class="td"><span class="dday ${ddClass}">${ddText}</span></div>
+      <div class="td"><span class="td-txt" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3)">${i.id||'-'}</span></div>
+      <div class="td"><span class="td-txt">${i.customer||'-'}</span></div>
+      <div class="td"><span class="td-txt" style="font-size:11px;color:var(--text2)">${i.workType||'-'}</span></div>
+      <div class="td"><span class="td-txt ${i.priority==='High'?'p-high':i.priority==='Medium'?'p-med':'p-low'}">${i.priority||'-'}</span></div>
+      <div class="td">${sbadge(i.status)}</div>
+      <div class="td"><span class="td-txt">${i.task||''}</span></div>
+      <div class="td"><span class="dday ${ddCls}">${ddTxt}</span></div>
       <div class="td" style="flex-direction:column;align-items:flex-start;gap:3px">
-        <div style="display:flex;align-items:center;gap:6px;width:100%">
-          <span class="progress-text">${prog}%</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2)">${prog}%</span>
           ${deltaHtml}
         </div>
-        <div class="progress-wrap" style="width:100%"><div class="progress-fill" style="width:${prog}%;background:${prog>=100?'var(--green)':prog>=70?'var(--accent)':prog>=30?'var(--yellow)':'var(--orange)'}"></div></div>
+        <div class="pbar-wrap" style="width:100%"><div class="pbar-fill" style="width:${prog}%;background:${pcolor}"></div></div>
       </div>
-      <div class="td"><span class="td-text" style="font-size:11px;color:var(--dim)">${i.owner||'-'}</span></div>
-      <div class="td"><span class="td-text" style="font-size:11px;color:var(--dim)">${i.dueDate||'-'}</span></div>
+      <div class="td"><span class="td-txt" style="font-size:11px;color:var(--text3)">${i.owner||'-'}</span></div>
+      <div class="td"><span class="td-txt" style="font-size:11px;color:var(--text3)">${i.dueDate||'-'}</span></div>
     </div>`;
   }).join('');
 }
 
 // ── 미팅 모드 ─────────────────────────────────
+// Action Items와 완전히 동일한 필터 적용
 function renderMeeting() {
-  const list = Object.entries(items).filter(([,i])=>i&&i.task).map(([k,i])=>({...i,_key:k}));
+  // 동일한 getFilteredList() 사용 → 항상 같은 데이터
+  const list = getFilteredList();
   const total=list.length, done=list.filter(i=>i.status==='Completed').length;
   const inprog=list.filter(i=>i.status==='In Progress').length;
   const delayed=list.filter(i=>i.status!=='Completed'&&diffDays(i.dueDate)<0).length;
 
   document.getElementById('meetingKpi').innerHTML = [
-    {label:'TOTAL',value:total,color:'var(--white)'},
+    {label:'TOTAL',value:total,color:'var(--text)'},
     {label:'IN PROGRESS',value:inprog,color:'var(--accent)'},
     {label:'COMPLETED',value:done,color:'var(--green)'},
     {label:'DELAYED',value:delayed,color:'var(--red)'},
     {label:'RATE',value:(total?Math.round(done/total*100):0)+'%',color:'var(--green)'},
   ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.color}">${k.value}</div></div>`).join('');
 
-  // 지연 → High 우선순위 → In Progress → 완료 순
-  const sorted = [...list].sort((a,b)=>{
+  // 지연 → High → In Progress → 완료 순
+  const sorted = [...list].sort((a,b) => {
     const score = i => i.status==='Completed'?3:diffDays(i.dueDate)<0?0:i.priority==='High'?1:2;
     return score(a)-score(b);
   });
 
-  document.getElementById('meetingItems').innerHTML = sorted.map((i,idx)=>{
+  document.getElementById('meetingItems').innerHTML = sorted.map((i,idx) => {
     const dd = diffDays(i.dueDate);
+    const isDelayed = i.status!=='Completed'&&dd<0;
     const prog = Number(i.progress)||0;
     const delta = Number(i.weeklyDelta)||0;
-    const isDelayed = i.status!=='Completed'&&dd<0;
-    const borderColor = isDelayed?'var(--red)':i.priority==='High'?'rgba(0,212,255,.3)':'var(--border)';
-    return `<div style="background:var(--surface);border:1px solid ${borderColor};border-radius:12px;padding:18px;margin-bottom:12px;cursor:pointer" onclick="openDetail('${i._key}')">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">
+    const pcolor = prog>=100?'var(--green)':prog>=70?'var(--accent)':'var(--yellow)';
+    return `<div class="meeting-card${isDelayed?' delayed':i.priority==='High'?' high':''}" onclick="openDetail('${i._key}')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:10px;flex:1">
-          <span style="font-family:'Bebas Neue',cursive;font-size:18px;color:var(--dim);min-width:36px">${String(idx+1).padStart(2,'0')}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:var(--text3);min-width:36px">${String(idx+1).padStart(2,'0')}</span>
           <div>
-            <div style="font-size:14px;font-weight:500;margin-bottom:4px">${i.task}</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap">
-              <span style="font-size:11px;color:var(--dim)">${i.customer||''}</span>
-              ${i.category?`<span style="font-size:10px;background:var(--surface2);padding:2px 6px;border-radius:3px;color:var(--dim)">${i.category}</span>`:''}
-              ${i.owner?`<span style="font-size:10px;background:var(--surface2);padding:2px 6px;border-radius:3px;color:var(--dim)">${i.owner}</span>`:''}
+            <div style="font-size:14px;font-weight:700;margin-bottom:5px">${i.task}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+              ${i.id?`<span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">${i.id}</span>`:''}
+              ${i.customer?`<span style="font-size:11px;color:var(--text2)">${i.customer}</span>`:''}
+              ${i.category?`<span style="font-size:10px;background:var(--bg);padding:2px 7px;border-radius:4px;border:1px solid var(--border);color:var(--text2)">${i.category}</span>`:''}
+              ${i.owner?`<span style="font-size:10px;background:var(--bg);padding:2px 7px;border-radius:4px;border:1px solid var(--border);color:var(--text2)">${i.owner}</span>`:''}
+              <span class="${i.priority==='High'?'p-high':i.priority==='Medium'?'p-med':'p-low'}" style="font-size:11px">${i.priority||''}</span>
             </div>
           </div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
-          ${statusBadge(i.status)}
-          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:${isDelayed?'var(--red)':dd<=3?'var(--yellow)':'var(--dim)'}">${i.status==='Completed'?'완료':dd<0?`${-dd}일 지연`:`D-${dd}`}</span>
+          ${sbadge(i.status)}
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:${isDelayed?'var(--red)':dd<=3?'var(--yellow)':'var(--text3)'}">${i.status==='Completed'?'완료됨':dd<0?`${-dd}일 지연`:`D-${dd}`}</span>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
         <div>
-          <div style="font-size:10px;color:var(--dim);margin-bottom:5px;font-family:'JetBrains Mono',monospace">PROGRESS</div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <span style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)">${prog}%</span>
-            ${delta>0?`<span style="font-size:11px;color:var(--green)">▲ +${Math.round(delta*100)}%</span>`:delta<0?`<span style="font-size:11px;color:var(--red)">▼ ${Math.round(delta*100)}%</span>`:''}
+          <div class="flabel" style="margin-bottom:6px">PROGRESS</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;color:var(--accent)">${prog}%</span>
+            ${delta>0?`<span style="font-size:11px;color:var(--green);font-weight:700">▲ +${Math.round(delta*100)}%</span>`:delta<0?`<span style="font-size:11px;color:var(--red);font-weight:700">▼ ${Math.round(delta*100)}%</span>`:''}
           </div>
-          <div class="progress-wrap"><div class="progress-fill" style="width:${prog}%;background:${prog>=100?'var(--green)':prog>=70?'var(--accent)':'var(--yellow)'}"></div></div>
+          <div class="pbar-wrap"><div class="pbar-fill" style="width:${prog}%;background:${pcolor}"></div></div>
         </div>
         <div>
-          <div style="font-size:10px;color:var(--dim);margin-bottom:5px;font-family:'JetBrains Mono',monospace">F/UP</div>
-          <div style="font-size:12px;color:var(--white);line-height:1.5">${i.followup||'<span style="color:var(--dim)">내용 없음</span>'}</div>
+          <div class="flabel" style="margin-bottom:6px">F/UP</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6">${i.followup||`<span style="color:var(--text3)">내용 없음</span>`}</div>
         </div>
       </div>
-      ${i.risk?`<div style="margin-top:10px;padding:8px 12px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);border-radius:6px;font-size:11px;color:var(--red)">⚠ ${i.risk}</div>`:''}
+      ${i.risk?`<div style="margin-top:12px;padding:8px 12px;background:var(--red-l);border:1px solid #fca5a5;border-radius:6px;font-size:11px;color:var(--red)">⚠ ${i.risk}</div>`:''}
     </div>`;
   }).join('');
 }
 
-// ── 상태 배지 ─────────────────────────────────
-function statusBadge(s) {
-  const cls = s==='In Progress'?'s-inprog':s==='Completed'?'s-done':s==='Pending'?'s-pending':'s-other';
-  return `<span class="status-badge ${cls}">${s||'-'}</span>`;
-}
-
-// ── 상세/수정 모달 ────────────────────────────
+// ── 상세 모달 ─────────────────────────────────
 window.openDetail = (key) => {
   const i = items[key]; if(!i) return;
   const prog = Number(i.progress)||0;
-  const lastProg = Number(i.lastProgress)||0;
   const delta = Number(i.weeklyDelta)||0;
-  document.getElementById('modalTitle').textContent = i.id||'ACTION ITEM';
+  const dd = diffDays(i.dueDate);
+  document.getElementById('modalTitle').textContent = `${i.id||''} — ACTION ITEM`;
   document.getElementById('modalBody').innerHTML = `
     <div class="detail-grid">
-      <div class="detail-section"><div class="detail-label">STATUS</div>${statusBadge(i.status)}</div>
-      <div class="detail-section"><div class="detail-label">PRIORITY</div><div class="detail-value ${i.priority==='High'?'prio-high':i.priority==='Medium'?'prio-med':'prio-low'}" style="font-weight:700">${i.priority||'-'}</div></div>
-      <div class="detail-section"><div class="detail-label">D-DAY</div><div class="detail-value dday ${i.status==='Completed'?'dday-done':diffDays(i.dueDate)<0?'dday-late':diffDays(i.dueDate)<=3?'dday-soon':'dday-ok'}" style="font-size:18px;font-weight:700">${i.status==='Completed'?'완료':diffDays(i.dueDate)<0?`${-diffDays(i.dueDate)}일 지연`:`D-${diffDays(i.dueDate)}`}</div></div>
+      <div class="detail-card"><div class="detail-label">STATUS</div>${sbadge(i.status)}</div>
+      <div class="detail-card"><div class="detail-label">PRIORITY</div><div class="detail-val ${i.priority==='High'?'p-high':i.priority==='Medium'?'p-med':'p-low'}">${i.priority||'-'}</div></div>
+      <div class="detail-card"><div class="detail-label">D-DAY</div><div class="detail-val dday ${i.status==='Completed'?'dd-done':dd<0?'dd-late':dd<=3?'dd-soon':'dd-ok'}">${i.status==='Completed'?'완료':dd<0?`${-dd}일 지연`:`D-${dd}`}</div></div>
     </div>
-    <div class="detail-section">
-      <div class="detail-label">TASK</div>
-      <div class="detail-value" style="font-size:15px;font-weight:500">${i.task||''}</div>
+    <div class="detail-card" style="margin-bottom:12px"><div class="detail-label">TASK</div><div style="font-size:15px;font-weight:600;margin-top:4px">${i.task||''}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div class="detail-card"><div class="detail-label">CUSTOMER</div><div class="detail-val">${i.customer||'-'}</div></div>
+      <div class="detail-card"><div class="detail-label">OWNER</div><div class="detail-val">${i.owner||'-'}</div></div>
+      <div class="detail-card"><div class="detail-label">WORK TYPE</div><div class="detail-val">${i.workType||'-'}</div></div>
+      <div class="detail-card"><div class="detail-label">CATEGORY</div><div class="detail-val">${i.category||'-'}</div></div>
+      <div class="detail-card"><div class="detail-label">START DATE</div><div class="detail-val">${i.startDate||'-'}</div></div>
+      <div class="detail-card"><div class="detail-label">DUE DATE</div><div class="detail-val">${i.dueDate||'-'}</div></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="detail-section"><div class="detail-label">CUSTOMER</div><div class="detail-value">${i.customer||'-'}</div></div>
-      <div class="detail-section"><div class="detail-label">OWNER</div><div class="detail-value">${i.owner||'-'}</div></div>
-      <div class="detail-section"><div class="detail-label">WORK TYPE</div><div class="detail-value">${i.workType||'-'}</div></div>
-      <div class="detail-section"><div class="detail-label">CATEGORY</div><div class="detail-value">${i.category||'-'}</div></div>
-      <div class="detail-section"><div class="detail-label">START DATE</div><div class="detail-value">${i.startDate||'-'}</div></div>
-      <div class="detail-section"><div class="detail-label">DUE DATE</div><div class="detail-value">${i.dueDate||'-'}</div></div>
-    </div>
-    <div class="detail-section">
+    <div class="detail-card" style="margin-bottom:12px">
       <div class="detail-label">PROGRESS</div>
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-        <span style="font-family:'Bebas Neue',cursive;font-size:28px;color:var(--accent)">${prog}%</span>
-        <span style="font-size:12px;color:var(--dim)">지난주: ${lastProg}%</span>
-        ${delta>0?`<span style="color:var(--green);font-size:13px;font-weight:700">▲ +${Math.round(delta*100)}%</span>`:delta<0?`<span style="color:var(--red);font-size:13px;font-weight:700">▼ ${Math.round(delta*100)}%</span>`:''}
+      <div style="display:flex;align-items:center;gap:12px;margin:8px 0">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:700;color:var(--accent)">${prog}%</span>
+        <span style="font-size:12px;color:var(--text3)">지난주: ${Number(i.lastProgress)||0}%</span>
+        ${delta>0?`<span style="color:var(--green);font-weight:700">▲ +${Math.round(delta*100)}%</span>`:delta<0?`<span style="color:var(--red);font-weight:700">▼ ${Math.round(delta*100)}%</span>`:''}
       </div>
-      <div class="progress-wrap" style="height:10px;border-radius:6px"><div class="progress-fill" style="width:${prog}%;background:${prog>=100?'var(--green)':prog>=70?'var(--accent)':'var(--yellow)'}"></div></div>
+      <div class="pbar-wrap" style="height:8px;border-radius:5px"><div class="pbar-fill" style="width:${prog}%;background:${prog>=100?'var(--green)':prog>=70?'var(--accent)':'var(--yellow)'}"></div></div>
     </div>
-    ${i.followup?`<div class="detail-section"><div class="detail-label">F/UP</div><div class="detail-value" style="line-height:1.7">${i.followup}</div></div>`:''}
-    ${i.risk?`<div class="detail-section" style="border-color:rgba(255,68,68,.3)"><div class="detail-label" style="color:var(--red)">⚠ RISK / ISSUE</div><div class="detail-value" style="color:var(--red)">${i.risk}</div></div>`:''}
+    ${i.followup?`<div class="detail-card" style="margin-bottom:12px"><div class="detail-label">F/UP</div><div style="font-size:13px;line-height:1.7;margin-top:4px">${i.followup}</div></div>`:''}
+    ${i.risk?`<div class="detail-card" style="margin-bottom:12px;border-color:#fca5a5;background:var(--red-l)"><div class="detail-label" style="color:var(--red)">⚠ RISK / ISSUE</div><div style="font-size:13px;line-height:1.7;margin-top:4px;color:var(--red)">${i.risk}</div></div>`:''}
     <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:2px;margin-bottom:14px">// 주간 업데이트</div>
-      <div class="form-grid">
-        <div>
-          <div class="form-label">상태 변경</div>
-          <select class="form-select" id="edit-status">
+      <div class="flabel" style="margin-bottom:14px">// 주간 업데이트</div>
+      <div class="fgrid">
+        <div><div class="flabel">상태 변경</div>
+          <select class="fselect" id="edit-status">
             ${['In Progress','Completed','Pending'].map(s=>`<option${s===i.status?' selected':''}>${s}</option>`).join('')}
-          </select>
-        </div>
-        <div>
-          <div class="form-label">진행률 (%)</div>
-          <input class="form-input" type="number" id="edit-progress" min="0" max="100" value="${prog}">
-        </div>
-        <div class="form-full">
-          <div class="form-label">이번 주 F/UP</div>
-          <textarea class="form-textarea" id="edit-followup" style="min-height:60px">${i.followup||''}</textarea>
-        </div>
-        <div class="form-full">
-          <div class="form-label">RISK / ISSUE</div>
-          <textarea class="form-textarea" id="edit-risk" style="min-height:60px">${i.risk||''}</textarea>
-        </div>
+          </select></div>
+        <div><div class="flabel">진행률 (%)</div><input class="finput" type="number" id="edit-prog" min="0" max="100" value="${prog}"></div>
+        <div class="ff"><div class="flabel">이번 주 F/UP</div><textarea class="ftextarea" id="edit-fup">${i.followup||''}</textarea></div>
+        <div class="ff"><div class="flabel">RISK / ISSUE</div><textarea class="ftextarea" id="edit-risk">${i.risk||''}</textarea></div>
       </div>
       <div class="form-actions">
-        <button class="btn-delete" onclick="deleteItem('${key}')">🗑 삭제</button>
+        <button class="btn-del" onclick="deleteItem('${key}')">🗑 삭제</button>
         <button class="btn-cancel" onclick="document.getElementById('modalOverlay').classList.remove('show')">닫기</button>
         <button class="btn-save" onclick="updateItem('${key}')">💾 업데이트</button>
       </div>
@@ -668,12 +625,9 @@ window.openDetail = (key) => {
   document.getElementById('modalOverlay').classList.add('show');
 };
 
-window.closeModal = (e) => {
-  if(e.target===document.getElementById('modalOverlay'))
-    document.getElementById('modalOverlay').classList.remove('show');
-};
+window.closeModal = e => { if(e.target===document.getElementById('modalOverlay')) document.getElementById('modalOverlay').classList.remove('show'); };
 
-// ── 항목 추가 ─────────────────────────────────
+// ── CRUD ──────────────────────────────────────
 window.addItem = async () => {
   const task = document.getElementById('a-task').value.trim();
   const due = document.getElementById('a-due').value;
@@ -681,55 +635,45 @@ window.addItem = async () => {
   setSyncStatus('syncing');
   const list = Object.values(items).filter(i=>i&&i.id);
   const nextId = list.length ? String(Number(list.map(i=>i.id).sort().pop())+1).padStart(3,'0') : '001';
-  const prog = Number(document.getElementById('a-progress').value)||0;
-  await push(itemsRef, {
-    id: nextId,
-    workType: document.getElementById('a-worktype').value,
-    customer: document.getElementById('a-customer').value.trim(),
-    stage: document.getElementById('a-stage').value,
-    category: document.getElementById('a-category').value,
-    task,
-    owner: document.getElementById('a-owner').value.trim()||'JNFAM',
-    priority: document.getElementById('a-priority').value,
-    startDate: document.getElementById('a-start').value,
-    dueDate: due,
-    status: document.getElementById('a-status').value,
-    progress: prog,
-    lastProgress: 0,
-    weeklyDelta: 0,
-    followup: document.getElementById('a-followup').value.trim(),
-    risk: document.getElementById('a-risk').value.trim(),
-    createdAt: new Date().toISOString(),
+  const prog = Number(document.getElementById('a-prog').value)||0;
+  await push(itemsRef,{
+    id:nextId, workType:document.getElementById('a-wtype').value,
+    customer:document.getElementById('a-cust').value.trim(),
+    stage:document.getElementById('a-stage').value, category:document.getElementById('a-cat').value,
+    task, owner:document.getElementById('a-owner').value.trim()||'JNFAM',
+    priority:document.getElementById('a-prio').value,
+    startDate:document.getElementById('a-start').value, dueDate:due,
+    status:document.getElementById('a-status').value,
+    progress:prog, lastProgress:0, weeklyDelta:0,
+    followup:document.getElementById('a-fup').value.trim(),
+    risk:document.getElementById('a-risk').value.trim(),
+    createdAt:new Date().toISOString()
   });
   setSyncStatus('connected');
-  showToast('✓ Action Item이 등록됐습니다!');
-  // 폼 초기화
-  ['a-customer','a-task','a-owner','a-start','a-due','a-followup','a-risk'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('a-progress').value='0';
-  switchTab('items', document.querySelectorAll('.tab')[1]);
+  showToast('✓ Action Item 등록됐습니다!');
+  ['a-cust','a-task','a-owner','a-start','a-due','a-fup','a-risk'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('a-prog').value='0';
+  switchTab('items',document.querySelectorAll('.tab')[1]);
 };
 
-// ── 항목 업데이트 ─────────────────────────────
 window.updateItem = async (key) => {
   const i = items[key]; if(!i) return;
-  const newProg = Number(document.getElementById('edit-progress').value)||0;
+  const newProg = Number(document.getElementById('edit-prog').value)||0;
   const oldProg = Number(i.progress)||0;
   setSyncStatus('syncing');
-  await update(ref(db,'items/'+key), {
-    status: document.getElementById('edit-status').value,
-    progress: newProg,
-    lastProgress: oldProg,
-    weeklyDelta: (newProg - oldProg) / 100,
-    followup: document.getElementById('edit-followup').value.trim(),
-    risk: document.getElementById('edit-risk').value.trim(),
-    updatedAt: new Date().toISOString(),
+  await update(ref(db,'items/'+key),{
+    status:document.getElementById('edit-status').value,
+    progress:newProg, lastProgress:oldProg,
+    weeklyDelta:(newProg-oldProg)/100,
+    followup:document.getElementById('edit-fup').value.trim(),
+    risk:document.getElementById('edit-risk').value.trim(),
+    updatedAt:new Date().toISOString()
   });
   setSyncStatus('connected');
   document.getElementById('modalOverlay').classList.remove('show');
   showToast('✓ 업데이트됐습니다!');
 };
 
-// ── 항목 삭제 ─────────────────────────────────
 window.deleteItem = async (key) => {
   if(!confirm('이 항목을 삭제할까요?')) return;
   setSyncStatus('syncing');
@@ -741,60 +685,46 @@ window.deleteItem = async (key) => {
 
 // ── 탭 전환 ───────────────────────────────────
 window.switchTab = (name, btn) => {
-  ['dashboard','items','meeting','add'].forEach(t=>{
-    document.getElementById('tab-'+t).style.display = t===name?'block':'none';
-  });
+  ['dashboard','items','meeting','add'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
+  if(name==='items') renderItems();
   if(name==='meeting') renderMeeting();
 };
 
-// ── 주간 이동 ─────────────────────────────────
-window.changeWeek = (d) => {
-  curWeekOffset += d;
-  updateWeekBadge();
-};
+window.changeWeek = d => { curWeekOffset+=d; updateWeekBadge(); };
 
-// ── 모달 열기 (신규) ──────────────────────────
-window.openAddModal = () => {
-  switchTab('add', document.querySelectorAll('.tab')[3]);
-};
-
-// ── 토스트 ────────────────────────────────────
-function showToast(msg, isError=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast'+(isError?' error':'')+' show';
-  setTimeout(()=>t.className='toast', 2500);
+function showToast(msg,isError=false) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(isError?' error':'')+' show';
+  setTimeout(()=>t.className='toast',2500);
 }
 
-// ── 초기화 ────────────────────────────────────
-updateWeekBadge();
-
-// 기존 엑셀 데이터 초기 로드
-onValue(itemsRef, async (snap) => {
-  if(!snap.exists()) {
-    const samples = [
-      {id:'001',workType:'Management',customer:'other',stage:'Execution',category:'EHS',task:'Biz licence update',owner:'JNFAM',priority:'High',startDate:'2026-04-01',dueDate:'2026-05-31',status:'In Progress',progress:91,lastProgress:90,weeklyDelta:0.01,followup:'담당 소방관에 현재 진행 사항 update 완료. 2차 Update 완료',risk:'Fire inspection action item 해결 후 처리(ID 002 연계)'},
+// ── 초기 샘플 데이터 ──────────────────────────
+onValue(itemsRef, async snap => {
+  if(!snap.exists()){
+    const samples=[
+      {id:'001',workType:'Management',customer:'other',stage:'Execution',category:'EHS',task:'Biz licence update',owner:'JNFAM',priority:'High',startDate:'2026-03-20',dueDate:'2026-05-31',status:'In Progress',progress:91,lastProgress:90,weeklyDelta:0.01,followup:'담당 소방관에 현재 진행 사항 update 완료. 2차 Update 완료',risk:'Fire inspection action item 해결 후 처리(ID 002 연계)'},
       {id:'002',workType:'EHS',customer:'Internal',stage:'Negotiation',category:'EHS',task:'Fire inspection C/A - Fire Monitoring system / Sprinkler installation / EPA enroll',owner:'JNFAM',priority:'High',startDate:'2026-04-10',dueDate:'2026-05-31',status:'In Progress',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'EPA 등록 완료. Fire Monitoring 완료. Splinker 견적 완료',risk:'Splinker 공사시 도면 업데이트와 신고 필요'},
-      {id:'003',workType:'Customer',customer:'HWQ',stage:'Execution',category:'Operation',task:'재가동에 따른 공급 준비 SOP/Training/Safety check',owner:'JNFAM',priority:'High',startDate:'2026-04-29',dueDate:'2026-05-19',status:'In Progress',progress:75,lastProgress:60,weeklyDelta:0.15,followup:'SOP update 완료. HWQ 재교육 완료. Trucker 교육 예정',risk:''},
-      {id:'004',workType:'Customer',customer:'PVJC',stage:'Execution',category:'Sales',task:'HCL 운송 및 관련 서류 정리',owner:'JNFAM',priority:'Medium',startDate:'2026-04-24',dueDate:'2026-05-03',status:'Completed',progress:100,lastProgress:100,weeklyDelta:0,followup:'PVJC 입고 확인 및 CoA 통과. Invoice 가능 확인 완료',risk:''},
-      {id:'005',workType:'Customer',customer:'PVJC',stage:'Execution',category:'Sales',task:'HF ISO Tank 운송 (ISO Tank line modification/SOP/Trucker training)',owner:'JNFAM',priority:'Medium',startDate:'2026-04-10',dueDate:'2026-05-22',status:'In Progress',progress:90,lastProgress:80,weeklyDelta:0.1,followup:'SOP 준비중. 업체별 Line 구분 완료. Trucker 교육 예정',risk:'Qcells vs PVJC 스펙 차이'},
-      {id:'006',workType:'Customer',customer:'PVJC',stage:'Proposal',category:'Sales',task:'31% H2O2 Proposal',owner:'JNFAM',priority:'Low',startDate:'2026-04-10',dueDate:'2026-05-31',status:'In Progress',progress:10,lastProgress:10,weeklyDelta:0,followup:'가격 제안 완료. 현재 내부 협의중',risk:'PVJC 내부 협의 필요'},
-      {id:'007',workType:'Customer',customer:'PVJC',stage:'Execution',category:'Sales',task:'IBC용 H2O2 Dispenser & Diptube 판매',owner:'JNFAM',priority:'Low',startDate:'2026-04-24',dueDate:'2026-06-06',status:'In Progress',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'PO 수령. ETA update, AS 주문 완료',risk:''},
-      {id:'008',workType:'Management',customer:'Internal',stage:'Execution',category:'Operation',task:'JNFAM 법인 전환 (LLC => C-Corp)',owner:'JNFAM',priority:'Medium',startDate:'2026-01-01',dueDate:'2026-07-12',status:'Pending',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'IRS 진행중. 벌금 면제 확인',risk:'IRS 진행 연기중'},
-      {id:'009',workType:'Operation',customer:'Internal',stage:'Execution',category:'Operation',task:'RM Build up (Safety Inventory 확보)',owner:'JNFAM',priority:'High',startDate:'2026-04-01',dueDate:'2026-05-31',status:'In Progress',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'HCl 1 CNT/HF 1CNT Inbound',risk:''},
-      {id:'010',workType:'Customer',customer:'Suniva',stage:'Execution',category:'Sales',task:'H2SO4 Qual test',owner:'JNFAM',priority:'High',startDate:'2026-02-23',dueDate:'2026-05-09',status:'Completed',progress:100,lastProgress:90,weeklyDelta:0.1,followup:'황산 입고 완료 후 출하 준비 완료',risk:''},
-      {id:'011',workType:'Customer',customer:'Suniva',stage:'Proposal',category:'Sales',task:'31% H2O2 Proposal',owner:'JNFAM',priority:'Medium',startDate:'2026-02-23',dueDate:'2026-05-29',status:'In Progress',progress:10,lastProgress:10,weeklyDelta:0,followup:'가격 제안 완료 후 Suniva 내부 협의중',risk:''},
+      {id:'003',workType:'Customer',customer:'HWQ',stage:'Execution',category:'Operation',task:'재가동에 따른 공급 준비 SOP/Training/Safety check',owner:'JNFAM',priority:'High',startDate:'2026-04-20',dueDate:'2026-05-19',status:'In Progress',progress:75,lastProgress:60,weeklyDelta:0.15,followup:'SOP update 완료. HWQ 재교육 완료. Trucker 교육 예정',risk:''},
+      {id:'004',workType:'Customer',customer:'PVJC',stage:'Execution',category:'Sales',task:'HCL 운송 및 관련 서류 정리',owner:'JNFAM',priority:'Medium',startDate:'2026-04-15',dueDate:'2026-05-03',status:'Completed',progress:100,lastProgress:100,weeklyDelta:0,followup:'PVJC 입고 확인 및 CoA 통과. Invoice 가능 확인 완료',risk:''},
+      {id:'005',workType:'Customer',customer:'PVJC',stage:'Execution',category:'Sales',task:'HF ISO Tank 운송 (ISO Tank line modification/SOP/Trucker training)',owner:'JNFAM',priority:'Medium',startDate:'2026-04-01',dueDate:'2026-05-22',status:'In Progress',progress:90,lastProgress:80,weeklyDelta:0.1,followup:'SOP 준비중. 업체별 Line 구분 완료. Trucker 교육 예정',risk:'Qcells vs PVJC 스펙 차이'},
+      {id:'006',workType:'Customer',customer:'PVJC',stage:'Proposal',category:'Sales',task:'31% H2O2 Proposal',owner:'JNFAM',priority:'Low',startDate:'2026-04-01',dueDate:'2026-05-31',status:'In Progress',progress:10,lastProgress:10,weeklyDelta:0,followup:'가격 제안 완료. 현재 내부 협의중',risk:'PVJC 내부 협의 필요'},
+      {id:'007',workType:'Customer',customer:'PVJC',stage:'Execution',category:'Sales',task:'IBC용 H2O2 Dispenser & Diptube 판매',owner:'JNFAM',priority:'Low',startDate:'2026-04-15',dueDate:'2026-06-06',status:'In Progress',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'PO 수령. ETA update, AS 주문 완료',risk:''},
+      {id:'008',workType:'Management',customer:'Internal',stage:'Execution',category:'Operation',task:'JNFAM 법인 전환 (LLC => C-Corp)',owner:'JNFAM',priority:'Medium',startDate:'2025-12-10',dueDate:'2026-07-12',status:'Pending',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'IRS 진행중. 벌금 면제 확인',risk:'IRS 진행 연기중'},
+      {id:'009',workType:'Operation',customer:'Internal',stage:'Execution',category:'Operation',task:'RM Build up (Safety Inventory 확보)',owner:'JNFAM',priority:'High',startDate:'2026-03-20',dueDate:'2026-05-31',status:'In Progress',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'HCl 1 CNT/HF 1CNT Inbound',risk:''},
+      {id:'010',workType:'Customer',customer:'Suniva',stage:'Execution',category:'Sales',task:'H2SO4 Qual test',owner:'JNFAM',priority:'High',startDate:'2026-02-01',dueDate:'2026-05-09',status:'Completed',progress:100,lastProgress:90,weeklyDelta:0.1,followup:'황산 입고 완료 후 출하 준비 완료',risk:''},
+      {id:'011',workType:'Customer',customer:'Suniva',stage:'Proposal',category:'Sales',task:'31% H2O2 Proposal',owner:'JNFAM',priority:'Medium',startDate:'2026-02-01',dueDate:'2026-05-29',status:'In Progress',progress:10,lastProgress:10,weeklyDelta:0,followup:'가격 제안 완료 후 Suniva 내부 협의중',risk:''},
       {id:'012',workType:'Customer',customer:'ESF (Korechem)',stage:'Audit',category:'Operation',task:'업체 승인 Audit (5/6~7)',owner:'JNF',priority:'High',startDate:'2026-05-06',dueDate:'2026-05-07',status:'In Progress',progress:75,lastProgress:70,weeklyDelta:0.05,followup:'Audit 지원',risk:'JNF audit'},
-      {id:'013',workType:'Customer',customer:'ESF (Korechem)',stage:'Negotiation',category:'Sales',task:'HF/HCl 공급 제안',owner:'JNFAM',priority:'High',startDate:'2026-02-27',dueDate:'2026-05-31',status:'In Progress',progress:50,lastProgress:40,weeklyDelta:0.1,followup:'협의 진행중. commitment-based pricing structure 제안',risk:'POR 대비 가격 이슈'},
-      {id:'014',workType:'Operation',customer:'Internal',stage:'Execution',category:'Operation',task:'Clean Room & ICP-MS Installation',owner:'JNFAM',priority:'High',startDate:'2025-06-01',dueDate:'2026-08-01',status:'Pending',progress:20,lastProgress:20,weeklyDelta:0,followup:'세부 견적 진행중',risk:'Capital issue / Fire inspection issue'},
-      {id:'015',workType:'Customer',customer:'Suniva',stage:'Proposal',category:'Sales',task:'Follow-up on APV Flexible Hose',owner:'JNFAM',priority:'High',startDate:'2026-05-01',dueDate:'2026-05-13',status:'In Progress',progress:40,lastProgress:0,weeklyDelta:0.4,followup:'담당자 Colin 요청 완료',risk:''},
+      {id:'013',workType:'Customer',customer:'ESF (Korechem)',stage:'Negotiation',category:'Sales',task:'HF/HCl 공급 제안',owner:'JNFAM',priority:'High',startDate:'2026-01-06',dueDate:'2026-05-31',status:'In Progress',progress:50,lastProgress:40,weeklyDelta:0.1,followup:'협의 진행중. commitment-based pricing structure 제안',risk:'POR 대비 가격 이슈'},
+      {id:'014',workType:'Operation',customer:'Internal',stage:'Execution',category:'Operation',task:'Clean Room & ICP-MS Installation',owner:'JNFAM',priority:'High',startDate:'2025-05-08',dueDate:'2026-08-01',status:'Pending',progress:20,lastProgress:20,weeklyDelta:0,followup:'세부 견적 진행중',risk:'Capital issue / Fire inspection issue'},
+      {id:'015',workType:'Customer',customer:'Suniva',stage:'Proposal',category:'Sales',task:'Follow-up on APV Flexible Hose',owner:'JNFAM',priority:'High',startDate:'2026-04-30',dueDate:'2026-05-13',status:'In Progress',progress:40,lastProgress:0,weeklyDelta:0.4,followup:'담당자 Colin 요청 완료',risk:''},
     ];
-    for(const s of samples) await push(itemsRef, {...s, createdAt: new Date().toISOString()});
+    for(const s of samples) await push(itemsRef,{...s,createdAt:new Date().toISOString()});
   }
 },{onlyOnce:true});
 
+updateWeekBadge();
 </script>
 </body>
 </html>
