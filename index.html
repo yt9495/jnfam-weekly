@@ -233,11 +233,13 @@ label.ck{display:flex;gap:8px;align-items:center;cursor:pointer}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;z-index:50;font-weight:600;max-width:calc(100% - 32px)}
 .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
 .kv label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.copy{max-width:1240px;margin:0 auto;padding:18px 16px calc(24px + env(safe-area-inset-bottom,0px));font-size:11.5px;line-height:1.5;color:var(--muted);border-top:1px solid var(--line)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
 <div id="app"></div>
+<footer class="copy">© 2025–2026 Young Tai Kang. All rights reserved. Unauthorized use, copying, modification, or distribution without the written permission of Young Tai Kang is prohibited.</footer>
 <div id="toast" role="status" aria-live="polite" hidden></div>
 
 <script>
