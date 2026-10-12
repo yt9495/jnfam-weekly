@@ -6,1090 +6,1323 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JNFAM Weekly Operation Review</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>JNFAM Weekly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
+html,body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+/* Layout: sticky top bar · report column + summary rail · IPS board stacks TOR/EHS → SIC table → projects → actions */
 :root{
-  --bg:#f5f6fa;--white:#fff;--border:#e2e6ef;
-  --accent:#2563eb;--accent-l:#eff4ff;
-  --green:#16a34a;--green-l:#f0fdf4;
-  --red:#dc2626;--red-l:#fef2f2;
-  --orange:#ea580c;--orange-l:#fff7ed;
-  --yellow:#d97706;--yellow-l:#fffbeb;
-  --purple:#7c3aed;--purple-l:#f5f3ff;
-  --text:#1e2533;--text2:#5a6478;--text3:#9aa3b5;
-  --shadow:0 1px 4px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.05);
-  --shadow-lg:0 4px 12px rgba(0,0,0,.10),0 8px 28px rgba(0,0,0,.08);
+  --bg:#F4F5F2; --surface:#FFFFFF; --surface2:#F7F8F6; --line:#E1E4DF; --line2:#EEF0EC;
+  --ink:#18211D; --ink2:#3D4842; --muted:#5B6560;
+  --main:#1D4F91; --main-soft:#EEF2F8; --on-main:#FFFFFF;
+  --sub:#B4530E; --sub-soft:#FDF1E7; --sub-ink:#8A3D07;
+  --ok:#1C6B3D; --ok-soft:#E4F1E8; --warn:#8A5A00; --warn-soft:#FFF3D6; --bad:#B3261E; --bad-soft:#FDECEA;
+  --fb:#FFFBEF; --fb-line:#EAD9A6; --fb-ink:#7A5A00;
+  --hero:#18211D; --hero-ink:#FFFFFF; --hero-muted:#C2CAC5; --hero-line:#3A4540;
+  --font:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;min-height:100vh;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111513; --surface:#1A201D; --surface2:#202724; --line:#2F3733; --line2:#262D29;
+  --ink:#E7ECE8; --ink2:#C3CBC6; --muted:#98A39C;
+  --main:#8DB4EC; --main-soft:#1E2A3B; --on-main:#0E1826;
+  --sub:#F0A060; --sub-soft:#33251A; --sub-ink:#F3B886;
+  --ok:#7FCB9A; --ok-soft:#1B2E22; --warn:#E8C26A; --warn-soft:#332A15; --bad:#F2928A; --bad-soft:#3A1F1D;
+  --fb:#2A2517; --fb-line:#4D4325; --fb-ink:#E8C979;
+  --hero:#0A0D0B; --hero-ink:#E7ECE8; --hero-muted:#9AA59E; --hero-line:#2A322E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111513; --surface:#1A201D; --surface2:#202724; --line:#2F3733; --line2:#262D29;
+  --ink:#E7ECE8; --ink2:#C3CBC6; --muted:#98A39C;
+  --main:#8DB4EC; --main-soft:#1E2A3B; --on-main:#0E1826;
+  --sub:#F0A060; --sub-soft:#33251A; --sub-ink:#F3B886;
+  --ok:#7FCB9A; --ok-soft:#1B2E22; --warn:#E8C26A; --warn-soft:#332A15; --bad:#F2928A; --bad-soft:#3A1F1D;
+  --fb:#2A2517; --fb-line:#4D4325; --fb-ink:#E8C979;
+  --hero:#0A0D0B; --hero-ink:#E7ECE8; --hero-muted:#9AA59E; --hero-line:#2A322E; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:16px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--main);outline-offset:2px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)} .small{font-size:12.5px}
+h1{margin:4px 0 0;font-size:26px;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+h2{margin:0;font-size:16.5px;font-weight:700;text-wrap:balance}
+h3{margin:0;font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+.eyebrow{font-family:var(--mono);font-size:12.5px;color:var(--muted);letter-spacing:.03em}
 
-header{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;box-shadow:0 1px 6px rgba(0,0,0,.06);}
-.logo{font-size:16px;font-weight:900;color:var(--accent);display:flex;align-items:center;gap:8px;}
-.logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;}
-.logo-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.1em;margin-top:2px;}
-.header-right{display:flex;gap:10px;align-items:center;}
-.sync-status{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);}
-.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--text3);}
-.sync-dot.connected{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
-.sync-dot.syncing{background:var(--yellow);animation:pulse .5s infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.week-badge{background:var(--accent-l);border:1px solid #bfdbfe;border-radius:20px;padding:5px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);font-weight:600;}
+/* top bar */
+header.top{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:6px 22px;min-height:58px;padding-block:6px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px}
+.logo{width:30px;height:30px;border-radius:7px;background:var(--hero);color:var(--hero-ink);display:grid;place-items:center;font-family:var(--mono);font-weight:600;font-size:12px;flex:0 0 auto}
+nav.tabs{display:flex;flex-wrap:wrap;gap:2px;flex:1 1 auto}
+.tab{padding:8px 12px;border-radius:6px;color:var(--ink2);background:none;border:0;cursor:pointer;min-height:38px}
+.tab:hover{background:var(--surface2)}
+.tab[aria-current="page"]{background:var(--main-soft);color:var(--main);font-weight:600}
+.who{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.av{width:32px;height:32px;border-radius:50%;background:var(--main-soft);color:var(--main);font-weight:700;font-size:11.5px;display:grid;place-items:center;flex:0 0 auto}
+.av.adm{background:var(--hero);color:var(--hero-ink);font-size:10px}
+.lang{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.lang button{border:0;padding:5px 9px;background:var(--surface);color:var(--ink2);cursor:pointer;font-size:12px}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.demo{background:var(--warn-soft);color:var(--ink);font-size:12.5px;border-bottom:1px solid var(--line)}
+.demo .wrap{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding-block:6px}
 
-.tabs{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;display:flex;}
-.tab{padding:12px 18px;border:none;background:transparent;color:var(--text3);font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;font-weight:500;}
-.tab:hover{color:var(--text);}
-.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700;}
-.main{padding:24px 28px;}
+main{padding-block:22px 80px}
+.page-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:18px}
+.page-h .meta{margin-top:6px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 
-/* KPI */
-.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
-.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--shadow);}
-.kpi-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.08em;margin-bottom:8px;text-transform:uppercase;}
-.kpi-value{font-size:30px;font-weight:900;}
-.kpi-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+.btn{min-height:40px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:var(--muted)}
+.btn.pri{background:var(--main);border-color:var(--main);color:var(--on-main)}
+.btn.subc{background:var(--sub);border-color:var(--sub);color:var(--on-main)}
+.btn.sm{min-height:32px;padding:0 10px;font-size:12.5px}
+.btn.dash{border-style:dashed;color:var(--ink2)}
+.btn.danger{color:var(--bad)}
+.btn.icon{width:36px;padding:0}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.on{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
 
-/* FILTER PANEL */
-.filter-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow);}
-.filter-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.filter-title{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;font-weight:600;}
-.filter-top-right{display:flex;gap:8px;align-items:center;}
-.btn-reset{padding:4px 12px;border-radius:6px;border:1px solid var(--border);background:var(--white);color:var(--text3);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
-.btn-reset:hover{border-color:var(--red);color:var(--red);}
-.filter-count-badge{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);font-weight:700;background:var(--accent-l);padding:3px 10px;border-radius:10px;border:1px solid #bfdbfe;}
-.filter-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.filter-row:last-child{margin-bottom:0;}
-.filter-lbl{font-size:11px;font-weight:700;color:var(--text2);min-width:64px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;}
-.chip-group{display:flex;flex-wrap:wrap;gap:6px;flex:1;}
-.chip{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--text2);transition:all .15s;user-select:none;}
-.chip:hover{border-color:var(--accent);color:var(--accent);}
-.chip.on{color:#fff;border-color:transparent;}
-.chip[data-g="status"].on{background:var(--accent);}
-.chip[data-g="type"][data-v="Customer"].on{background:var(--purple);}
-.chip[data-g="type"][data-v="Operation"].on{background:var(--green);}
-.chip[data-g="type"][data-v="Management"].on{background:var(--orange);}
-.chip[data-g="type"][data-v="EHS"].on{background:var(--red);}
-.chip[data-g="priority"][data-v="High"].on{background:var(--red);}
-.chip[data-g="priority"][data-v="Medium"].on{background:var(--yellow);}
-.chip[data-g="priority"][data-v="Low"].on{background:var(--text3);}
-.search-wrap{display:flex;gap:8px;align-items:center;flex:1;}
-.fsearch{flex:1;max-width:260px;background:var(--bg);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:7px 12px;font-family:'Noto Sans KR',sans-serif;font-size:12px;outline:none;}
-.fsearch::placeholder{color:var(--text3);}
-.fsearch:focus{border-color:var(--accent);}
-.btn-new{background:var(--accent);color:#fff;font-weight:700;border:none;border-radius:8px;padding:7px 16px;font-family:'Noto Sans KR',sans-serif;font-size:12px;cursor:pointer;}
-.btn-new:hover{background:#1d4ed8;}
+.layout{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start}
+.col-main{flex:999 1 620px;min-width:0;display:flex;flex-direction:column;gap:18px}
+.col-side{flex:1 1 270px;min-width:0;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;min-width:0}
+.card.subcard{border-top:4px solid var(--sub)}
+.card.pad{padding:16px 18px}
+.sec-h{padding:16px 18px 10px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 12px;align-items:baseline}
+.sec-h p{margin:3px 0 0;color:var(--muted);font-size:13px;max-width:66ch}
+.sec-n{font-family:var(--mono);color:var(--muted);margin-right:8px;font-weight:500}
+.sec-f{padding:10px 18px 16px;border-top:1px solid var(--line2);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.scroll{overflow-x:auto}
+.row{display:grid;gap:10px;align-items:center;padding:9px 18px;border-top:1px solid var(--line2)}
+.row.hd{background:var(--surface2);font-size:12px;font-weight:600;color:var(--muted);padding-block:7px}
+.empty{padding:14px 18px;border-top:1px solid var(--line2);color:var(--muted);font-size:13px}
+.in{width:100%;min-height:36px;padding:6px 10px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);font-size:13.5px}
+textarea.in{min-height:76px;resize:vertical;line-height:1.5}
+.in:disabled{background:var(--surface2);color:var(--ink2)}
+.in::placeholder{color:var(--muted);opacity:.85}
+input[type=range]{width:100%;accent-color:var(--main)}
+input[type=checkbox]{width:16px;height:16px;accent-color:var(--main)}
+label.ck{display:flex;gap:8px;align-items:center;cursor:pointer}
 
-/* RESULT INFO */
-.result-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.result-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text3);}
+.tag{display:inline-block;padding:1px 8px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap;line-height:1.6}
+.t-main{background:var(--main-soft);color:var(--main)} .t-sub{background:var(--sub-soft);color:var(--sub-ink)}
+.t-ok{background:var(--ok-soft);color:var(--ok)} .t-warn{background:var(--warn-soft);color:var(--warn)}
+.t-bad{background:var(--bad-soft);color:var(--bad)} .t-neutral{background:var(--surface2);color:var(--ink2);border:1px solid var(--line)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px}
+.seg button{min-height:32px;padding:0 6px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:12px;cursor:pointer;white-space:nowrap}
+.seg button:hover:not(:disabled){border-color:var(--muted)}
+.seg button[aria-pressed="true"]{font-weight:700}
+.seg button[aria-pressed="true"].ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.seg button[aria-pressed="true"].warn{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.seg button[aria-pressed="true"].bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.seg button[aria-pressed="true"].neutral{background:var(--surface2);border-color:var(--ink2);color:var(--ink)}
+.seg button:disabled{cursor:default}
 
-/* TABLE */
-.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);}
-.table-head{display:grid;grid-template-columns:56px 100px 95px 85px 105px 1fr 70px 130px 60px 80px;background:var(--bg);border-bottom:1px solid var(--border);}
-.th{padding:10px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase;border-right:1px solid var(--border);}
-.th:last-child{border-right:none;}
-.table-body{max-height:calc(100vh - 460px);overflow-y:auto;}
-.tr{display:grid;grid-template-columns:56px 100px 95px 85px 105px 1fr 70px 130px 60px 80px;border-bottom:1px solid var(--border);transition:background .15s;cursor:pointer;}
-.tr:hover{background:var(--accent-l);}
-.tr:last-child{border-bottom:none;}
-.td{padding:10px 10px;font-size:12px;border-right:1px solid var(--border);display:flex;align-items:center;overflow:hidden;}
-.td:last-child{border-right:none;}
-.td-txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fbbox{background:var(--fb);border:1px solid var(--fb-line);border-radius:12px;padding:16px 18px}
+.fbbox .lbl{font-size:12px;font-weight:700;letter-spacing:.03em;color:var(--fb-ink)}
+.fbbox p{margin:6px 0 0;font-size:15px;line-height:1.6;max-width:70ch;white-space:pre-line}
+.fbline{margin-top:6px;padding:7px 10px;border-radius:8px;background:var(--fb);border:1px solid var(--fb-line);font-size:13px}
+.fbline b{color:var(--fb-ink);margin-right:4px}
+.reply{margin-top:6px;padding:7px 10px;border-radius:8px;background:var(--main-soft);font-size:13px;margin-left:24px}
+.reply b{color:var(--main);margin-right:4px}
+.fbtools{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center}
+.fbtools .in{flex:1 1 220px;min-height:32px;font-size:13px;background:var(--fb);border-color:var(--fb-line)}
 
-/* BADGES */
-.sbadge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap;}
-.s-inprog{background:var(--accent-l);color:var(--accent);border:1px solid #bfdbfe;}
-.s-done{background:var(--green-l);color:var(--green);border:1px solid #bbf7d0;}
-.s-pending{background:var(--yellow-l);color:var(--yellow);border:1px solid #fde68a;}
-.s-other{background:var(--bg);color:var(--text3);border:1px solid var(--border);}
-.p-high{color:var(--red);font-weight:700;}
-.p-med{color:var(--yellow);font-weight:700;}
-.p-low{color:var(--text3);}
+.ro{padding:10px 18px;border-top:1px solid var(--line2)}
+.ro-top{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.ro-top .tx{flex:1 1 240px;min-width:0}
+.ro-top .tx b{font-weight:600}
+.ro .det{color:var(--ink2);font-size:13px}
 
-/* PBAR */
-.pbar-wrap{width:100%;background:var(--border);border-radius:4px;height:6px;}
-.pbar-fill{height:6px;border-radius:4px;transition:width .3s;}
+.pj{padding:12px 18px 14px;border-top:1px solid var(--line2)}
+.pj-top{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.pj-top .tt{font-weight:600;flex:1 1 220px;min-width:0}
+.pj-grid{margin-top:10px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.pj-grid label{display:block;font-size:12px;color:var(--muted);margin-bottom:3px;font-weight:600}
+.dd{font-family:var(--mono);font-size:12px;font-weight:600}
+.dd.late{color:var(--bad)} .dd.soon{color:var(--warn)} .dd.fine{color:var(--ink2)}
 
-/* D-DAY */
-.dday{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;}
-.dd-late{color:var(--red);}.dd-soon{color:var(--yellow);}.dd-ok{color:var(--text3);}.dd-done{color:var(--green);}
-.delta-p{color:var(--green);font-weight:700;font-size:10px;}
-.delta-n{color:var(--red);font-weight:700;font-size:10px;}
-.delta-z{color:var(--text3);font-size:10px;}
+.prompts{margin:6px 18px 16px;padding:12px 14px;border-radius:10px;background:var(--surface2)}
+.prompts .g{margin-top:8px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px}
+.prompt{display:flex;gap:8px;align-items:center;text-align:left;min-height:36px;padding:4px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:13px;color:var(--ink2)}
+.prompt:hover{border-color:var(--sub)}
+.prompt .tag{margin-left:auto}
 
-/* FILE LINK */
-.file-link{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--accent);text-decoration:none;padding:2px 8px;border-radius:5px;background:var(--accent-l);border:1px solid #bfdbfe;font-weight:600;transition:all .15s;}
-.file-link:hover{background:#dbeafe;text-decoration:underline;}
-.file-link-teams{color:#5059C9;background:#f0f0ff;border-color:#c7c8f9;}
-.file-link-teams:hover{background:#e0e0ff;}
+.stat{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 10px;margin-top:10px}
+.stat .v{font-family:var(--mono);font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat .k{font-size:12px;color:var(--muted)}
+.bar{height:8px;border-radius:4px;background:var(--line2);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--main);border-radius:4px}
+.bar.sub>i{background:var(--sub)}
+.checks{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:7px;font-size:13px}
+.checks li{display:flex;gap:8px;align-items:flex-start}
+.checks .ic{font-weight:700;width:14px;flex:0 0 auto}
+.checks .ok{color:var(--ok)} .checks .no{color:var(--warn)}
+.spark{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;align-items:end;height:84px;margin-top:12px}
+.spark div{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:84px}
+.spark i{display:block;width:100%;max-width:24px;border-radius:3px 3px 0 0;background:var(--sub-soft);border:1px solid var(--sub)}
+.spark i.cur{background:var(--sub)}
+.spark span{font-family:var(--mono);font-size:11px;color:var(--ink2)}
+.spark-x{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:center;margin-top:4px}
 
-/* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(30,37,51,.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
-.modal-overlay.show{display:flex;}
-.modal{background:var(--white);border:1px solid var(--border);border-radius:16px;width:720px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .2s ease;}
-@keyframes slideUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
-.modal-hd{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.modal-title{font-size:16px;font-weight:900;}
-.modal-close{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;padding:2px 8px;border-radius:6px;}
-.modal-close:hover{color:var(--text);background:var(--bg);}
-.modal-bd{padding:20px 22px;}
-.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
-.ff{grid-column:1/-1;}
-.flabel{font-size:10px;color:var(--text2);letter-spacing:.05em;margin-bottom:5px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;font-weight:600;display:flex;align-items:center;gap:6px;}
-.finput,.fselect,.ftextarea{width:100%;background:var(--bg);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:9px 11px;font-family:'Noto Sans KR',sans-serif;font-size:13px;transition:border-color .2s;outline:none;}
-.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--accent);}
-.ftextarea{resize:vertical;min-height:70px;}
-.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
-.btn-save{background:var(--accent);color:#fff;font-weight:700;border:none;border-radius:8px;padding:10px 22px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
-.btn-save:hover{background:#1d4ed8;}
-.btn-cancel{background:var(--white);border:1.5px solid var(--border);color:var(--text2);border-radius:8px;padding:10px 18px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
-.btn-cancel:hover{background:var(--bg);}
-.btn-del{background:var(--red-l);border:1px solid #fca5a5;color:var(--red);border-radius:8px;padding:10px 18px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
-.btn-del:hover{background:#fee2e2;}
+.warnbox{background:var(--warn-soft);border:1px solid var(--warn);border-radius:10px;padding:12px 14px}
+.warnbox ul{margin:6px 0 10px;padding-left:18px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
 
-/* FILE ADD ROW */
-.file-add-row{display:flex;gap:8px;margin-bottom:8px;}
-.file-add-row .finput{flex:1;}
-.file-add-row .finput-name{width:140px;flex-shrink:0;}
-.btn-add-file{background:var(--green-l);border:1px solid #bbf7d0;color:var(--green);border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;}
-.btn-add-file:hover{background:#dcfce7;}
-.file-list-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;}
-.file-list-item a{font-size:12px;color:var(--accent);font-weight:600;text-decoration:none;flex:1;}
-.file-list-item a:hover{text-decoration:underline;}
-.btn-remove-file{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 4px;border-radius:4px;}
-.btn-remove-file:hover{color:var(--red);background:var(--red-l);}
+/* people cards */
+.people{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:20px}
+.pcard{display:block;text-align:left;width:100%;padding:14px 16px;border-radius:12px;background:var(--surface);border:1px solid var(--line);cursor:pointer}
+.pcard[aria-pressed="true"]{border:2px solid var(--main);padding:13px 15px}
+.pcard .hd{display:flex;align-items:center;gap:10px}
+.pcard .nm{flex:1 1 auto;line-height:1.3;min-width:0}
+.pcard .nm b{display:block}
+.pcard .nums{margin-top:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.pcard .nums .v{font-family:var(--mono);font-size:18px;font-weight:600}
+.pcard .nums .k{font-size:11px;color:var(--muted)}
 
-/* DETAIL */
-.detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
-.detail-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
-.detail-lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.05em;margin-bottom:6px;text-transform:uppercase;}
-.detail-val{font-size:14px;font-weight:600;}
+/* history list */
+.wklist{flex:1 1 250px;min-width:0;overflow:hidden;padding:0}
+.wkbtn{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:0 16px;border:0;border-top:1px solid var(--line2);background:var(--surface);text-align:left;cursor:pointer}
+.wkbtn:first-child{border-top:0}
+.wkbtn[aria-current="true"]{background:var(--main-soft);box-shadow:inset 3px 0 0 var(--main)}
+.wkbtn .w{font-family:var(--mono);font-weight:600;width:40px}
+.wkbtn .r{flex:1 1 auto;font-size:13px;color:var(--ink2)}
 
-/* MEETING */
-.meeting-banner{background:linear-gradient(135deg,var(--accent-l),var(--green-l));border:1px solid #bfdbfe;border-radius:10px;padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--accent);font-weight:600;}
-.meeting-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1s infinite;}
-.meeting-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px;cursor:pointer;box-shadow:var(--shadow);transition:all .15s;}
-.meeting-card:hover{box-shadow:var(--shadow-lg);}
-.meeting-card.delayed{border-color:#fca5a5;background:var(--red-l);}
-.meeting-card.high-prio{border-color:#bfdbfe;}
+/* IPS */
+.tor{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:12px 0 0;padding:0;list-style:none}
+.tor li{padding:10px 12px;border-radius:8px;background:var(--surface2)}
+.tor .n{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.tor b{display:block;margin-top:2px}
+.tor .w{font-size:12px;color:var(--ink2)}
+.hero{background:var(--hero);color:var(--hero-ink);border-radius:12px;padding:16px 18px}
+.hero .m{color:var(--hero-muted)}
+.ehs{margin-top:12px;display:grid;grid-template-columns:minmax(0,1fr) 78px 78px;gap:10px 12px;align-items:end}
+.ehs .big{font-family:var(--mono);font-size:30px;font-weight:600;text-align:right;line-height:1.1}
+.ehs .rec{font-family:var(--mono);font-size:17px;text-align:right;color:var(--hero-muted)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--ink2)}
+.legend span{display:flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;display:inline-block}
+.cell{text-align:center;padding:5px 2px;border-radius:5px;font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;border:1px solid transparent}
+.c-ok{background:var(--ok-soft);color:var(--ok)} .c-bad{background:var(--bad-soft);color:var(--bad)} .c-na{background:var(--surface2);color:var(--muted);border-color:var(--line2)}
+.c-cur{border:2px solid currentColor;font-weight:700}
+.dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto;display:inline-block}
+.dot.auto{background:var(--main)} .dot.man{border:1.5px solid var(--muted)}
 
-.week-nav{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
-.wnav-btn{width:32px;height:32px;border-radius:8px;background:var(--white);border:1.5px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);}
-.wnav-btn:hover{border-color:var(--accent);color:var(--accent);}
-.week-title{font-size:16px;font-weight:900;}
-.dash-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--shadow);}
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
-.urgent-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .15s;}
-.urgent-item:hover{background:var(--accent-l);}
-.add-panel{max-width:700px;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;box-shadow:var(--shadow);}
-.panel-title{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:.1em;margin-bottom:20px;text-transform:uppercase;}
-/* WRAP-UP CARDS */
-.wu-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow);transition:all .15s;}
-.wu-card:hover{box-shadow:var(--shadow-lg);}
-.wu-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border);}
-.wu-week-tag{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-l);padding:5px 14px;border-radius:20px;border:1px solid #bfdbfe;}
-.wu-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);}
-.wu-section{margin-bottom:14px;}
-.wu-section-title{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
-.wu-section-body{font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;}
-.wu-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.wu-edit-btn{background:var(--bg);border:1px solid var(--border);color:var(--text2);border-radius:7px;padding:5px 14px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
-.wu-edit-btn:hover{border-color:var(--accent);color:var(--accent);}
-.loading{display:flex;align-items:center;justify-content:center;padding:48px;gap:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:13px;}
-.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.empty{text-align:center;padding:48px;color:var(--text3);font-size:13px;}
-.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:700;transform:translateY(60px);opacity:0;transition:all .3s;z-index:300;box-shadow:var(--shadow-lg);}
-.toast.show{transform:translateY(0);opacity:1;}
-.toast.error{background:var(--red);}
+/* login */
+.login{min-height:100%;display:flex;align-items:center;justify-content:center;padding-block:40px}
+.login-card{width:100%;max-width:960px;display:flex;flex-wrap:wrap;overflow:hidden;border-radius:16px}
+.login-l{flex:1 1 340px;min-width:0;padding:40px 36px;border-radius:0;display:flex;flex-direction:column;justify-content:space-between;gap:36px}
+.login-l h1{font-size:28px;line-height:1.35;margin-top:30px}
+.login-l .steps{display:flex;flex-direction:column;gap:9px;font-size:13px}
+.login-l .steps span{font-family:var(--mono);margin-right:10px}
+.login-r{flex:1 1 400px;min-width:0;padding:40px 36px;display:flex;flex-direction:column;gap:20px;background:var(--surface)}
+.ugrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.ubtn{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;text-align:left;min-height:60px}
+.ubtn[aria-pressed="true"]{border:2px solid var(--main);background:var(--main-soft);padding:11px 13px}
+.ubtn .r{font-size:12px;color:var(--muted);display:block}
+.pin{font-family:var(--mono);font-size:20px;letter-spacing:.4em;min-height:48px}
+.err{color:var(--bad);font-size:13px;font-weight:600}
+
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;z-index:50;font-weight:600;max-width:calc(100% - 32px)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.kv label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
+<div id="app"></div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
 
-<header>
-  <div>
-    <div class="logo"><div class="logo-dot"></div>JNFAM WEEKLY REVIEW</div>
-    <div class="logo-sub">// OPERATION ACTION ITEMS · REAL-TIME SYNC</div>
-  </div>
-  <div class="header-right">
-    <div class="sync-status">
-      <div class="sync-dot" id="syncDot"></div>
-      <span id="syncText">연결 중...</span>
-    </div>
-    <div class="week-badge" id="weekBadge"></div>
-  </div>
-</header>
+<script>
+(function(){
+'use strict';
 
-<div class="tabs">
-  <button class="tab active" onclick="switchTab('dashboard',this)">📊 대시보드</button>
-  <button class="tab" onclick="switchTab('items',this)">📋 Action Items</button>
-  <button class="tab" onclick="switchTab('meeting',this)">🎯 미팅 모드</button>
-  <button class="tab" onclick="switchTab('wrapup',this)">📝 Weekly Wrap-up</button>
-  <button class="tab" onclick="switchTab('add',this)">➕ 신규 등록</button>
-</div>
+/* ───────── 배포 설정 ─────────
+   Firebase Realtime Database를 쓰려면 아래 null 대신 Firebase 콘솔의 config 객체(databaseURL 포함)를 넣으세요.
+   데이터는 /weekly 경로 아래에 저장됩니다.
+   null이면 이 브라우저에만 저장되는 로컬 데모 모드로 동작합니다. */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBkY5IGIPC0CsJB55hui7wqCffcCiS33NI",
+  authDomain: "jnfam-task-plan.firebaseapp.com",
+  databaseURL: "https://jnfam-task-plan-default-rtdb.firebaseio.com",
+  projectId: "jnfam-task-plan",
+  storageBucket: "jnfam-task-plan.firebasestorage.app",
+  messagingSenderId: "76859256151",
+  appId: "1:76859256151:web:c056fd641305780908e212"
+};
+const FB_VER = '10.12.2';
+const DB_ROOT = 'weekly';
+const LS_KEY = 'jnfam_weekly_v1';
+const COLS = ['users','reports','routines','projects','actions','settings'];
 
-<div class="main">
+let DB = {users:{},reports:{},routines:{},projects:{},actions:{},settings:{}};
+let FS = null;
+const S = {uid:null, view:'report', wk:null, sel:null, histWk:null, tasksUid:null, dashWk:null,
+  lang:'ko', confirm:null, nf:{proj:{kind:'main',cat:'etc'}, ac:{}}, showProj:false, fb:null,
+  submitWarn:false, draft:null, loginPick:null, loginErr:'', ready:false};
+try{ S.lang = localStorage.getItem('wr_lang') || 'ko'; }catch(e){}
+try{ S.uid = sessionStorage.getItem('wr_uid'); }catch(e){}
 
-  <!-- DASHBOARD -->
-  <div id="tab-dashboard">
-    <div class="week-nav">
-      <button class="wnav-btn" onclick="changeWeek(-1)">‹</button>
-      <div class="week-title" id="weekTitle"></div>
-      <button class="wnav-btn" onclick="changeWeek(1)">›</button>
-    </div>
-    <div class="kpi-grid" id="kpiGrid"><div class="loading" style="grid-column:1/-1"><div class="spinner"></div>로딩 중...</div></div>
-    <div id="dashSummary"></div>
-  </div>
+const L = (ko,en) => S.lang==='en' ? en : ko;
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const newId = p => (p||'') + Math.random().toString(36).slice(2,8) + Date.now().toString(36).slice(-4);
+const clone = o => JSON.parse(JSON.stringify(o));
+const $ = s => document.querySelector(s);
 
-  <!-- ACTION ITEMS -->
-  <div id="tab-items" style="display:none">
-    <div id="filter-panel-items"></div>
-    <div class="result-info">
-      <span class="result-count" id="items-count"></span>
-    </div>
-    <div class="table-wrap">
-      <div class="table-head">
-        <div class="th">ID</div><div class="th">고객/대상</div><div class="th">유형</div>
-        <div class="th">우선순위</div><div class="th">상태</div><div class="th">Task</div>
-        <div class="th">D-DAY</div><div class="th">진행률</div><div class="th">파일</div>
-        <div class="th">마감일</div>
-      </div>
-      <div class="table-body" id="itemsBody"><div class="loading"><div class="spinner"></div>로딩 중...</div></div>
-    </div>
-  </div>
+/* ───────── 날짜 · ISO 주차 ───────── */
+const pad = n => String(n).padStart(2,'0');
+const ymd = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+function parseD(s){ if(!s) return null; const [y,m,d]=s.split('-').map(Number); if(!y) return null; return new Date(y,m-1,d); }
+function wkKey(d){ const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())); const day=t.getUTCDay()||7; t.setUTCDate(t.getUTCDate()+4-day); const y=t.getUTCFullYear(); const w=Math.ceil(((t-Date.UTC(y,0,1))/864e5+1)/7); return y+'-W'+pad(w); }
+function wkMon(key){ const y=+key.slice(0,4), w=+key.slice(6); const j4=new Date(y,0,4); const dd=j4.getDay()||7; return new Date(y,0,4-dd+1+(w-1)*7); }
+function wkDay(key,i){ const m=wkMon(key); return new Date(m.getFullYear(),m.getMonth(),m.getDate()+i); }
+function addWk(key,n){ return wkKey(wkDay(key,7*n)); }
+const wkLabel = key => (+key.slice(6))+'W';
+const md = d => (d.getMonth()+1)+'/'+d.getDate();
+const wkRange = key => md(wkDay(key,0))+' – '+md(wkDay(key,4));
+const DOW = {ko:['일','월','화','수','목','금','토'], en:['Sun','Mon','Tue','Wed','Thu','Fri','Sat']};
+const dow = d => DOW[S.lang==='en'?'en':'ko'][d.getDay()];
+function fmtDate(s){ const d=parseD(s); return d ? md(d)+' '+dow(d) : ''; }
+function today0(){ const n=new Date(); return new Date(n.getFullYear(),n.getMonth(),n.getDate()); }
+function dday(s){ const d=parseD(s); return d ? Math.round((d-today0())/864e5) : null; }
+function ddLabel(n){ if(n===null) return '—'; if(n===0) return 'D-day'; return n>0 ? 'D-'+n : 'D+'+(-n); }
+function ddCls(n){ if(n===null) return 'fine'; if(n<0) return 'late'; if(n<=7) return 'soon'; return 'fine'; }
+function wkEnd(key){ const d=wkDay(key,6); d.setHours(23,59,59,0); return d; }
+function dueOf(key){ const st=settings(); const d=wkDay(key,(+st.dueDay||5)-1); d.setHours(+st.dueHour||18,0,0,0); return d; }
+function wksBetween(a,b){ return Math.round((wkMon(b)-wkMon(a))/(7*864e5)); }
+const curWk = () => wkKey(new Date());
+function hm(ts){ const d=new Date(ts); return md(d)+' '+pad(d.getHours())+':'+pad(d.getMinutes()); }
 
-  <!-- MEETING MODE -->
-  <div id="tab-meeting" style="display:none">
-    <div class="meeting-banner">
-      <div class="meeting-dot"></div>
-      미팅 모드 — Action Items와 동일한 필터/데이터 · 지연→High→진행중→완료 순
-    </div>
-    <div id="filter-panel-meeting"></div>
-    <div class="kpi-grid" id="meetingKpi" style="margin-top:14px"></div>
-    <div id="meetingItems" style="margin-top:14px"></div>
-  </div>
+/* ───────── 저장소 (Firebase Realtime Database · /weekly 경로) ───────── */
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+function normalize(){
+  COLS.forEach(c=>{ DB[c]=DB[c]||{}; });
+  Object.values(DB.reports).forEach(r=>{
+    ['extra','subs','nextPlan','routineIds'].forEach(k=>{ const v=r[k]; r[k]=Array.isArray(v)?v.filter(Boolean):(v&&typeof v==='object'?Object.values(v):[]); });
+    ['planCheck','routineLog','projectLog'].forEach(k=>{ r[k]=r[k]||{}; });
+    if(r.feedback){ r.feedback.items=r.feedback.items||{}; r.feedback.good=r.feedback.good||{}; }
+  });
+}
+async function storeInit(){
+  if(FIREBASE_CONFIG){
+    await loadScript(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-app-compat.js`);
+    await loadScript(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-database-compat.js`);
+    const app = firebase.apps.find(a=>a.name==='weekly') || firebase.initializeApp(FIREBASE_CONFIG,'weekly');
+    FS = app.database().ref(DB_ROOT);
+    await refreshAll();
+    if(!Object.keys(DB.users).length){
+      const seed = seedEmpty();
+      for(const c of COLS) for(const o of Object.values(seed[c])) await put(c,o);
+    }
+  } else {
+    let saved=null;
+    try{ saved = JSON.parse(localStorage.getItem(LS_KEY)||'null'); }catch(e){}
+    DB = (saved && saved.users) ? saved : seedDemo();
+    normalize(); persistLocal();
+  }
+}
+async function refreshAll(){
+  if(!FS) return;
+  const snap = await FS.once('value');
+  DB = snap.val() || {};
+  normalize();
+}
+function persistLocal(){ if(FS) return; try{ localStorage.setItem(LS_KEY, JSON.stringify(DB)); }catch(e){} }
+function put(col,obj){
+  DB[col][obj.id]=obj;
+  if(FS) return FS.child(col).child(obj.id).set(clone(obj)).catch(()=>toast(L('저장 실패 · 인터넷 연결 또는 권한을 확인하세요','Save failed · check connection or permissions')));
+  persistLocal();
+}
+function del(col,id){
+  delete DB[col][id];
+  if(FS) return FS.child(col).child(id).remove().catch(()=>toast(L('삭제 실패','Delete failed')));
+  persistLocal();
+}
+const timers={};
+function saveLater(col,obj){
+  DB[col][obj.id]=obj;
+  clearTimeout(timers[col+obj.id]);
+  timers[col+obj.id]=setTimeout(()=>{ put(col,obj); const n=$('#savedNote'); if(n) n.textContent=L('저장됨 ','Saved ')+hm(Date.now()).split(' ')[1]; },600);
+}
 
-  <!-- WEEKLY WRAP-UP -->
-  <div id="tab-wrapup" style="display:none">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+/* ───────── 조회 도우미 ───────── */
+const users = () => Object.values(DB.users).sort((a,b)=>(a.order??0)-(b.order??0));
+const staff = () => users().filter(u=>u.active!==false && !u.admin);
+const me = () => DB.users[S.uid];
+const uname = id => DB.users[id]?.name || '?';
+function settings(){ if(!DB.settings.main) DB.settings.main=defaultSettings(); return DB.settings.main; }
+const rep = (uid,wk) => DB.reports[uid+'_'+wk];
+const byCreated = (a,b)=>(a.createdAt||0)-(b.createdAt||0);
+function routineDue(r,wk){
+  if(r.freq==='biweekly') return ((wksBetween(r.startWk||wk,wk))%2+2)%2===0;
+  if(r.freq==='monthly'){ const dm=+r.monthDay||1; for(let i=0;i<7;i++) if(wkDay(wk,i).getDate()===dm) return true; return false; }
+  return true;
+}
+function routinesFor(uid,wk){ return Object.values(DB.routines).filter(r=>r.uid===uid && r.active!==false && (!r.startWk||r.startWk<=wk) && routineDue(r,wk)).sort(byCreated); }
+function projectsFor(uid,wk){
+  return Object.values(DB.projects).filter(p=>p.uid===uid && (!p.startWk||p.startWk<=wk) && (p.status!=='done' || (p.doneWk && p.doneWk>=wk)))
+    .sort((a,b)=>(a.target||'9999').localeCompare(b.target||'9999'));
+}
+function prevPlan(r){ const p=rep(r.uid,addWk(r.wk,-1)); return (p?.nextPlan||[]).filter(x=>x.text); }
+function routineIdsOf(r){ return r.routineIds || routinesFor(r.uid,r.wk).map(x=>x.id); }
+function repStats(r){
+  if(!r) return null;
+  const plan=prevPlan(r); const pDone=plan.filter(p=>r.planCheck?.[p.id]?.s==='done').length;
+  const ids=routineIdsOf(r); const rs=ids.reduce((a,id)=>a+({done:1,partial:.5}[r.routineLog?.[id]?.s]||0),0);
+  const subN=(r.subs||[]).filter(s=>s.text).length;
+  const ehsN=(r.subs||[]).filter(s=>s.text&&s.cat==='ehs').length;
+  const mainN=pDone + ids.filter(id=>DB.routines[id]?.kind!=='sub' && ['done','partial'].includes(r.routineLog?.[id]?.s)).length + (r.extra||[]).filter(x=>x.text).length;
+  return { planTotal:plan.length, pDone, planRate: plan.length? Math.round(pDone/plan.length*100) : null,
+    rTotal:ids.length, routineRate: ids.length? Math.round(rs/ids.length*100) : null, subN, ehsN, mainN };
+}
+function repStatus(r){
+  if(!r) return [L('미작성','Not started'),'t-neutral'];
+  if(r.status==='reviewed') return [L('피드백 완료','Reviewed'),'t-ok'];
+  if(r.status==='submitted') return [L('제출됨','Submitted'),'t-main'];
+  if(r.returned) return [L('보완 요청','Returned'),'t-bad'];
+  return [L('작성 중','Draft'),'t-warn'];
+}
+function keyTitle(r,key){
+  const i=key.indexOf(':'); const t=i<0?key:key.slice(0,i), id=key.slice(i+1);
+  if(t==='plan') return prevPlan(r).find(x=>x.id===id)?.text||'';
+  if(t==='rt') return DB.routines[id]?.title||'';
+  if(t==='pj') return DB.projects[id]?.title||'';
+  if(t==='ex') return (r.extra||[]).find(x=>x.id===id)?.text||'';
+  if(t==='sub') return (r.subs||[]).find(x=>x.id===id)?.text||'';
+  if(t==='issue') return L('이슈 · 도움 요청','Issues · help');
+  return '';
+}
+
+/* ───────── 분류 ───────── */
+const SUBCAT = {clean:['청소·정리','Cleaning · 5S'], ehs:['EHS·안전','EHS · Safety'], equip:['설비 점검·보수','Equipment'], idea:['개선 아이디어','Improvement'], edu:['교육·기타','Training · Other']};
+const MAINCAT = {ship:['출하','Shipping'], prod:['생산','Production'], recv:['입고','Receiving'], sales:['영업·정산','Sales · Billing'], admin:['행정·관리','Admin'], etc:['기타','Other']};
+const PLAN_S = {done:['완료','Done','ok'], prog:['진행중','Ongoing','warn'], late:['지연','Delayed','bad'], cancel:['취소','Cancelled','neutral']};
+const ROUT_S = {done:['완료','Done','ok'], partial:['일부','Partial','warn'], skip:['미실시','Skipped','bad']};
+const HEALTH = {ok:['정상','On track','ok'], risk:['주의','At risk','warn'], late:['지연','Delayed','bad']};
+const FREQ = {weekly:['매주','Weekly'], biweekly:['격주','Every 2 wks'], monthly:['매월','Monthly']};
+const PSTAT = {open:['진행','Open'], hold:['보류','On hold'], done:['완료','Done']};
+const lbl = (map,k) => map[k] ? L(map[k][0],map[k][1]) : '';
+const catOpts = kind => Object.entries(kind==='sub'?SUBCAT:MAINCAT).map(([k,v])=>[k,L(v[0],v[1])]);
+function kindTag(kind,cat){
+  const sub = kind==='sub';
+  const name = sub ? lbl(SUBCAT,cat) : lbl(MAINCAT,cat);
+  return `<span class="tag ${sub?'t-sub':'t-main'}">${esc(name || (sub?'Sub':'Main'))}</span>`;
+}
+const KIND_OPTS = () => [['main','Main'],['sub','Sub']];
+const kTag = kind => kind==='sub' ? '<span class="tag t-sub">Sub</span>' : '<span class="tag t-main">Main</span>';
+
+/* ───────── 입력 도우미 ───────── */
+function inp(s,k,val,o={}){
+  return `<input class="in ${o.cls||''}" type="${o.type||'text'}" data-s="${s}" data-k="${esc(k)}" value="${esc(val??'')}" placeholder="${esc(o.ph||'')}" aria-label="${esc(o.aria||o.ph||k)}" ${o.dis?'disabled':''} ${o.num?'data-num':''} ${o.rr?'data-rr':''} ${o.extra||''}>`;
+}
+function sel(s,k,val,opts,o={}){
+  return `<select class="in" data-s="${s}" data-k="${esc(k)}" aria-label="${esc(o.aria||k)}" ${o.dis?'disabled':''} ${o.num?'data-num':''} ${o.rr?'data-rr':''}>${opts.map(([v,l])=>`<option value="${esc(v)}" ${String(v)===String(val??'')?'selected':''}>${esc(l)}</option>`).join('')}</select>`;
+}
+function ta(s,k,val,o={}){
+  return `<textarea class="in" data-s="${s}" data-k="${esc(k)}" rows="${o.rows||3}" placeholder="${esc(o.ph||'')}" aria-label="${esc(o.aria||o.ph||k)}" ${o.dis?'disabled':''}>${esc(val??'')}</textarea>`;
+}
+function ck(s,k,val,label,o={}){
+  return `<label class="ck"><input type="checkbox" data-s="${s}" data-k="${esc(k)}" ${val?'checked':''} ${o.dis?'disabled':''} ${o.rr?'data-rr':''}> ${label}</label>`;
+}
+function seg(map,cur,act,data,dis){
+  return `<div class="seg" role="group">${Object.entries(map).map(([k,v])=>`<button type="button" class="${v[2]}" aria-pressed="${cur===k}" data-act="${act}" data-v="${k}" ${data} ${dis?'disabled':''}>${L(v[0],v[1])}</button>`).join('')}</div>`;
+}
+function delBtn(act,key,data){
+  const on = S.confirm===act+':'+key;
+  return `<button type="button" class="btn sm ${on?'danger':''}" data-act="${act}" data-cf ${data} aria-label="${L('삭제','Delete')}">${on?L('정말 삭제','Confirm'):'×'}</button>`;
+}
+const chev = d => `<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="${d==='l'?'M15 18l-6-6 6-6':'M9 6l6 6-6 6'}"/></svg>`;
+
+function scopeObj(scope){
+  const i=scope.indexOf(':'); const t=i<0?scope:scope.slice(0,i), id=scope.slice(i+1);
+  switch(t){
+    case 'r': return [S.draft,'reports'];
+    case 'fb': return [S.fb,null];
+    case 'nf': return [S.nf,null];
+    case 'set': return [settings(),'settings'];
+    case 'rt': return [DB.routines[id],'routines'];
+    case 'pj': return [DB.projects[id],'projects'];
+    case 'u': return [DB.users[id],'users'];
+    case 'ac': return [DB.actions[id],'actions'];
+    case 'rep': return [DB.reports[id],'reports'];
+  }
+  return [null,null];
+}
+function setPath(o,path,v){ const ks=path.split('.'); let c=o; for(let i=0;i<ks.length-1;i++){ if(c[ks[i]]==null||typeof c[ks[i]]!=='object') c[ks[i]]={}; c=c[ks[i]]; } c[ks[ks.length-1]]=v; }
+function onBind(el,isChange){
+  const [o,col]=scopeObj(el.dataset.s); if(!o) return;
+  let v = el.type==='checkbox' ? el.checked : el.value;
+  if(el.dataset.num!==undefined) v = v==='' ? null : Number(v);
+  const k=el.dataset.k;
+  setPath(o,k,v);
+  if(col==='projects'){
+    if(k==='status'){ if(v==='done'){ o.doneAt=Date.now(); o.doneWk=curWk(); if((o.progress||0)<100) o.progress=100; } else { delete o.doneAt; delete o.doneWk; } }
+    if(k==='start' && parseD(v)) o.startWk=wkKey(parseD(v));
+  }
+  if((col==='routines'||col==='projects') && k==='kind') o.cat = v==='sub' ? 'clean' : 'etc';
+  if(el.dataset.s==='nf' && k==='proj.kind') S.nf.proj.cat = v==='sub' ? 'clean' : 'etc';
+  if(el.dataset.out){ const t=document.getElementById(el.dataset.out); if(t) t.textContent=v+'%'; }
+  if(col) saveLater(col,o);
+  if(isChange && el.dataset.rr!==undefined) render();
+}
+document.addEventListener('input',e=>{ const el=e.target; if(el.dataset && el.dataset.k && el.type!=='checkbox' && el.tagName!=='SELECT') onBind(el,false); });
+document.addEventListener('change',e=>{ const el=e.target; if(el.dataset && el.dataset.k) onBind(el,true); if(el.dataset && el.dataset.chg==='import') importFile(el); });
+
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>{t.hidden=true},2600); }
+
+/* ───────── 화면: 로그인 ───────── */
+function vLogin(){
+  const us=users().filter(u=>u.active!==false);
+  const cw=curWk();
+  return `<div class="wrap login"><div class="card login-card">
+    <div class="hero login-l">
       <div>
-        <div style="font-size:18px;font-weight:900;margin-bottom:4px;">📝 Weekly Wrap-up</div>
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);">주간 미팅 요약 · 핵심 결정사항 · 지시사항 기록</div>
+        <div class="brand"><div class="logo" style="background:var(--hero-ink);color:var(--hero)">W</div>JNFAM Weekly</div>
+        <h1>${L('지난주에 약속한 일,<br>이번 주에 해낸 일,<br>아무도 시키지 않은 일.','What we promised,<br>what we did,<br>what nobody asked for.')}</h1>
       </div>
-      <button class="btn-save" onclick="openWrapupModal()" style="padding:10px 20px">+ 이번 주 Wrap-up 작성</button>
-    </div>
-    <div id="wrapup-list"><div class="loading"><div class="spinner"></div>로딩 중...</div></div>
-  </div>
-
-    <!-- ADD -->
-  <div id="tab-add" style="display:none">
-    <div class="add-panel">
-      <div class="panel-title">// NEW ACTION ITEM 등록</div>
-      <div class="fgrid">
-        <div><div class="flabel">Work Type</div>
-          <select class="fselect" id="a-wtype"><option>Customer</option><option>Management</option><option>Operation</option><option>EHS</option></select></div>
-        <div><div class="flabel">Customer / 대상</div><input class="finput" id="a-cust" placeholder="고객사 또는 Internal"></div>
-        <div><div class="flabel">Stage</div>
-          <select class="fselect" id="a-stage"><option>Execution</option><option>Proposal</option><option>Negotiation</option><option>Audit</option><option>Support</option></select></div>
-        <div><div class="flabel">Category</div>
-          <select class="fselect" id="a-cat"><option>Sales</option><option>Operation</option><option>EHS</option><option>Logistics</option><option>Quality</option><option>Finance</option></select></div>
-        <div class="ff"><div class="flabel">Task 내용 *</div><textarea class="ftextarea" id="a-task" placeholder="Task 내용을 입력하세요"></textarea></div>
-        <div><div class="flabel">담당자 (Owner)</div><input class="finput" id="a-owner" placeholder="JNFAM"></div>
-        <div><div class="flabel">우선순위</div>
-          <select class="fselect" id="a-prio"><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></div>
-        <div><div class="flabel">시작일</div><input class="finput" type="date" id="a-start"></div>
-        <div><div class="flabel">마감일 *</div><input class="finput" type="date" id="a-due"></div>
-        <div><div class="flabel">상태</div>
-          <select class="fselect" id="a-status"><option>In Progress</option><option>Pending</option><option>Completed</option></select></div>
-        <div><div class="flabel">진행률 (%)</div><input class="finput" type="number" id="a-prog" min="0" max="100" value="0"></div>
-        <div class="ff"><div class="flabel">F/UP 내용</div><textarea class="ftextarea" id="a-fup" placeholder="이번 주 진행사항"></textarea></div>
-        <div class="ff"><div class="flabel">Risk / Issue</div><textarea class="ftextarea" id="a-risk" placeholder="리스크 또는 이슈사항"></textarea></div>
-        <div class="ff">
-          <div class="flabel">📎 Teams 파일 링크</div>
-          <div id="a-file-list" style="margin-bottom:8px"></div>
-          <div class="file-add-row">
-            <input class="finput finput-name" id="a-fname" placeholder="파일명 (예: 계약서.pdf)">
-            <input class="finput" id="a-furl" placeholder="Teams 공유 링크 붙여넣기">
-            <button class="btn-add-file" onclick="addFileRow('add')">+ 추가</button>
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-top:6px">💡 Teams에서 파일 우클릭 → 링크 복사 → 여기에 붙여넣기</div>
-        </div>
-      </div>
-      <button class="btn-save" onclick="addItem()" style="width:100%;padding:12px;font-size:14px">+ Action Item 등록</button>
-    </div>
-  </div>
-
-</div>
-
-<!-- DETAIL MODAL -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-hd">
-      <div class="modal-title" id="modalTitle">ACTION ITEM</div>
-      <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('show')">×</button>
-    </div>
-    <div class="modal-bd" id="modalBody"></div>
-  </div>
-</div>
-
-<!-- WRAP-UP MODAL -->
-<div class="modal-overlay" id="wrapupOverlay" onclick="closeWrapupModal(event)">
-  <div class="modal" onclick="event.stopPropagation()" style="max-width:640px">
-    <div class="modal-hd">
-      <div class="modal-title" id="wrapupModalTitle">📝 Weekly Wrap-up 작성</div>
-      <button class="modal-close" onclick="document.getElementById('wrapupOverlay').classList.remove('show')">×</button>
-    </div>
-    <div class="modal-bd">
-      <div style="background:var(--accent-l);border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);font-weight:600;" id="wrapup-week-label"></div>
-      <div class="fgrid">
-        <div class="ff">
-          <div class="flabel">📌 핵심 결정사항 / Key Decisions</div>
-          <textarea class="ftextarea" id="wu-decisions" placeholder="이번 주 미팅에서 결정된 핵심 사항을 입력하세요&#10;예) - HWQ 납품 일정 5/20으로 확정&#10;     - Fire inspection 대응 예산 승인"></textarea>
-        </div>
-        <div class="ff">
-          <div class="flabel">📋 지시사항 / Action Directives</div>
-          <textarea class="ftextarea" id="wu-directives" placeholder="추가 지시사항이나 Follow-up 요청사항을 입력하세요&#10;예) - PVJC 담당자에게 이번 주 내 회신 요청&#10;     - 법인 전환 IRS 상태 다음 주 보고"></textarea>
-        </div>
-        <div class="ff">
-          <div class="flabel">⚠️ 주요 이슈 / Key Issues</div>
-          <textarea class="ftextarea" id="wu-issues" placeholder="해결해야 할 주요 이슈나 리스크를 입력하세요"></textarea>
-        </div>
-        <div class="ff">
-          <div class="flabel">✅ 완료된 사항 / Accomplishments</div>
-          <textarea class="ftextarea" id="wu-done" placeholder="이번 주 완료되거나 달성된 주요 성과를 입력하세요"></textarea>
-        </div>
-        <div class="ff">
-          <div class="flabel">📅 다음 주 중점사항 / Next Week Focus</div>
-          <textarea class="ftextarea" id="wu-next" placeholder="다음 주에 집중해야 할 사항을 입력하세요"></textarea>
-        </div>
-        <div class="ff">
-          <div class="flabel">📝 기타 메모 / Additional Notes</div>
-          <textarea class="ftextarea" id="wu-notes" placeholder="기타 메모사항"></textarea>
-        </div>
-      </div>
-      <div class="form-actions">
-        <button class="btn-del" id="wu-del-btn" style="display:none" onclick="deleteWrapup()">🗑 삭제</button>
-        <button class="btn-cancel" onclick="document.getElementById('wrapupOverlay').classList.remove('show')">닫기</button>
-        <button class="btn-save" onclick="saveWrapup()">💾 저장</button>
+      <div class="steps m">
+        <div><span>01</span>${L('지난주 계획 점검','Check last week’s plan')}</div>
+        <div><span>02</span>${L('루틴 · 장기 업무 진행','Routines · long-term work')}</div>
+        <div><span>03</span>${L('Sub work 발굴','Find sub work')}</div>
+        <div><span>04</span>${L('다음 주 계획 → 피드백','Next plan → feedback')}</div>
       </div>
     </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, push, update, remove }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey:"AIzaSyCTWXWap9qRC1RXY6lVOVFOzorJiUvqJWU",
-  authDomain:"jnfam-weekly.firebaseapp.com",
-  databaseURL:"https://jnfam-weekly-default-rtdb.firebaseio.com",
-  projectId:"jnfam-weekly",
-  storageBucket:"jnfam-weekly.firebasestorage.app",
-  messagingSenderId:"685753288571",
-  appId:"1:685753288571:web:7baaac23f5c1c9d0299fde"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const itemsRef = ref(db,'items');
-
-let items={}, curWeekOffset=0;
-const today=new Date(); today.setHours(0,0,0,0);
-
-// ── 필터 상태 (공유) ─────────────────────────
-// Action Items와 미팅 모드가 완전히 동일한 필터 상태 공유
-const filters = { status:new Set(), type:new Set(), priority:new Set(), search:'' };
-
-// 등록 폼의 임시 파일 목록
-let addFiles = [];
-
-// ── 날짜 유틸 ─────────────────────────────────
-function diffDays(dl){
-  if(!dl) return 999;
-  const d=new Date(dl+'T00:00:00'); d.setHours(0,0,0,0);
-  return Math.round((d-today)/86400000);
-}
-function fmtDate(d){
-  if(!d) return '';
-  return new Date(d+'T00:00:00').toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
-}
-function getWeekNum(d){
-  const s=new Date(d.getFullYear(),0,1);
-  return Math.ceil(((d-s)/86400000+s.getDay()+1)/7);
-}
-function getWeekRange(offset=0){
-  const d=new Date(today), day=d.getDay();
-  const mon=new Date(d); mon.setDate(d.getDate()-(day===0?6:day-1)+offset*7);
-  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
-  return {mon,sun};
-}
-
-// ── 동기화 ────────────────────────────────────
-function setSyncStatus(s){
-  document.getElementById('syncDot').className='sync-dot '+s;
-  document.getElementById('syncText').textContent=s==='connected'?'실시간 동기화 중':s==='syncing'?'저장 중...':'연결 끊김';
-}
-function updateWeekBadge(){
-  const {mon,sun}=getWeekRange(curWeekOffset);
-  const monStr=mon.toISOString().slice(0,10), sunStr=sun.toISOString().slice(0,10);
-  document.getElementById('weekBadge').textContent=`W${getWeekNum(mon)} · ${fmtDate(monStr)} ~ ${fmtDate(sunStr)}`;
-  const el=document.getElementById('weekTitle');
-  if(el) el.textContent=`${mon.getFullYear()} W${getWeekNum(mon)}  ${fmtDate(monStr)} ~ ${fmtDate(sunStr)}`;
-}
-
-// ── Firebase ──────────────────────────────────
-onValue(itemsRef, snap=>{
-  items=snap.val()||{};
-  setSyncStatus('connected');
-  renderAll();
-}, err=>{ setSyncStatus(''); showToast('연결 오류: '+err.message,true); });
-
-function renderAll(){
-  updateWeekBadge();
-  renderDashboard();
-  renderFilterPanel('items','filter-panel-items');
-  renderFilterPanel('meeting','filter-panel-meeting');
-  renderItems();
-  renderMeeting();
-  renderWrapupList();
-}
-
-// ── 공통 필터 패널 렌더 ───────────────────────
-function renderFilterPanel(tabName, containerId){
-  const el=document.getElementById(containerId);
-  if(!el) return;
-  el.innerHTML=`
-    <div class="filter-panel">
-      <div class="filter-top">
-        <span class="filter-title">// FILTER</span>
-        <div class="filter-top-right">
-          <span class="filter-count-badge" id="fcount-${tabName}"></span>
-          <button class="btn-reset" onclick="resetFilters()">초기화</button>
-          ${tabName==='items'?`<button class="btn-new" onclick="switchTab('add',document.querySelectorAll('.tab')[3])">+ 신규 등록</button>`:''}
-        </div>
+    <form class="login-r" id="loginForm" novalidate>
+      <div>
+        <div class="eyebrow">${cw.slice(0,4)} · WEEK ${+cw.slice(6)} · ${wkRange(cw)}</div>
+        <h2 style="font-size:22px;margin-top:4px">${L('이름을 선택하세요','Choose your name')}</h2>
       </div>
-      <div class="filter-row">
-        <span class="filter-lbl">STATUS</span>
-        <div class="chip-group">
-          ${['In Progress','Completed','Pending'].map(v=>`<div class="chip${filters.status.has(v)?' on':''}" data-g="status" data-v="${v}" onclick="toggleChip('status','${v}')">${v}</div>`).join('')}
-        </div>
+      <div class="ugrid" role="group" aria-label="${L('담당자','Person')}">
+        ${us.map(u=>`<button type="button" class="ubtn" data-act="pick-user" data-id="${u.id}" aria-pressed="${S.loginPick===u.id}">
+          <span class="av ${u.admin?'adm':''}">${esc(u.name.slice(0,3))}</span>
+          <span><b>${esc(u.name)}</b><span class="r">${esc(u.role||'')}</span></span></button>`).join('')}
       </div>
-      <div class="filter-row">
-        <span class="filter-lbl">TYPE</span>
-        <div class="chip-group">
-          ${['Customer','Operation','Management','EHS'].map(v=>`<div class="chip${filters.type.has(v)?' on':''}" data-g="type" data-v="${v}" onclick="toggleChip('type','${v}')">${v}</div>`).join('')}
-        </div>
+      <div>
+        <label for="pin" style="display:block;font-weight:600;margin-bottom:6px">${L('PIN 4자리','4-digit PIN')}</label>
+        <input id="pin" class="in pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off">
+        ${S.loginErr?`<div class="err" style="margin-top:6px">${esc(S.loginErr)}</div>`:''}
       </div>
-      <div class="filter-row">
-        <span class="filter-lbl">PRIORITY</span>
-        <div class="chip-group">
-          ${['High','Medium','Low'].map(v=>`<div class="chip${filters.priority.has(v)?' on':''}" data-g="priority" data-v="${v}" onclick="toggleChip('priority','${v}')">${v}</div>`).join('')}
-        </div>
+      <button type="submit" class="btn pri" style="min-height:48px;font-size:15px">${L('로그인','Sign in')}</button>
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-size:13px" class="muted">
+        <div class="lang" role="group" aria-label="Language"><button type="button" data-act="lang" data-v="ko" aria-pressed="${S.lang==='ko'}">한국어</button><button type="button" data-act="lang" data-v="en" aria-pressed="${S.lang==='en'}">English</button></div>
+        <span>${FS?'':L('데모 PIN · CEO 0000 · JS 1111 · MW 2222 · TK 3333','Demo PINs · CEO 0000 · JS 1111 · MW 2222 · TK 3333')}</span>
       </div>
-      <div class="filter-row">
-        <span class="filter-lbl">SEARCH</span>
-        <div class="search-wrap">
-          <input class="fsearch" placeholder="🔍 Task / 고객 / 담당자 검색..." value="${filters.search}" oninput="updateSearch(this.value)">
-        </div>
-      </div>
-    </div>`;
-  updateFilterCount(tabName);
+    </form>
+  </div></div>`;
 }
 
-function updateFilterCount(tabName){
-  const el=document.getElementById(`fcount-${tabName}`);
-  if(!el) return;
-  const total=filters.status.size+filters.type.size+filters.priority.size+(filters.search?1:0);
-  el.textContent=total>0?`${total}개 필터 적용`:'전체 표시';
-  el.style.display='inline';
+/* ───────── 상단 ───────── */
+function vHeader(){
+  const u=me();
+  const tabs = u.admin
+    ? [['review',L('팀 리뷰','Team review')],['dash',L('IPS 대시보드','IPS board')],['tasks',L('업무 설정','Work setup')],['admin',L('관리','Admin')]]
+    : [['report',L('내 보고','My report')],['tasks',L('내 업무','My work')],['history',L('지난 보고','History')],['dash',L('IPS 대시보드','IPS board')]];
+  const demo = !FS ? `<div class="demo"><div class="wrap"><b>${L('로컬 데모 모드','Local demo mode')}</b><span>${L('샘플 데이터 · 이 브라우저에만 저장됩니다. 배포 시 Firebase로 전환합니다.','Sample data · saved in this browser only. Switches to Firebase on deploy.')}</span></div></div>` : '';
+  return `${demo}<header class="top"><div class="wrap">
+    <div class="brand"><div class="logo">W</div>JNFAM Weekly</div>
+    <nav class="tabs" aria-label="${L('주 메뉴','Main menu')}">${tabs.map(([v,l])=>`<button type="button" class="tab" data-act="nav" data-v="${v}" ${S.view===v?'aria-current="page"':''}>${l}</button>`).join('')}</nav>
+    <div class="who">
+      <div class="lang" role="group" aria-label="Language"><button type="button" data-act="lang" data-v="ko" aria-pressed="${S.lang==='ko'}">KO</button><button type="button" data-act="lang" data-v="en" aria-pressed="${S.lang==='en'}">EN</button></div>
+      <span class="av ${u.admin?'adm':''}">${esc(u.name.slice(0,3))}</span>
+      <span style="line-height:1.25;font-size:13px"><b>${esc(u.name)}</b><br><span class="muted">${esc(u.role||'')}</span></span>
+      <button type="button" class="btn sm" data-act="logout">${L('로그아웃','Sign out')}</button>
+    </div>
+  </div></header>`;
+}
+function wkNav(key, act){
+  const cw=curWk();
+  return `<div class="actions">
+    <button type="button" class="btn icon" data-act="${act}" data-n="-1" aria-label="${L('이전 주','Previous week')}">${chev('l')}</button>
+    <span class="mono" style="font-weight:600;min-width:44px;text-align:center">${wkLabel(key)}</span>
+    <button type="button" class="btn icon" data-act="${act}" data-n="1" aria-label="${L('다음 주','Next week')}" ${key>=cw?'disabled':''}>${chev('r')}</button>
+    ${key!==cw?`<button type="button" class="btn sm" data-act="${act}" data-n="0">${L('이번 주','This week')}</button>`:''}
+  </div>`;
 }
 
-// ── 필터 토글 (즉시 반영) ─────────────────────
-window.toggleChip = (group, val) => {
-  const set = filters[group];
-  set.has(val) ? set.delete(val) : set.add(val);
-  // 양쪽 패널 칩 동기화
-  document.querySelectorAll(`.chip[data-g="${group}"][data-v="${val}"]`).forEach(c=>{
-    c.classList.toggle('on', set.has(val));
-  });
-  updateFilterCount('items');
-  updateFilterCount('meeting');
-  renderItems();
-  renderMeeting();
-  renderWrapupList();
-};
+/* ───────── 화면: 내 보고 ───────── */
+function blankReport(uid,wk){ return {id:uid+'_'+wk,uid,wk,status:'draft',planCheck:{},routineLog:{},projectLog:{},extra:[],subs:[],nextPlan:[],issues:'',help:false,createdAt:Date.now()}; }
+function submitIssues(r){
+  const out=[]; const st=settings();
+  const plan=prevPlan(r); const miss=plan.filter(p=>!r.planCheck?.[p.id]?.s).length;
+  if(miss) out.push(L(`지난주 계획 ${miss}건 결과 미선택`,`${miss} plan item(s) without a result`));
+  const rs=routinesFor(r.uid,r.wk).filter(x=>!r.routineLog?.[x.id]?.s).length;
+  if(rs) out.push(L(`루틴 ${rs}건 수행 여부 미선택`,`${rs} routine(s) not marked`));
+  const ps=projectsFor(r.uid,r.wk).filter(p=>p.status==='open' && !(r.projectLog?.[p.id]?.update||'').trim()).length;
+  if(ps) out.push(L(`장기 업무 ${ps}건 이번 주 진행 내용 없음`,`${ps} long-term item(s) without an update`));
+  const sn=(r.subs||[]).filter(s=>s.text).length; const tgt=+st.targets?.subPer||2;
+  if(sn<tgt) out.push(L(`Sub work ${sn}건 · 목표 ${tgt}건 이상`,`Sub work ${sn} · target ${tgt}+`));
+  const np=(r.nextPlan||[]).filter(n=>n.text);
+  if(!np.length) out.push(L('다음 주 계획이 비어 있음','Next week plan is empty'));
+  const nd=np.filter(n=>!n.date).length;
+  if(nd) out.push(L(`다음 주 계획 ${nd}건 날짜 없음`,`${nd} plan item(s) without a date`));
+  return out;
+}
+function vReport(){
+  const u=me(); const wk=S.wk; const cw=curWk();
+  let r=rep(u.id,wk);
+  if(r) S.draft=r; else { if(!S.draft || S.draft.id!==u.id+'_'+wk) S.draft=blankReport(u.id,wk); r=S.draft; }
+  const lock = r.status==='reviewed'; const D=lock;
+  const prev=rep(u.id,addWk(wk,-1)); const plan=prevPlan(r);
+  const rts=routinesFor(u.id,wk); const pjs=projectsFor(u.id,wk);
+  const st=settings(); const due=dueOf(wk);
+  const stats=repStats(r); const issues=submitIssues(r);
+  const [stL,stC]=repStatus(rep(u.id,wk));
+  const subTarget=+st.targets?.subPer||2;
 
-window.updateSearch = (val) => {
-  filters.search = val;
-  // 다른 패널 검색창도 동기화
-  document.querySelectorAll('.fsearch').forEach(el=>{ if(el.value!==val) el.value=val; });
-  updateFilterCount('items');
-  updateFilterCount('meeting');
-  renderItems();
-  renderMeeting();
-  renderWrapupList();
-};
-
-window.resetFilters = () => {
-  filters.status.clear(); filters.type.clear(); filters.priority.clear(); filters.search='';
-  renderFilterPanel('items','filter-panel-items');
-  renderFilterPanel('meeting','filter-panel-meeting');
-  renderItems();
-  renderMeeting();
-  renderWrapupList();
-};
-
-// ── 공통 필터 적용 ────────────────────────────
-function getFilteredList(){
-  let list=Object.entries(items).filter(([,i])=>i&&i.task).map(([k,i])=>({...i,_key:k}));
-  if(filters.status.size) list=list.filter(i=>filters.status.has(i.status));
-  if(filters.type.size)   list=list.filter(i=>filters.type.has(i.workType));
-  if(filters.priority.size) list=list.filter(i=>filters.priority.has(i.priority));
-  if(filters.search){
-    const q=filters.search.toLowerCase();
-    list=list.filter(i=>(i.task+i.customer+i.owner+'').toLowerCase().includes(q));
+  // 피드백 배너
+  let fbHtml='';
+  if(r.returned && r.feedback){
+    fbHtml+=`<section class="fbbox" style="border-color:var(--bad)"><div class="lbl" style="color:var(--bad)">${L('보완 요청','Revision requested')} · ${esc(r.feedback.by||'CEO')} · ${r.feedback.at?hm(r.feedback.at):''}</div><p>${esc(r.feedback.overall||'')}</p></section>`;
   }
-  list.sort((a,b)=>(a.id||'').localeCompare(b.id||''));
-  return list;
-}
-
-// ── 배지/유틸 ─────────────────────────────────
-function sbadge(s){
-  const cls=s==='In Progress'?'s-inprog':s==='Completed'?'s-done':s==='Pending'?'s-pending':'s-other';
-  return `<span class="sbadge ${cls}">${s||'-'}</span>`;
-}
-function pcolor(prog){
-  return prog>=100?'var(--green)':prog>=70?'var(--accent)':prog>=30?'var(--yellow)':'var(--orange)';
-}
-function ddayHtml(i){
-  const dd=diffDays(i.dueDate);
-  const cls=i.status==='Completed'?'dd-done':dd<0?'dd-late':dd<=3?'dd-soon':'dd-ok';
-  const txt=i.status==='Completed'?'✓':dd<0?`-${-dd}d`:`D-${dd}`;
-  return `<span class="dday ${cls}">${txt}</span>`;
-}
-function filesHtml(files){
-  if(!files||!files.length) return '';
-  return files.map(f=>`<a class="file-link file-link-teams" href="${f.url}" target="_blank" rel="noopener" title="${f.url}">📎 ${f.name||'파일'}</a>`).join(' ');
-}
-
-// ── 대시보드 ──────────────────────────────────
-function renderDashboard(){
-  const list=Object.values(items).filter(i=>i&&i.task);
-  const total=list.length,done=list.filter(i=>i.status==='Completed').length;
-  const inprog=list.filter(i=>i.status==='In Progress').length;
-  const pending=list.filter(i=>i.status==='Pending').length;
-  const delayed=list.filter(i=>i.status!=='Completed'&&diffDays(i.dueDate)<0).length;
-  const rate=total?Math.round(done/total*100):0;
-
-  document.getElementById('kpiGrid').innerHTML=[
-    {label:'TOTAL',value:total,color:'var(--text)',sub:'전체 항목'},
-    {label:'IN PROGRESS',value:inprog,color:'var(--accent)',sub:'진행중'},
-    {label:'COMPLETED',value:done,color:'var(--green)',sub:'완료'},
-    {label:'PENDING',value:pending,color:'var(--yellow)',sub:'대기'},
-    {label:'DELAYED',value:delayed,color:'var(--red)',sub:'지연'},
-  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.color}">${k.value}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
-
-  const byType={};
-  list.forEach(i=>{ if(i.workType){if(!byType[i.workType])byType[i.workType]={total:0,done:0};byType[i.workType].total++;if(i.status==='Completed')byType[i.workType].done++;}});
-
-  document.getElementById('dashSummary').innerHTML=`
-    <div class="dash-grid">
-      <div class="dash-card">
-        <div class="filter-lbl" style="margin-bottom:12px">전체 완료율</div>
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-          <span style="font-size:36px;font-weight:900;color:var(--green)">${rate}%</span>
-          <span style="color:var(--text3);font-size:12px">${done} / ${total} 완료</span>
+  if(prev?.feedback && prev.status==='reviewed'){
+    const f=prev.feedback; const items=Object.entries(f.items||{}).filter(([,v])=>v);
+    fbHtml+=`<section class="fbbox" aria-labelledby="fbh">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:flex-start">
+        <div style="flex:1 1 380px;min-width:0">
+          <div class="lbl" id="fbh">${L(`${wkLabel(prev.wk)} 보고에 대한 피드백`,`Feedback on ${wkLabel(prev.wk)}`)} · ${esc(f.by||'CEO')} · ${f.at?hm(f.at):''}</div>
+          ${f.overall?`<p>${esc(f.overall)}</p>`:''}
+          ${items.map(([k,v])=>`<div class="fbline"><b>${esc(keyTitle(prev,k))}</b>${esc(v)}</div>`).join('')}
         </div>
-        <div class="pbar-wrap"><div class="pbar-fill" style="width:${rate}%;background:var(--green)"></div></div>
+        ${prev.ackAt?`<span class="pill t-ok">${L('확인함','Acknowledged')} ${hm(prev.ackAt)}</span>`:`<button type="button" class="btn" style="border-color:var(--fb-line)" data-act="ack" data-id="${prev.id}">${L('확인했습니다','Acknowledge')}</button>`}
       </div>
-      <div class="dash-card">
-        <div class="filter-lbl" style="margin-bottom:12px">유형별 현황</div>
-        ${Object.entries(byType).map(([type,v])=>{
-          const r=v.total?Math.round(v.done/v.total*100):0;
-          return `<div style="margin-bottom:10px">
-            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-              <span style="font-size:12px;color:var(--text2)">${type}</span>
-              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent)">${v.done}/${v.total}</span>
-            </div>
-            <div class="pbar-wrap"><div class="pbar-fill" style="width:${r}%;background:var(--accent)"></div></div>
-          </div>`;}).join('')}
-      </div>
-    </div>
-    <div class="dash-card">
-      <div class="filter-lbl" style="margin-bottom:12px">마감 임박 (D-7 이내)</div>
-      ${list.filter(i=>i.status!=='Completed'&&diffDays(i.dueDate)>=0&&diffDays(i.dueDate)<=7)
-        .sort((a,b)=>diffDays(a.dueDate)-diffDays(b.dueDate)).slice(0,5)
-        .map(i=>`<div class="urgent-item" onclick="openDetail('${Object.keys(items).find(k=>items[k]===i)}')">
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:${diffDays(i.dueDate)<=3?'var(--yellow)':'var(--orange)'};min-width:40px;font-weight:700">D-${diffDays(i.dueDate)}</span>
-          <span style="flex:1;font-size:12px">${i.task}</span>
-          <span style="font-size:11px;color:var(--text3);margin-right:8px">${i.customer||''}</span>
-          ${sbadge(i.status)}
-        </div>`).join('')||'<div style="color:var(--text3);font-size:12px;padding:8px">마감 임박 항목 없음</div>'}
-    </div>`;
-}
+      <div style="margin-top:10px">${inp('rep:'+prev.id,'reply',prev.reply||'',{ph:L('답글 (선택)','Reply (optional)')})}</div>
+    </section>`;
+  }
 
-// ── Action Items 목록 ─────────────────────────
-function renderItems(){
-  const list=getFilteredList();
-  const cnt=document.getElementById('items-count');
-  if(cnt) cnt.textContent=`${list.length}건 표시중 / 전체 ${Object.values(items).filter(i=>i&&i.task).length}건`;
-  const body=document.getElementById('itemsBody');
-  if(!body) return;
-  if(!list.length){body.innerHTML='<div class="empty">조건에 맞는 항목이 없습니다</div>';return;}
+  // 01 지난주 계획
+  const planRows = plan.length ? `<div class="scroll"><div style="min-width:820px">
+    ${plan.map(p=>{ const pc=r.planCheck?.[p.id]||{}; return `<div class="row" style="grid-template-columns:72px 92px minmax(160px,1fr) 270px minmax(140px,.8fr)">
+      <div class="mono small muted">${esc(fmtDate(p.date))||'—'}</div>
+      <div>${kTag(p.kind)}</div>
+      <div style="font-weight:600;min-width:0">${esc(p.text)}${p.carried?` <span class="tag t-warn">${L('이월','Carried')}</span>`:''}</div>
+      ${seg(PLAN_S,pc.s,'plan',`data-id="${p.id}"`,D)}
+      ${inp('r',`planCheck.${p.id}.note`,pc.note,{ph:L('메모 · 변경 사유','Note · reason'),dis:D})}
+    </div>`; }).join('')}</div></div>`
+    : `<div class="empty">${prev?L('지난주 보고에 다음 주 계획이 없었습니다.','Last week’s report had no plan.'):L(`${wkLabel(addWk(wk,-1))} 보고가 없어 점검할 계획이 없습니다. 이번 주부터 아래 04에 다음 주 계획을 적으면 다음 주에 여기로 넘어옵니다.`,`No report for ${wkLabel(addWk(wk,-1))}. Plans you add in 05 below will show up here next week.`)}</div>`;
 
-  body.innerHTML=list.map(i=>{
-    const prog=Number(i.progress)||0;
-    const delta=Number(i.weeklyDelta)||0;
-    const deltaHtml=delta>0?`<span class="delta-p">▲+${Math.round(delta*100)}%</span>`:delta<0?`<span class="delta-n">▼${Math.round(delta*100)}%</span>`:`<span class="delta-z">-</span>`;
-    const hasFiles=i.files&&i.files.length>0;
-    return `<div class="tr" onclick="openDetail('${i._key}')">
-      <div class="td"><span class="td-txt" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3)">${i.id||'-'}</span></div>
-      <div class="td"><span class="td-txt">${i.customer||'-'}</span></div>
-      <div class="td"><span class="td-txt" style="font-size:11px;color:var(--text2)">${i.workType||'-'}</span></div>
-      <div class="td"><span class="td-txt ${i.priority==='High'?'p-high':i.priority==='Medium'?'p-med':'p-low'}">${i.priority||'-'}</span></div>
-      <div class="td">${sbadge(i.status)}</div>
-      <div class="td"><span class="td-txt">${i.task||''}</span></div>
-      <div class="td">${ddayHtml(i)}</div>
-      <div class="td" style="flex-direction:column;align-items:flex-start;gap:3px">
-        <div style="display:flex;align-items:center;gap:5px">
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2)">${prog}%</span>
-          ${deltaHtml}
-        </div>
-        <div class="pbar-wrap" style="width:100%"><div class="pbar-fill" style="width:${prog}%;background:${pcolor(prog)}"></div></div>
-      </div>
-      <div class="td" style="justify-content:center">
-        ${hasFiles?`<span style="font-size:14px" title="${i.files.length}개 파일">📎 ${i.files.length}</span>`:'<span style="color:var(--text3);font-size:11px">-</span>'}
-      </div>
-      <div class="td"><span class="td-txt" style="font-size:11px;color:var(--text3)">${i.dueDate||'-'}</span></div>
-    </div>`;
+  // 02 루틴
+  const rtRows = rts.length ? `<div class="scroll"><div style="min-width:760px">
+    ${rts.map(x=>{ const lg=r.routineLog?.[x.id]||{}; return `<div class="row" style="grid-template-columns:minmax(200px,1.3fr) 120px 220px minmax(140px,1fr)">
+      <div style="min-width:0">${kindTag(x.kind,x.cat)} <b style="font-weight:600">${esc(x.title)}</b>${x.std?`<div class="small muted">${L('기준','Standard')} · ${esc(x.std)}</div>`:''}</div>
+      <div class="small muted">${lbl(FREQ,x.freq)}${x.days?' · '+esc(x.days):''}${x.freq==='monthly'?' · '+(x.monthDay||1)+L('일',''):''}</div>
+      ${seg(ROUT_S,lg.s,'rout',`data-id="${x.id}"`,D)}
+      ${inp('r',`routineLog.${x.id}.note`,lg.note,{ph:L('실적 (예: 3회, 10/13 · 10/15)','Result (e.g. 3 times)'),dis:D})}
+    </div>`; }).join('')}</div></div>`
+    : `<div class="empty">${L('등록된 루틴이 없습니다. 매주 반복하는 일을 ‘내 업무’에서 루틴으로 지정하세요.','No routines yet. Set your recurring work under “My work”.')}</div>`;
+
+  // 03 장기 업무
+  const pjRows = pjs.map(p=>{
+    const lg=r.projectLog?.[p.id]||{}; const prog = lg.progress ?? p.progress ?? 0; const n=dday(p.target);
+    const hold = p.status==='hold';
+    return `<div class="pj">
+      <div class="pj-top">${kindTag(p.kind,p.cat)}<span class="tt">${esc(p.title)}</span>
+        ${hold?`<span class="tag t-neutral">${L('보류','On hold')}</span>`:''}
+        <span class="dd ${p.status==='done'?'fine':ddCls(n)}">${L('목표','Target')} ${esc(fmtDate(p.target))||'—'} · ${p.status==='done'?L('완료','Done'):ddLabel(n)}</span></div>
+      <div class="pj-grid">
+        <div><label>${L('진행률','Progress')} · ${L('지난주','last')} ${p.progress||0}% → <span id="pv_${p.id}" class="mono">${prog}%</span></label>
+          <input type="range" min="0" max="100" step="5" value="${prog}" data-s="r" data-k="projectLog.${p.id}.progress" data-num data-out="pv_${p.id}" aria-label="${L('진행률','Progress')}" ${D?'disabled':''}></div>
+        <div><label>${L('상태','Health')}</label>${seg(HEALTH,lg.health,'health',`data-id="${p.id}"`,D)}</div>
+        <div><label>${L('이번 주 진행','This week')}</label>${inp('r',`projectLog.${p.id}.update`,lg.update,{ph:L('이번 주에 한 것','What moved this week'),dis:D})}</div>
+        <div><label>${L('다음 단계','Next step')}</label>${inp('r',`projectLog.${p.id}.next`,lg.next,{ph:L('다음 주에 할 것','Next step'),dis:D})}</div>
+      </div></div>`;
   }).join('');
-}
+  const nf=S.nf.proj;
+  const projForm = S.showProj ? `<div class="pj" style="background:var(--surface2)">
+    <div class="pj-grid" style="margin-top:0">
+      <div style="grid-column:1/-1"><label>${L('과제명','Title')}</label>${inp('nf','proj.title',nf.title,{ph:L('예: Fire license 취득','e.g. Fire license')})}</div>
+      <div><label>Main / Sub</label>${sel('nf','proj.kind',nf.kind,KIND_OPTS(),{rr:true})}</div>
+      <div><label>${L('분류','Category')}</label>${sel('nf','proj.cat',nf.cat,catOpts(nf.kind))}</div>
+      <div><label>${L('목표일','Target date')}</label>${inp('nf','proj.target',nf.target,{type:'date'})}</div>
+    </div>
+    <div class="actions" style="margin-top:10px"><button type="button" class="btn pri sm" data-act="proj-add">${L('등록','Add')}</button><button type="button" class="btn sm" data-act="proj-form">${L('취소','Cancel')}</button></div></div>` : '';
 
-// ── 미팅 모드 ─────────────────────────────────
-function renderMeeting(){
-  const list=getFilteredList();
-  const total=list.length,done=list.filter(i=>i.status==='Completed').length;
-  const inprog=list.filter(i=>i.status==='In Progress').length;
-  const delayed=list.filter(i=>i.status!=='Completed'&&diffDays(i.dueDate)<0).length;
-
-  document.getElementById('meetingKpi').innerHTML=[
-    {label:'TOTAL',value:list.length,color:'var(--text)'},
-    {label:'IN PROGRESS',value:inprog,color:'var(--accent)'},
-    {label:'COMPLETED',value:done,color:'var(--green)'},
-    {label:'DELAYED',value:delayed,color:'var(--red)'},
-    {label:'RATE',value:(total?Math.round(done/total*100):0)+'%',color:'var(--green)'},
-  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.color}">${k.value}</div></div>`).join('');
-
-  const sorted=[...list].sort((a,b)=>{
-    const score=i=>i.status==='Completed'?3:diffDays(i.dueDate)<0?0:i.priority==='High'?1:2;
-    return score(a)-score(b);
-  });
-
-  document.getElementById('meetingItems').innerHTML=sorted.map((i,idx)=>{
-    const dd=diffDays(i.dueDate),isDelayed=i.status!=='Completed'&&dd<0;
-    const prog=Number(i.progress)||0,delta=Number(i.weeklyDelta)||0;
-    return `<div class="meeting-card${isDelayed?' delayed':i.priority==='High'?' high-prio':''}" onclick="openDetail('${i._key}')">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px">
-        <div style="display:flex;align-items:center;gap:10px;flex:1">
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;color:var(--text3);min-width:36px">${String(idx+1).padStart(2,'0')}</span>
-          <div>
-            <div style="font-size:14px;font-weight:700;margin-bottom:5px">${i.task}</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-              ${i.id?`<span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">${i.id}</span>`:''}
-              ${i.customer?`<span style="font-size:11px;color:var(--text2)">${i.customer}</span>`:''}
-              ${i.category?`<span style="font-size:10px;background:var(--bg);padding:2px 7px;border-radius:4px;border:1px solid var(--border);color:var(--text2)">${i.category}</span>`:''}
-              ${i.owner?`<span style="font-size:10px;background:var(--bg);padding:2px 7px;border-radius:4px;border:1px solid var(--border);color:var(--text2)">${i.owner}</span>`:''}
-              <span class="${i.priority==='High'?'p-high':i.priority==='Medium'?'p-med':'p-low'}" style="font-size:11px">${i.priority||''}</span>
-            </div>
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
-          ${sbadge(i.status)}
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:${isDelayed?'var(--red)':dd<=3?'var(--yellow)':'var(--text3)'}">${i.status==='Completed'?'완료됨':dd<0?`${-dd}일 지연`:`D-${dd}`}</span>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:${(i.files&&i.files.length)||i.risk?'12px':'0'}">
-        <div>
-          <div class="filter-lbl" style="margin-bottom:6px">PROGRESS</div>
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
-            <span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:var(--accent)">${prog}%</span>
-            ${delta>0?`<span style="font-size:11px;color:var(--green);font-weight:700">▲ +${Math.round(delta*100)}%</span>`:delta<0?`<span style="font-size:11px;color:var(--red);font-weight:700">▼ ${Math.round(delta*100)}%</span>`:''}
-          </div>
-          <div class="pbar-wrap"><div class="pbar-fill" style="width:${prog}%;background:${pcolor(prog)}"></div></div>
-        </div>
-        <div>
-          <div class="filter-lbl" style="margin-bottom:6px">F/UP</div>
-          <div style="font-size:12px;line-height:1.6">${i.followup||`<span style="color:var(--text3)">내용 없음</span>`}</div>
-        </div>
-      </div>
-      ${i.files&&i.files.length?`
-        <div style="margin-top:12px;padding:12px 14px;background:var(--accent-l);border:1px solid #bfdbfe;border-radius:8px;">
-          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.06em;margin-bottom:8px;font-weight:700;">📎 관련 파일 (클릭하여 열기)</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            ${i.files.map(f=>`
-              <a class="file-link file-link-teams" href="${f.url}" target="_blank" rel="noopener"
-                style="padding:6px 14px;font-size:12px;display:inline-flex;align-items:center;gap:6px;"
-                onclick="event.stopPropagation()">
-                📄 ${f.name||'파일'}
-              </a>`).join('')}
-          </div>
-        </div>`:''}
-      ${i.risk?`<div style="margin-top:8px;padding:8px 12px;background:var(--red-l);border:1px solid #fca5a5;border-radius:6px;font-size:11px;color:var(--red)">⚠ ${i.risk}</div>`:''}
-    </div>`;
-  }).join('');
-}
-
-// ── 파일 관리 (등록 폼) ───────────────────────
-window.addFileRow = (mode) => {
-  if(mode==='add'){
-    const name=document.getElementById('a-fname').value.trim();
-    const url=document.getElementById('a-furl').value.trim();
-    if(!url){showToast('파일 링크를 입력해주세요',true);return;}
-    addFiles.push({name:name||url.split('/').pop()||'파일',url});
-    document.getElementById('a-fname').value='';
-    document.getElementById('a-furl').value='';
-    renderAddFileList();
-  } else if(mode==='edit'){
-    const name=document.getElementById('e-fname').value.trim();
-    const url=document.getElementById('e-furl').value.trim();
-    if(!url){showToast('파일 링크를 입력해주세요',true);return;}
-    editFiles.push({name:name||url.split('/').pop()||'파일',url});
-    document.getElementById('e-fname').value='';
-    document.getElementById('e-furl').value='';
-    renderEditFileList();
-  }
-};
-
-function renderAddFileList(){
-  const el=document.getElementById('a-file-list');
-  if(!el) return;
-  el.innerHTML=addFiles.map((f,idx)=>`
-    <div class="file-list-item">
-      <span style="font-size:14px">📎</span>
-      <a href="${f.url}" target="_blank" rel="noopener">${f.name}</a>
-      <button class="btn-remove-file" onclick="removeAddFile(${idx})">×</button>
+  // 04 추가 Main
+  const exRows = (r.extra||[]).map((x,i)=>`<div class="row" style="grid-template-columns:140px minmax(160px,1fr) minmax(160px,1.2fr) 44px">
+      ${sel('r',`extra.${i}.cat`,x.cat,catOpts('main'),{dis:D,aria:L('분류','Category')})}
+      ${inp('r',`extra.${i}.text`,x.text,{ph:L('업무','Work'),dis:D})}
+      ${inp('r',`extra.${i}.detail`,x.detail,{ph:L('상세 (날짜 · 수량 · 시간)','Detail (date · qty · hours)'),dis:D})}
+      ${D?'':`<button type="button" class="btn sm" data-act="extra-del" data-i="${i}" aria-label="${L('삭제','Delete')}">×</button>`}
     </div>`).join('');
-}
 
-window.removeAddFile = idx => { addFiles.splice(idx,1); renderAddFileList(); };
-
-let editFiles=[];
-function renderEditFileList(){
-  const el=document.getElementById('e-file-list');
-  if(!el) return;
-  el.innerHTML=editFiles.map((f,idx)=>`
-    <div class="file-list-item">
-      <span style="font-size:14px">📎</span>
-      <a href="${f.url}" target="_blank" rel="noopener">${f.name}</a>
-      <button class="btn-remove-file" onclick="removeEditFile(${idx})">×</button>
+  // 05 Sub
+  const subRows = (r.subs||[]).map((x,i)=>`<div class="row" style="grid-template-columns:150px minmax(160px,1fr) minmax(160px,1.2fr) 44px">
+      ${sel('r',`subs.${i}.cat`,x.cat,catOpts('sub'),{dis:D,aria:L('분류','Category')})}
+      ${inp('r',`subs.${i}.text`,x.text,{ph:x.hint||L('무엇을 했나요?','What did you do?'),dis:D})}
+      ${inp('r',`subs.${i}.detail`,x.detail,{ph:L('어디서 · 무엇을 발견 · 어떻게 처리','Where · what you found · what you did'),dis:D})}
+      ${D?'':`<button type="button" class="btn sm" data-act="sub-del" data-i="${i}" aria-label="${L('삭제','Delete')}">×</button>`}
     </div>`).join('');
-}
-window.removeEditFile = idx => { editFiles.splice(idx,1); renderEditFileList(); };
+  const PROMPTS=[
+    ['ehs',L('누수 · 냄새 · 부식 흔적을 발견했다','Found a leak, odor or corrosion')],
+    ['ehs',L('보호구 · 아이워시 · 샤워 상태를 확인했다','Checked PPE, eyewash or shower')],
+    ['clean',L('정리 안 된 구역을 치웠다','Cleared a messy area')],
+    ['equip',L('설비 이상 징후를 미리 봤다','Spotted an equipment issue early')],
+    ['clean',L('라벨 · 표지가 틀리거나 낡은 걸 고쳤다','Fixed a wrong or worn label')],
+    ['idea',L('더 쉽게 · 빠르게 할 방법이 떠올랐다','Thought of a faster way')],
+    ['edu',L('다른 사람에게 가르치거나 배웠다','Taught or learned something')]
+  ];
 
-// ── 상세 모달 ─────────────────────────────────
-window.openDetail = (key) => {
-  const i=items[key]; if(!i) return;
-  const prog=Number(i.progress)||0,delta=Number(i.weeklyDelta)||0,dd=diffDays(i.dueDate);
-  editFiles=[...(i.files||[])];
-  document.getElementById('modalTitle').textContent=`${i.id||''} — ACTION ITEM`;
-  document.getElementById('modalBody').innerHTML=`
-    <div class="detail-grid">
-      <div class="detail-card"><div class="detail-lbl">STATUS</div>${sbadge(i.status)}</div>
-      <div class="detail-card"><div class="detail-lbl">PRIORITY</div><div class="detail-val ${i.priority==='High'?'p-high':i.priority==='Medium'?'p-med':'p-low'}">${i.priority||'-'}</div></div>
-      <div class="detail-card"><div class="detail-lbl">D-DAY</div><div class="detail-val dday ${i.status==='Completed'?'dd-done':dd<0?'dd-late':dd<=3?'dd-soon':'dd-ok'}">${i.status==='Completed'?'완료':dd<0?`${-dd}일 지연`:`D-${dd}`}</div></div>
+  // 06 다음 주
+  const nwk=addWk(wk,1);
+  const npRows=(r.nextPlan||[]).map((x,i)=>`<div class="row" style="grid-template-columns:150px 100px minmax(200px,1fr) 44px">
+      ${inp('r',`nextPlan.${i}.date`,x.date,{type:'date',dis:D,aria:L('날짜','Date'),extra:`min="${ymd(wkDay(nwk,0))}" max="${ymd(wkDay(nwk,6))}"`})}
+      ${sel('r',`nextPlan.${i}.kind`,x.kind||'main',KIND_OPTS(),{dis:D,aria:'Main/Sub'})}
+      <div style="display:flex;gap:6px;align-items:center;min-width:0">${inp('r',`nextPlan.${i}.text`,x.text,{ph:L('할 일 (예: ESF HF IBC 출하 · 16 IBC)','Task'),dis:D})}${x.carried?`<span class="tag t-warn">${L('이월','Carried')}</span>`:''}</div>
+      ${D?'':`<button type="button" class="btn sm" data-act="np-del" data-i="${i}" aria-label="${L('삭제','Delete')}">×</button>`}
+    </div>`).join('');
+
+  // 사이드 · Sub 추이
+  const trendWks=[...Array(6)].map((_,i)=>addWk(wk,i-5));
+  const trend=trendWks.map(w=>{ const rr=w===wk?r:rep(u.id,w); return rr?(rr.subs||[]).filter(s=>s.text).length:0; });
+  const tmax=Math.max(3,...trend);
+  const upcoming=Object.values(DB.projects).filter(p=>p.uid===u.id&&p.status==='open').sort((a,b)=>(a.target||'9').localeCompare(b.target||'9')).slice(0,4);
+
+  return `<main class="wrap">
+  <div class="page-h">
+    <div>
+      <div class="eyebrow">${wk.slice(0,4)} · WEEK ${+wk.slice(6)} · ${wkRange(wk)}</div>
+      <h1>${wkLabel(wk)} ${L('주간 보고','weekly report')}</h1>
+      <div class="meta"><span class="tag ${stC}">${stL}</span><span>${L('마감','Due')} ${md(due)} ${dow(due)} ${pad(due.getHours())}:00</span><span id="savedNote">${r.submittedAt?L('제출 ','Submitted ')+hm(r.submittedAt):''}</span></div>
     </div>
-    <div class="detail-card" style="margin-bottom:12px"><div class="detail-lbl">TASK</div><div style="font-size:15px;font-weight:600;margin-top:4px">${i.task||''}</div></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <div class="detail-card"><div class="detail-lbl">CUSTOMER</div><div class="detail-val">${i.customer||'-'}</div></div>
-      <div class="detail-card"><div class="detail-lbl">OWNER</div><div class="detail-val">${i.owner||'-'}</div></div>
-      <div class="detail-card"><div class="detail-lbl">WORK TYPE</div><div class="detail-val">${i.workType||'-'}</div></div>
-      <div class="detail-card"><div class="detail-lbl">CATEGORY</div><div class="detail-val">${i.category||'-'}</div></div>
-      <div class="detail-card"><div class="detail-lbl">START DATE</div><div class="detail-val">${i.startDate||'-'}</div></div>
-      <div class="detail-card"><div class="detail-lbl">DUE DATE</div><div class="detail-val">${i.dueDate||'-'}</div></div>
+    <div class="actions">${wkNav(wk,'wk')}
+      ${lock?`<span class="muted small">${L('피드백 완료된 보고는 수정할 수 없습니다','Reviewed reports are locked')}</span>`:`
+      <button type="button" class="btn" data-act="save">${L('저장','Save')}</button>
+      <button type="button" class="btn pri" data-act="submit">${r.status==='submitted'?L('다시 제출','Resubmit'):L('제출하기','Submit')}</button>`}
     </div>
-    <div class="detail-card" style="margin-bottom:12px">
-      <div class="detail-lbl">PROGRESS</div>
-      <div style="display:flex;align-items:center;gap:12px;margin:8px 0">
-        <span style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:700;color:var(--accent)">${prog}%</span>
-        <span style="font-size:12px;color:var(--text3)">지난주: ${Number(i.lastProgress)||0}%</span>
-        ${delta>0?`<span style="color:var(--green);font-weight:700">▲ +${Math.round(delta*100)}%</span>`:delta<0?`<span style="color:var(--red);font-weight:700">▼ ${Math.round(delta*100)}%</span>`:''}
+  </div>
+  ${S.submitWarn?`<div class="warnbox" style="margin-bottom:16px" role="alert"><b>${L('아직 채우지 않은 항목이 있습니다','Some items are incomplete')}</b><ul>${issues.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+    <div class="actions"><button type="button" class="btn" data-act="submit-cancel">${L('돌아가서 채우기','Go back')}</button><button type="button" class="btn pri" data-act="submit-force">${L('그대로 제출','Submit anyway')}</button></div></div>`:''}
+  <div class="layout">
+  <div class="col-main">
+    ${fbHtml}
+    <section class="card" aria-labelledby="s1">
+      <div class="sec-h"><div><h2 id="s1"><span class="sec-n">01</span>${L('지난주 계획 점검','Last week’s plan')}</h2><p>${L(`${wkLabel(addWk(wk,-1))}에 적은 다음 주 계획이 자동으로 들어옵니다. 결과만 고르세요. 진행중 · 지연은 다음 주 계획으로 자동 이월됩니다.`,`Plans from ${wkLabel(addWk(wk,-1))} appear here. Pick a result; ongoing or delayed items carry over automatically.`)}</p></div>
+        <div class="mono">${L('이행','Done')} <b>${stats.pDone}</b> / ${stats.planTotal}</div></div>
+      ${planRows}
+    </section>
+
+    <section class="card" aria-labelledby="s2">
+      <div class="sec-h"><div><h2 id="s2"><span class="sec-n">02</span>${L('루틴 업무','Routines')}</h2><p>${L('매주 반복하는 일. 수행 여부와 실적만 적습니다.','Recurring work. Mark it and note the result.')}</p></div>
+        <button type="button" class="btn sm dash" data-act="nav" data-v="tasks">${L('루틴 관리','Manage routines')}</button></div>
+      ${rtRows}
+    </section>
+
+    <section class="card" aria-labelledby="s3">
+      <div class="sec-h"><div><h2 id="s3"><span class="sec-n">03</span>${L('장기 업무 · 목표일 관리','Long-term work')}</h2><p>${L('몇 주 · 몇 달 걸리는 일. 완료될 때까지 매주 진행률과 진행 내용을 적습니다. 100%로 제출하면 완료 처리됩니다.','Work that takes weeks or months. Update progress weekly until done; submitting at 100% closes it.')}</p></div>
+        ${D?'':`<button type="button" class="btn sm dash" data-act="proj-form">+ ${L('장기 업무 등록','Add long-term item')}</button>`}</div>
+      ${projForm}
+      ${pjRows || (S.showProj?'':`<div class="empty">${L('진행 중인 장기 업무가 없습니다.','No long-term work in progress.')}</div>`)}
+    </section>
+
+    <section class="card" aria-labelledby="s4">
+      <div class="sec-h"><div><h2 id="s4"><span class="sec-n">04</span><span style="color:var(--main)">Main Work</span> · ${L('계획 외 추가 업무','Unplanned main work')}</h2><p>${L('계획 · 루틴에 없던 본업만 적습니다. 이미 위에 있는 일은 다시 적지 않아도 됩니다.','Only main work not covered above.')}</p></div></div>
+      ${exRows?`<div class="scroll"><div style="min-width:640px">${exRows}</div></div>`:''}
+      ${D?'':`<div class="sec-f"><button type="button" class="btn sm dash" data-act="extra-add">+ ${L('항목 추가','Add item')}</button></div>`}
+    </section>
+
+    <section class="card subcard" aria-labelledby="s5">
+      <div class="sec-h"><div><h2 id="s5"><span class="sec-n">05</span><span style="color:var(--sub)">Sub Work</span> · ${L('숨은 일 찾기','Hidden work')}</h2>
+        <p>${L('시키지 않았지만 현장을 낫게 만든 일. 청소 · 정리, 안전, 설비 점검, 개선 아이디어처럼 눈에 잘 안 보이는 일을 적어주세요.','Things nobody asked for that made the site better: cleaning, safety, equipment checks, ideas.')}</p></div>
+        <div class="small">${L('이번 주','This week')} <b style="color:var(--sub)">${stats.subN}${L('건','')}</b> · ${L('목표','target')} ${subTarget}+</div></div>
+      ${subRows?`<div class="scroll"><div style="min-width:660px">${subRows}</div></div>`:''}
+      ${D?'':`<div class="prompts"><b style="font-size:13px">${L('이번 주에 이런 건 없었나요? 누르면 바로 한 줄이 추가됩니다.','Anything like this? Tap to add a line.')}</b>
+        <div class="g">${PROMPTS.map(([c,t])=>`<button type="button" class="prompt" data-act="sub-add" data-cat="${c}" data-hint="${esc(t)}">+ ${esc(t)} <span class="tag t-sub">${lbl(SUBCAT,c)}</span></button>`).join('')}</div>
+        <div style="margin-top:10px"><button type="button" class="btn sm subc" data-act="sub-add" data-cat="clean">+ ${L('Sub work 직접 추가','Add sub work')}</button></div></div>`}
+    </section>
+
+    <section class="card" aria-labelledby="s6">
+      <div class="sec-h"><div><h2 id="s6"><span class="sec-n">06</span>${L('다음 주 계획','Next week plan')} · ${wkLabel(nwk)} <span class="muted small mono">${wkRange(nwk)}</span></h2><p>${L('루틴 · 장기 업무는 자동으로 이어지니, 이번 주 안에 끝낼 일만 날짜와 함께 적습니다. 다음 주 01번으로 넘어갑니다.','Routines and long-term work carry over by themselves; list one-off tasks with a date.')}</p></div></div>
+      ${npRows?`<div class="scroll"><div style="min-width:600px">${npRows}</div></div>`:''}
+      ${D?'':`<div class="sec-f"><button type="button" class="btn sm dash" data-act="np-add">+ ${L('계획 추가','Add plan')}</button></div>`}
+    </section>
+
+    <section class="card pad" aria-labelledby="s7">
+      <h2 id="s7"><span class="sec-n">07</span>${L('이슈 · 위험 · 도움 요청','Issues · risks · help')}</h2>
+      <p class="muted small" style="margin:3px 0 10px">${L('막힌 일, 위험 요소, 결정이 필요한 것.','Blockers, risks, decisions needed.')}</p>
+      ${ta('r','issues',r.issues,{ph:L('없으면 비워두세요','Leave blank if none'),dis:D})}
+      <div style="margin-top:8px">${ck('r','help',r.help,`<span style="color:var(--bad);font-weight:600">${L('관리자 도움 요청으로 표시','Flag as help needed')}</span>`,{dis:D})}</div>
+    </section>
+  </div>
+
+  <aside class="col-side" aria-label="${L('이번 주 요약','Summary')}">
+    <div class="card pad">
+      <h3>${wkLabel(wk)} ${L('한눈에','AT A GLANCE')}</h3>
+      <div class="stat">
+        <div><div class="v">${stats.planRate??'—'}${stats.planRate!=null?'%':''}</div><div class="k">${L('계획 이행','Plan done')} ${stats.pDone}/${stats.planTotal}</div></div>
+        <div><div class="v">${stats.routineRate??'—'}${stats.routineRate!=null?'%':''}</div><div class="k">${L('루틴 수행','Routines')}</div></div>
+        <div><div class="v" style="color:var(--main)">${stats.mainN}</div><div class="k">Main</div></div>
+        <div><div class="v" style="color:var(--sub)">${stats.subN}</div><div class="k">Sub · ${L('목표','target')} ${subTarget}</div></div>
       </div>
-      <div class="pbar-wrap" style="height:8px;border-radius:5px"><div class="pbar-fill" style="width:${prog}%;background:${pcolor(prog)}"></div></div>
+      <div class="bar sub" style="margin-top:12px" aria-hidden="true"><i style="width:${Math.min(100,stats.subN/subTarget*100)}%"></i></div>
     </div>
-    ${i.followup?`<div class="detail-card" style="margin-bottom:12px"><div class="detail-lbl">F/UP</div><div style="font-size:13px;line-height:1.7;margin-top:4px">${i.followup}</div></div>`:''}
-    ${i.risk?`<div class="detail-card" style="margin-bottom:12px;border-color:#fca5a5;background:var(--red-l)"><div class="detail-lbl" style="color:var(--red)">⚠ RISK / ISSUE</div><div style="font-size:13px;line-height:1.7;margin-top:4px;color:var(--red)">${i.risk}</div></div>`:''}
-    ${i.files&&i.files.length?`<div class="detail-card" style="margin-bottom:12px">
-      <div class="detail-lbl">📎 첨부 파일</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${filesHtml(i.files)}</div>
-    </div>`:''}
-
-    <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px">
-      <div class="filter-lbl" style="margin-bottom:14px">// 주간 업데이트</div>
-      <div class="fgrid">
-        <div><div class="flabel">상태 변경</div>
-          <select class="fselect" id="edit-status">
-            ${['In Progress','Completed','Pending'].map(s=>`<option${s===i.status?' selected':''}>${s}</option>`).join('')}
-          </select></div>
-        <div><div class="flabel">진행률 (%)</div><input class="finput" type="number" id="edit-prog" min="0" max="100" value="${prog}"></div>
-        <div class="ff"><div class="flabel">이번 주 F/UP</div><textarea class="ftextarea" id="edit-fup">${i.followup||''}</textarea></div>
-        <div class="ff"><div class="flabel">Risk / Issue</div><textarea class="ftextarea" id="edit-risk">${i.risk||''}</textarea></div>
-        <div class="ff">
-          <div class="flabel">📎 Teams 파일 링크</div>
-          <div id="e-file-list" style="margin-bottom:8px"></div>
-          <div class="file-add-row">
-            <input class="finput finput-name" id="e-fname" placeholder="파일명 (예: 계약서.pdf)">
-            <input class="finput" id="e-furl" placeholder="Teams 공유 링크 붙여넣기">
-            <button class="btn-add-file" onclick="addFileRow('edit')">+ 추가</button>
-          </div>
-          <div style="font-size:11px;color:var(--text3);margin-top:6px">💡 Teams에서 파일 우클릭 → 링크 복사 → 여기에 붙여넣기</div>
-        </div>
-      </div>
-      <div class="form-actions">
-        <button class="btn-del" onclick="deleteItem('${key}')">🗑 삭제</button>
-        <button class="btn-cancel" onclick="document.getElementById('modalOverlay').classList.remove('show')">닫기</button>
-        <button class="btn-save" onclick="updateItem('${key}')">💾 업데이트</button>
-      </div>
-    </div>`;
-  renderEditFileList();
-  document.getElementById('modalOverlay').classList.add('show');
-};
-
-window.closeModal = e=>{ if(e.target===document.getElementById('modalOverlay')) document.getElementById('modalOverlay').classList.remove('show'); };
-
-// ── CRUD ──────────────────────────────────────
-window.addItem = async () => {
-  const task=document.getElementById('a-task').value.trim();
-  const due=document.getElementById('a-due').value;
-  if(!task||!due){showToast('Task 내용과 마감일을 입력하세요',true);return;}
-  setSyncStatus('syncing');
-  const list=Object.values(items).filter(i=>i&&i.id);
-  const nextId=list.length?String(Number(list.map(i=>i.id).sort().pop())+1).padStart(3,'0'):'001';
-  await push(itemsRef,{
-    id:nextId,workType:document.getElementById('a-wtype').value,
-    customer:document.getElementById('a-cust').value.trim(),
-    stage:document.getElementById('a-stage').value,category:document.getElementById('a-cat').value,
-    task,owner:document.getElementById('a-owner').value.trim()||'JNFAM',
-    priority:document.getElementById('a-prio').value,
-    startDate:document.getElementById('a-start').value,dueDate:due,
-    status:document.getElementById('a-status').value,
-    progress:Number(document.getElementById('a-prog').value)||0,lastProgress:0,weeklyDelta:0,
-    followup:document.getElementById('a-fup').value.trim(),
-    risk:document.getElementById('a-risk').value.trim(),
-    files:[...addFiles],
-    createdAt:new Date().toISOString()
-  });
-  setSyncStatus('connected');
-  showToast('✓ Action Item 등록됐습니다!');
-  ['a-cust','a-task','a-owner','a-start','a-due','a-fup','a-risk'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('a-prog').value='0';
-  addFiles=[]; renderAddFileList();
-  switchTab('items',document.querySelectorAll('.tab')[1]);
-};
-
-window.updateItem = async (key) => {
-  const i=items[key]; if(!i) return;
-  const newProg=Number(document.getElementById('edit-prog').value)||0;
-  setSyncStatus('syncing');
-  await update(ref(db,'items/'+key),{
-    status:document.getElementById('edit-status').value,
-    progress:newProg,lastProgress:Number(i.progress)||0,
-    weeklyDelta:(newProg-(Number(i.progress)||0))/100,
-    followup:document.getElementById('edit-fup').value.trim(),
-    risk:document.getElementById('edit-risk').value.trim(),
-    files:[...editFiles],
-    updatedAt:new Date().toISOString()
-  });
-  setSyncStatus('connected');
-  document.getElementById('modalOverlay').classList.remove('show');
-  showToast('✓ 업데이트됐습니다!');
-};
-
-window.deleteItem = async (key) => {
-  if(!confirm('이 항목을 삭제할까요?')) return;
-  setSyncStatus('syncing');
-  await remove(ref(db,'items/'+key));
-  setSyncStatus('connected');
-  document.getElementById('modalOverlay').classList.remove('show');
-  showToast('🗑 삭제됐습니다');
-};
-
-// ── 탭 전환 ───────────────────────────────────
-window.switchTab = (name,btn) => {
-  ['dashboard','items','meeting','wrapup','add'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-};
-
-window.changeWeek = d => { curWeekOffset+=d; updateWeekBadge(); };
-
-function showToast(msg,isError=false){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast'+(isError?' error':'')+' show';
-  setTimeout(()=>t.className='toast',2500);
+    <div class="card pad">
+      <h3>${L('제출 전 체크','BEFORE YOU SUBMIT')}</h3>
+      <ul class="checks">
+        ${prev?.feedback&&prev.status==='reviewed'?`<li><span class="ic ${prev.ackAt?'ok':'no'}">${prev.ackAt?'✓':'!'}</span>${L('지난주 피드백 확인','Feedback acknowledged')}</li>`:''}
+        ${issues.length?issues.map(x=>`<li><span class="ic no">!</span>${esc(x)}</li>`).join(''):`<li><span class="ic ok">✓</span>${L('모두 채웠습니다','All set')}</li>`}
+      </ul>
+    </div>
+    <div class="card pad">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h3>${L('Sub work 발굴 추이','SUB WORK TREND')}</h3></div>
+      <div class="spark">${trend.map((n,i)=>`<div><span>${n}</span><i class="${i===5?'cur':''}" style="height:${Math.max(3,n/tmax*62)}px"></i></div>`).join('')}</div>
+      <div class="spark-x">${trendWks.map(w=>`<div>${wkLabel(w)}</div>`).join('')}</div>
+    </div>
+    <div class="card pad">
+      <h3>${L('다가오는 목표일','UPCOMING TARGETS')}</h3>
+      ${upcoming.length?`<ul class="checks">${upcoming.map(p=>{const n=dday(p.target);return `<li style="justify-content:space-between"><span style="min-width:0">${esc(p.title)}</span><span class="dd ${ddCls(n)}">${ddLabel(n)}</span></li>`}).join('')}</ul>`:`<p class="muted small" style="margin:8px 0 0">${L('없음','None')}</p>`}
+    </div>
+  </aside>
+  </div></main>`;
 }
 
-// ── 초기 샘플 데이터 ──────────────────────────
-onValue(itemsRef, async snap=>{
-  if(!snap.exists()){
-    const s=[
-      {id:'001',workType:'Management',customer:'other',stage:'Execution',category:'EHS',task:'Biz licence update',owner:'JNFAM',priority:'High',startDate:'2026-03-20',dueDate:'2026-05-31',status:'In Progress',progress:91,lastProgress:90,weeklyDelta:0.01,followup:'담당 소방관에 현재 진행 사항 update 완료. 2차 Update 완료',risk:'Fire inspection action item 해결 후 처리(ID 002 연계)',files:[]},
-      {id:'002',workType:'EHS',customer:'Internal',stage:'Negotiation',category:'EHS',task:'Fire inspection C/A - Fire Monitoring system / Sprinkler installation / EPA enroll',owner:'JNFAM',priority:'High',startDate:'2026-04-10',dueDate:'2026-05-31',status:'In Progress',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'EPA 등록 완료. Fire Monitoring 완료. Splinker 견적 완료',risk:'Splinker 공사시 도면 업데이트와 신고 필요',files:[]},
-      {id:'003',workType:'Customer',customer:'HWQ',stage:'Execution',category:'Operation',task:'재가동에 따른 공급 준비 SOP/Training/Safety check',owner:'JNFAM',priority:'High',startDate:'2026-04-20',dueDate:'2026-05-19',status:'In Progress',progress:75,lastProgress:60,weeklyDelta:0.15,followup:'SOP update 완료. HWQ 재교육 완료. Trucker 교육 예정',risk:'',files:[]},
-      {id:'004',workType:'Customer',customer:'PVJC',stage:'Execution',category:'Sales',task:'HCL 운송 및 관련 서류 정리',owner:'JNFAM',priority:'Medium',startDate:'2026-04-15',dueDate:'2026-05-03',status:'Completed',progress:100,lastProgress:100,weeklyDelta:0,followup:'PVJC 입고 확인 및 CoA 통과. Invoice 가능 확인 완료',risk:'',files:[]},
-      {id:'005',workType:'Customer',customer:'PVJC',stage:'Execution',category:'Sales',task:'HF ISO Tank 운송 (ISO Tank line modification/SOP/Trucker training)',owner:'JNFAM',priority:'Medium',startDate:'2026-04-01',dueDate:'2026-05-22',status:'In Progress',progress:90,lastProgress:80,weeklyDelta:0.1,followup:'SOP 준비중. 업체별 Line 구분 완료. Trucker 교육 예정',risk:'Qcells vs PVJC 스펙 차이',files:[]},
-      {id:'006',workType:'Customer',customer:'PVJC',stage:'Proposal',category:'Sales',task:'31% H2O2 Proposal',owner:'JNFAM',priority:'Low',startDate:'2026-04-01',dueDate:'2026-05-31',status:'In Progress',progress:10,lastProgress:10,weeklyDelta:0,followup:'가격 제안 완료. 현재 내부 협의중',risk:'PVJC 내부 협의 필요',files:[]},
-      {id:'007',workType:'Customer',customer:'PVJC',stage:'Execution',category:'Sales',task:'IBC용 H2O2 Dispenser & Diptube 판매',owner:'JNFAM',priority:'Low',startDate:'2026-04-15',dueDate:'2026-06-06',status:'In Progress',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'PO 수령. ETA update, AS 주문 완료',risk:'',files:[]},
-      {id:'008',workType:'Management',customer:'Internal',stage:'Execution',category:'Operation',task:'JNFAM 법인 전환 (LLC => C-Corp)',owner:'JNFAM',priority:'Medium',startDate:'2025-12-10',dueDate:'2026-07-12',status:'Pending',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'IRS 진행중. 벌금 면제 확인',risk:'IRS 진행 연기중',files:[]},
-      {id:'009',workType:'Operation',customer:'Internal',stage:'Execution',category:'Operation',task:'RM Build up (Safety Inventory 확보)',owner:'JNFAM',priority:'High',startDate:'2026-03-20',dueDate:'2026-05-31',status:'In Progress',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'HCl 1 CNT/HF 1CNT Inbound',risk:'',files:[]},
-      {id:'010',workType:'Customer',customer:'Suniva',stage:'Execution',category:'Sales',task:'H2SO4 Qual test',owner:'JNFAM',priority:'High',startDate:'2026-02-01',dueDate:'2026-05-09',status:'Completed',progress:100,lastProgress:90,weeklyDelta:0.1,followup:'황산 입고 완료 후 출하 준비 완료',risk:'',files:[]},
-      {id:'011',workType:'Customer',customer:'Suniva',stage:'Proposal',category:'Sales',task:'31% H2O2 Proposal',owner:'JNFAM',priority:'Medium',startDate:'2026-02-01',dueDate:'2026-05-29',status:'In Progress',progress:10,lastProgress:10,weeklyDelta:0,followup:'가격 제안 완료 후 Suniva 내부 협의중',risk:'',files:[]},
-      {id:'012',workType:'Customer',customer:'ESF (Korechem)',stage:'Audit',category:'Operation',task:'업체 승인 Audit (5/6~7)',owner:'JNF',priority:'High',startDate:'2026-05-06',dueDate:'2026-05-07',status:'In Progress',progress:75,lastProgress:70,weeklyDelta:0.05,followup:'Audit 지원',risk:'JNF audit',files:[]},
-      {id:'013',workType:'Customer',customer:'ESF (Korechem)',stage:'Negotiation',category:'Sales',task:'HF/HCl 공급 제안',owner:'JNFAM',priority:'High',startDate:'2026-01-06',dueDate:'2026-05-31',status:'In Progress',progress:50,lastProgress:40,weeklyDelta:0.1,followup:'협의 진행중. commitment-based pricing structure 제안',risk:'POR 대비 가격 이슈',files:[]},
-      {id:'014',workType:'Operation',customer:'Internal',stage:'Execution',category:'Operation',task:'Clean Room & ICP-MS Installation',owner:'JNFAM',priority:'High',startDate:'2025-05-08',dueDate:'2026-08-01',status:'Pending',progress:20,lastProgress:20,weeklyDelta:0,followup:'세부 견적 진행중',risk:'Capital issue / Fire inspection issue',files:[]},
-      {id:'015',workType:'Customer',customer:'Suniva',stage:'Proposal',category:'Sales',task:'Follow-up on APV Flexible Hose',owner:'JNFAM',priority:'High',startDate:'2026-04-30',dueDate:'2026-05-13',status:'In Progress',progress:40,lastProgress:0,weeklyDelta:0.4,followup:'담당자 Colin 요청 완료',risk:'',files:[]},
-    ];
-    for(const item of s) await push(itemsRef,{...item,createdAt:new Date().toISOString()});
+/* ───────── 읽기 전용 보고서 (리뷰 · 이력) ───────── */
+function fbSlot(key,title,mode,r){
+  if(mode==='review'){
+    const v=S.fb.items?.[key]||''; const g=!!S.fb.good?.[key];
+    return `<div class="fbtools">
+      <button type="button" class="btn sm ${g?'on':''}" data-act="good" data-key="${esc(key)}" aria-pressed="${g}">${L('좋음','Good')}</button>
+      <input class="in" data-s="fb" data-k="items.${esc(key)}" value="${esc(v)}" placeholder="${L('코멘트','Comment')}" aria-label="${L('코멘트','Comment')}">
+      <button type="button" class="btn sm" data-act="act-from" data-key="${esc(key)}" data-title="${esc(title)}">${L('Action 등록','Add action')}</button></div>`;
   }
-},{onlyOnce:true});
+  const f=r.feedback; if(!f) return '';
+  const t=f.items?.[key]; const g=f.good?.[key]; if(!t&&!g) return '';
+  return `<div class="fbline"><b>${esc(f.by||'CEO')}</b>${g?`<span class="tag t-ok">${L('좋음','Good')}</span> `:''}${esc(t||'')}</div>`;
+}
+function stTag(map,k){ if(!map[k]) return `<span class="tag t-neutral">${L('미선택','Not set')}</span>`; const cls={ok:'t-ok',warn:'t-warn',bad:'t-bad',neutral:'t-neutral'}[map[k][2]]; return `<span class="tag ${cls}">${L(map[k][0],map[k][1])}</span>`; }
+function renderRO(r,mode){
+  const plan=prevPlan(r); const ids=routineIdsOf(r);
+  const pjIds=Object.keys(r.projectLog||{}).filter(id=>DB.projects[id]);
+  const sec=(title,inner,extra='')=>`<div class="sec-h" style="border-top:1px solid var(--line2);padding-top:14px"><h3>${title}</h3>${extra}</div>${inner}`;
+  const none=`<div class="empty">${L('없음','None')}</div>`;
+  let h='';
+  h+=sec(L('지난주 계획 점검','LAST WEEK’S PLAN'), plan.length?plan.map(p=>{const pc=r.planCheck?.[p.id]||{};return `<div class="ro"><div class="ro-top"><span class="mono small muted" style="width:64px">${esc(fmtDate(p.date))}</span>${stTag(PLAN_S,pc.s)}<span class="tx"><b>${esc(p.text)}</b>${pc.note?` <span class="det">· ${esc(pc.note)}</span>`:''}</span></div>${fbSlot('plan:'+p.id,p.text,mode,r)}</div>`}).join(''):none, `<span class="mono small">${plan.filter(p=>r.planCheck?.[p.id]?.s==='done').length} / ${plan.length}</span>`);
+  h+=sec(L('루틴','ROUTINES'), ids.length?ids.map(id=>{const x=DB.routines[id]; if(!x) return ''; const lg=r.routineLog?.[id]||{}; return `<div class="ro"><div class="ro-top">${stTag(ROUT_S,lg.s)}${kindTag(x.kind,x.cat)}<span class="tx"><b>${esc(x.title)}</b>${lg.note?` <span class="det">· ${esc(lg.note)}</span>`:''}</span></div>${fbSlot('rt:'+id,x.title,mode,r)}</div>`}).join(''):none);
+  h+=sec(L('장기 업무','LONG-TERM WORK'), pjIds.length?pjIds.map(id=>{const p=DB.projects[id]; const lg=r.projectLog[id]; const n=dday(p.target); return `<div class="ro"><div class="ro-top">${stTag(HEALTH,lg.health)}<span class="tx"><b>${esc(p.title)}</b> <span class="mono small">${lg.progress??p.progress??0}%</span></span><span class="dd ${p.status==='done'?'fine':ddCls(n)}">${esc(fmtDate(p.target))} · ${p.status==='done'?L('완료','Done'):ddLabel(n)}</span></div>
+     <div class="det" style="margin-top:3px">${lg.update?esc(lg.update):`<span class="muted">${L('진행 내용 없음','No update')}</span>`}${lg.next?` → ${esc(lg.next)}`:''}</div>
+     <div class="bar" style="margin-top:6px;max-width:320px" aria-hidden="true"><i style="width:${lg.progress??p.progress??0}%"></i></div>${fbSlot('pj:'+id,p.title,mode,r)}</div>`}).join(''):none);
+  const ex=(r.extra||[]).filter(x=>x.text);
+  h+=sec(L('계획 외 Main work','UNPLANNED MAIN WORK'), ex.length?ex.map(x=>`<div class="ro"><div class="ro-top">${kindTag('main',x.cat)}<span class="tx"><b>${esc(x.text)}</b>${x.detail?` <span class="det">· ${esc(x.detail)}</span>`:''}</span></div>${fbSlot('ex:'+x.id,x.text,mode,r)}</div>`).join(''):none);
+  const sb=(r.subs||[]).filter(x=>x.text);
+  h+=sec(`<span style="color:var(--sub)">SUB WORK · ${sb.length}</span>`, sb.length?sb.map(x=>`<div class="ro"><div class="ro-top">${kindTag('sub',x.cat)}<span class="tx"><b>${esc(x.text)}</b>${x.detail?` <span class="det">· ${esc(x.detail)}</span>`:''}</span></div>${fbSlot('sub:'+x.id,x.text,mode,r)}</div>`).join(''):none);
+  const np=(r.nextPlan||[]).filter(x=>x.text);
+  h+=sec(L('다음 주 계획','NEXT WEEK PLAN'), np.length?np.map(x=>`<div class="ro"><div class="ro-top"><span class="mono small muted" style="width:64px">${esc(fmtDate(x.date))||'—'}</span>${kTag(x.kind)}<span class="tx">${esc(x.text)}${x.carried?` <span class="tag t-warn">${L('이월','Carried')}</span>`:''}</span></div></div>`).join(''):none);
+  h+=sec(L('이슈 · 도움 요청','ISSUES · HELP'), `<div class="ro">${r.help?`<span class="tag t-bad">${L('도움 요청','Help needed')}</span> `:''}${r.issues?`<span style="white-space:pre-line">${esc(r.issues)}</span>`:`<span class="muted">${L('없음','None')}</span>`}${fbSlot('issue',L('이슈','Issues'),mode,r)}</div>`);
+  return h;
+}
 
+/* ───────── 화면: 지난 보고 ───────── */
+function vHistory(){
+  const u=me();
+  const list=Object.values(DB.reports).filter(r=>r.uid===u.id).sort((a,b)=>b.wk.localeCompare(a.wk));
+  if(!S.histWk || !list.find(r=>r.wk===S.histWk)) S.histWk=(list.find(r=>r.status!=='draft')||list[0])?.wk;
+  const r=list.find(x=>x.wk===S.histWk);
+  const s=r?repStats(r):null;
+  return `<main class="wrap">
+    <div class="page-h"><div><h1>${L('지난 보고','History')}</h1><div class="meta">${L('주차를 고르면 그 주의 보고와 피드백을 봅니다.','Pick a week to see the report and feedback.')}</div></div></div>
+    ${list.length?`<div class="layout">
+      <nav class="card wklist" aria-label="${L('주차 목록','Weeks')}">${list.map(x=>{const [l,c]=repStatus(x);return `<button type="button" class="wkbtn" data-act="hist" data-wk="${x.wk}" aria-current="${x.wk===S.histWk}"><span class="w">${wkLabel(x.wk)}</span><span class="r">${wkRange(x.wk)}</span><span class="tag ${c}">${l}</span></button>`}).join('')}</nav>
+      <article class="card" style="flex:999 1 600px;min-width:0">
+        <div class="sec-h"><div><h2 style="font-size:20px">${wkLabel(r.wk)} · ${wkRange(r.wk)}</h2><p>${r.submittedAt?L('제출 ','Submitted ')+hm(r.submittedAt):L('작성 중','Draft')}${r.feedback?.at?' · '+L('피드백 ','Feedback ')+hm(r.feedback.at):''}</p></div>
+          <div class="actions mono" style="gap:16px">
+            <div><div style="font-size:20px;font-weight:600">${s.planRate??'—'}${s.planRate!=null?'%':''}</div><div class="small muted">${L('이행','Plan')}</div></div>
+            <div><div style="font-size:20px;font-weight:600">${s.routineRate??'—'}${s.routineRate!=null?'%':''}</div><div class="small muted">${L('루틴','Routine')}</div></div>
+            <div><div style="font-size:20px;font-weight:600;color:var(--sub)">${s.subN}</div><div class="small muted">Sub</div></div>
+          </div></div>
+        ${r.feedback&&r.status==='reviewed'?`<div style="padding:0 18px 14px"><div class="fbbox"><div class="lbl">${L('전체 피드백','Overall feedback')} · ${esc(r.feedback.by||'CEO')}</div>${r.feedback.overall?`<p>${esc(r.feedback.overall)}</p>`:''}
+          ${r.reply?`<div class="reply"><b>${esc(u.name)}</b>${esc(r.reply)}</div>`:''}
+          <div class="actions" style="margin-top:10px">${r.ackAt?`<span class="pill t-ok">${L('확인함','Acknowledged')} ${hm(r.ackAt)}</span>`:`<button type="button" class="btn sm" data-act="ack" data-id="${r.id}">${L('확인했습니다','Acknowledge')}</button>`}
+          <div style="flex:1 1 240px">${inp('rep:'+r.id,'reply',r.reply||'',{ph:L('답글','Reply')})}</div></div></div></div>`:''}
+        ${renderRO(r,'view')}
+      </article></div>`:`<div class="card pad muted">${L('아직 보고가 없습니다.','No reports yet.')}</div>`}
+  </main>`;
+}
 
-// ── Wrap-up ───────────────────────────────────
-const wrapupsRef = ref(db, 'wrapups');
-let wrapups = {};
-let editingWrapupKey = null;
+/* ───────── 화면: 팀 리뷰 (관리자) ───────── */
+function vReview(){
+  const wk=S.wk; const ppl=staff();
+  if(!S.sel || !ppl.find(p=>p.id===S.sel)) S.sel=ppl[0]?.id;
+  const r=S.sel?rep(S.sel,wk):null;
+  if(r && (!S.fb || S.fb._rid!==r.id)) S.fb=Object.assign({overall:'',items:{},good:{}},clone(r.feedback||{}),{_rid:r.id});
+  const allSubs=ppl.flatMap(p=>{const x=rep(p.id,wk); return x&&x.status!=='draft'?(x.subs||[]).filter(s=>s.text).map(s=>({...s,who:p.name})):[];});
+  const helpN=ppl.filter(p=>rep(p.id,wk)?.help).length;
+  return `<main class="wrap">
+    <div class="page-h"><div><div class="eyebrow">WEEK ${+wk.slice(6)} · ${wkRange(wk)}</div><h1>${L('팀 리뷰','Team review')}</h1>
+      <div class="meta">${L('제출','Submitted')} ${ppl.filter(p=>['submitted','reviewed'].includes(rep(p.id,wk)?.status)).length} / ${ppl.length}${helpN?` · <span class="tag t-bad">${L('도움 요청','Help needed')} ${helpN}</span>`:''}</div></div>
+      ${wkNav(wk,'wk')}</div>
+    <div class="people">${ppl.map(p=>{const x=rep(p.id,wk); const s=repStats(x); const [l,c]=repStatus(x); return `<button type="button" class="pcard" data-act="sel" data-id="${p.id}" aria-pressed="${p.id===S.sel}">
+      <div class="hd"><span class="av">${esc(p.name.slice(0,3))}</span><span class="nm"><b>${esc(p.name)}</b><span class="small muted">${esc(p.role||'')}</span></span><span class="tag ${c}">${l}</span></div>
+      <div class="nums"><div><div class="v">${s?.planRate??'—'}${s?.planRate!=null?'%':''}</div><div class="k">${L('계획 이행','Plan')}</div></div><div><div class="v">${s?.routineRate??'—'}${s?.routineRate!=null?'%':''}</div><div class="k">${L('루틴','Routine')}</div></div><div><div class="v" style="color:var(--sub)">${s?.subN??0}</div><div class="k">Sub</div></div></div></button>`}).join('')}</div>
+    <div class="layout">
+      <article class="card" style="flex:999 1 620px;min-width:0">
+        ${!r?`<div class="card pad muted" style="border:0">${L(`${uname(S.sel)} · ${wkLabel(wk)} 보고가 아직 없습니다.`,`No ${wkLabel(wk)} report from ${uname(S.sel)} yet.`)}</div>`:`
+        <div class="sec-h"><div><h2 style="font-size:18px">${esc(uname(r.uid))} · ${wkLabel(wk)} ${L('보고','report')}</h2><p>${r.status==='draft'?L('작성 중 · 아직 제출 전','Draft · not submitted'):L('제출 ','Submitted ')+hm(r.submittedAt)}${r.status==='submitted'&&r.submittedAt>dueOf(wk).getTime()?` · <span style="color:var(--bad)">${L('마감 후 제출','Late')}</span>`:''}</p></div><span class="small muted">${L('항목마다 바로 코멘트','Comment on any item')}</span></div>
+        ${renderRO(r,r.status==='draft'?'view':'review')}
+        ${r.status==='draft'?'':`<div class="pad" style="padding:16px 18px 18px;border-top:1px solid var(--line2)">
+          <label for="ovfb" style="display:block;font-weight:700;margin-bottom:6px">${L('전체 피드백','Overall feedback')}</label>
+          <textarea id="ovfb" class="in" rows="3" data-s="fb" data-k="overall" placeholder="${L('이번 주 보고에 대한 한두 줄','A line or two on this week')}">${esc(S.fb.overall||'')}</textarea>
+          ${r.reply?`<div class="reply"><b>${esc(uname(r.uid))}</b>${esc(r.reply)}</div>`:''}
+          <div class="actions" style="justify-content:flex-end;margin-top:10px">
+            <button type="button" class="btn" data-act="fb-return">${L('보완 요청으로 반려','Return for revision')}</button>
+            <button type="button" class="btn pri" data-act="fb-send">${r.status==='reviewed'?L('피드백 수정 저장','Update feedback'):L('피드백 보내기','Send feedback')}</button></div></div>`}`}
+      </article>
+      <aside class="card subcard pad col-side" style="flex:1 1 280px" aria-label="Sub work">
+        <h2 style="font-size:15px">${L('이번 주 발굴된 Sub work','Sub work found this week')}</h2>
+        <div class="small muted">${L('팀 전체','Team')} ${allSubs.length}${L('건 · 월요일 회의 인정 후보','  · candidates for Monday recognition')}</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">${allSubs.length?allSubs.map(s=>`<div style="padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--sub-soft)"><div style="display:flex;justify-content:space-between;gap:8px;font-size:12px"><b style="color:var(--sub-ink)">${lbl(SUBCAT,s.cat)}</b><span class="muted">${esc(s.who)}</span></div><div style="font-weight:600;font-size:13px;margin-top:2px">${esc(s.text)}</div></div>`).join(''):`<div class="muted small">${L('아직 없음','None yet')}</div>`}</div>
+      </aside>
+    </div></main>`;
+}
 
-onValue(wrapupsRef, snap => {
-  wrapups = snap.val() || {};
-  renderWrapupList();
+/* ───────── 화면: 업무 설정 (루틴 · 장기) ───────── */
+function vTasks(){
+  const u=me(); const ppl=u.admin?staff():[u];
+  if(!S.tasksUid || !ppl.find(p=>p.id===S.tasksUid)) S.tasksUid=ppl[0]?.id;
+  const uid=S.tasksUid;
+  const rts=Object.values(DB.routines).filter(r=>r.uid===uid).sort(byCreated);
+  const pjs=Object.values(DB.projects).filter(p=>p.uid===uid).sort((a,b)=>(a.status==='done')-(b.status==='done')||(a.target||'9').localeCompare(b.target||'9'));
+  const open=pjs.filter(p=>p.status!=='done'), done=pjs.filter(p=>p.status==='done');
+  return `<main class="wrap">
+    <div class="page-h"><div><h1>${u.admin?L('업무 설정','Work setup'):L('내 업무','My work')}</h1><div class="meta">${L('루틴은 매주 보고에 자동으로 뜨고, 장기 업무는 완료될 때까지 매주 진행률을 받습니다. 1회성 일은 보고서의 다음 주 계획에 적습니다.','Routines appear in every report; long-term items ask for progress weekly until done. One-off tasks go in the weekly plan.')}</div></div>
+      ${u.admin?`<div class="actions">${ppl.map(p=>`<button type="button" class="btn sm ${p.id===uid?'pri':''}" data-act="tasks-user" data-id="${p.id}">${esc(p.name)}</button>`).join('')}</div>`:''}</div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+    <section class="card" aria-labelledby="rth">
+      <div class="sec-h"><div><h2 id="rth">${L('루틴 업무','Routines')} · ${rts.filter(r=>r.active!==false).length}</h2><p>${L('예: Qcells ISO 출하, 수불부 작성, Scrubber 수위 점검(매주 화). 끄면 보고서에 더 이상 나오지 않고 기록은 남습니다.','Turn one off to stop it appearing; history stays.')}</p></div></div>
+      <div class="scroll"><div style="min-width:980px">
+        <div class="row hd" style="grid-template-columns:minmax(200px,1.6fr) 90px 140px 120px 110px minmax(120px,1fr) 64px 44px"><div>${L('루틴','Routine')}</div><div>Main/Sub</div><div>${L('분류','Category')}</div><div>${L('주기','Frequency')}</div><div>${L('요일 · 날짜','Day')}</div><div>${L('기준 · 목표','Standard')}</div><div>${L('사용','Active')}</div><div></div></div>
+        ${rts.map(r=>`<div class="row" style="grid-template-columns:minmax(200px,1.6fr) 90px 140px 120px 110px minmax(120px,1fr) 64px 44px">
+          ${inp('rt:'+r.id,'title',r.title,{ph:L('루틴 이름','Routine name')})}
+          ${sel('rt:'+r.id,'kind',r.kind,KIND_OPTS(),{rr:true,aria:'Main/Sub'})}
+          ${sel('rt:'+r.id,'cat',r.cat,catOpts(r.kind),{aria:L('분류','Category')})}
+          ${sel('rt:'+r.id,'freq',r.freq,Object.entries(FREQ).map(([k,v])=>[k,L(v[0],v[1])]),{rr:true,aria:L('주기','Frequency')})}
+          ${r.freq==='monthly'?inp('rt:'+r.id,'monthDay',r.monthDay||1,{type:'number',num:true,aria:L('매월 날짜','Day of month'),extra:'min="1" max="31"'}):inp('rt:'+r.id,'days',r.days,{ph:L('예: 화','e.g. Tue')})}
+          ${inp('rt:'+r.id,'std',r.std,{ph:L('예: 주 4회','e.g. 4x/week')})}
+          <div>${ck('rt:'+r.id,'active',r.active!==false,'',{})}</div>
+          ${delBtn('rt-del',r.id,`data-id="${r.id}"`)}
+        </div>`).join('')||`<div class="empty">${L('루틴이 없습니다.','No routines.')}</div>`}
+      </div></div>
+      <div class="sec-f"><button type="button" class="btn sm dash" data-act="rt-add">+ ${L('루틴 추가','Add routine')}</button></div>
+    </section>
+    <section class="card" aria-labelledby="pjh">
+      <div class="sec-h"><div><h2 id="pjh">${L('장기 업무','Long-term work')} · ${open.length}</h2><p>${L('완료까지 몇 주 · 몇 달 걸리는 일. 목표일을 꼭 넣어주세요. 상태를 ‘완료’로 바꾸거나 보고서에서 100%로 제출하면 닫힙니다.','Set a target date. Closing: status Done, or submit at 100%.')}</p></div></div>
+      <div class="scroll"><div style="min-width:980px">
+        <div class="row hd" style="grid-template-columns:minmax(200px,1.6fr) 90px 140px 150px 150px 80px 110px 70px 44px"><div>${L('과제','Item')}</div><div>Main/Sub</div><div>${L('분류','Category')}</div><div>${L('시작일','Start')}</div><div>${L('목표일','Target')}</div><div>${L('진행률','Progress')}</div><div>${L('상태','Status')}</div><div>D-day</div><div></div></div>
+        ${open.map(p=>{const n=dday(p.target);return `<div class="row" style="grid-template-columns:minmax(200px,1.6fr) 90px 140px 150px 150px 80px 110px 70px 44px">
+          ${inp('pj:'+p.id,'title',p.title,{ph:L('과제명','Title')})}
+          ${sel('pj:'+p.id,'kind',p.kind,KIND_OPTS(),{rr:true,aria:'Main/Sub'})}
+          ${sel('pj:'+p.id,'cat',p.cat,catOpts(p.kind),{aria:L('분류','Category')})}
+          ${inp('pj:'+p.id,'start',p.start,{type:'date',aria:L('시작일','Start')})}
+          ${inp('pj:'+p.id,'target',p.target,{type:'date',rr:true,aria:L('목표일','Target')})}
+          ${inp('pj:'+p.id,'progress',p.progress,{type:'number',num:true,aria:L('진행률','Progress'),extra:'min="0" max="100" step="5"'})}
+          ${sel('pj:'+p.id,'status',p.status,Object.entries(PSTAT).map(([k,v])=>[k,L(v[0],v[1])]),{rr:true,aria:L('상태','Status')})}
+          <span class="dd ${ddCls(n)}">${ddLabel(n)}</span>
+          ${delBtn('pj-del',p.id,`data-id="${p.id}"`)}
+        </div>`}).join('')||`<div class="empty">${L('진행 중인 장기 업무가 없습니다.','None in progress.')}</div>`}
+      </div></div>
+      <div class="sec-f"><button type="button" class="btn sm dash" data-act="pj-add">+ ${L('장기 업무 추가','Add long-term item')}</button></div>
+      ${done.length?`<div class="sec-h" style="border-top:1px solid var(--line2)"><h3>${L('완료','DONE')} · ${done.length}</h3></div>${done.map(p=>`<div class="ro"><div class="ro-top"><span class="tag t-ok">${L('완료','Done')}</span><span class="tx"><b>${esc(p.title)}</b></span><span class="mono small muted">${L('목표','Target')} ${esc(fmtDate(p.target))} · ${L('완료','Done')} ${p.doneAt?md(new Date(p.doneAt)):''}</span><button type="button" class="btn sm" data-act="pj-reopen" data-id="${p.id}">${L('다시 열기','Reopen')}</button></div></div>`).join('')}`:''}
+    </section></div></main>`;
+}
+
+/* ───────── 화면: IPS 대시보드 ───────── */
+function sicRows(weeks){
+  const st=settings(); const T=st.targets||{}; const ppl=staff(); const cw=curWk();
+  const allWks=Object.values(DB.reports).map(r=>r.wk); const first=allWks.length?allWks.reduce((a,b)=>a<b?a:b):cw;
+  const live = w => w>=first && w<=cw;
+  const subd = w => ppl.map(p=>rep(p.id,w)).filter(r=>r&&r.status!=='draft');
+  const rows=[];
+  rows.push({name:L('주간 보고 기한 내 제출','On-time weekly reports'),owner:L('팀','Team'),uom:'%',plan:'100',lo:100,hi:100,fmt:'%',auto:true,
+    vals:weeks.map(w=>{ if(!live(w)||!ppl.length) return null; if(w===cw && Date.now()<dueOf(w).getTime()) return null; const n=ppl.filter(p=>{const r=rep(p.id,w); return r&&r.submittedAt&&r.submittedAt<=dueOf(w).getTime();}).length; return Math.round(n/ppl.length*100); })});
+  ppl.forEach(p=>rows.push({name:L('지난주 계획 이행률','Plan completion')+' · '+p.name,owner:p.name,uom:'%',plan:`${T.planMin??85} – 100`,lo:+(T.planMin??85),hi:100,fmt:'%',auto:true,
+    vals:weeks.map(w=>{const r=rep(p.id,w); if(!r||r.status==='draft') return null; return repStats(r).planRate;})}));
+  ppl.forEach(p=>rows.push({name:L('루틴 수행률','Routine completion')+' · '+p.name,owner:p.name,uom:'%',plan:`${T.routineMin??90} – 100`,lo:+(T.routineMin??90),hi:100,fmt:'%',auto:true,
+    vals:weeks.map(w=>{const r=rep(p.id,w); if(!r||r.status==='draft') return null; return repStats(r).routineRate;})}));
+  const subTgt=(+T.subPer||2)*ppl.length;
+  rows.push({name:L('Sub work 발굴 · 팀 합계','Sub work found · team'),owner:L('팀','Team'),uom:'#',plan:'≥ '+subTgt,lo:subTgt,hi:1e9,fmt:'',auto:true,
+    vals:weeks.map(w=>{const rs=subd(w); if(!rs.length) return null; return rs.reduce((a,r)=>a+(r.subs||[]).filter(s=>s.text).length,0);})});
+  rows.push({name:L('EHS Sub work','EHS sub work'),owner:L('팀','Team'),uom:'#',plan:'≥ '+(+T.ehsMin||1),lo:+T.ehsMin||1,hi:1e9,fmt:'',auto:true,
+    vals:weeks.map(w=>{const rs=subd(w); if(!rs.length) return null; return rs.reduce((a,r)=>a+(r.subs||[]).filter(s=>s.text&&s.cat==='ehs').length,0);})});
+  const asOf = w => { const e=wkEnd(w); const t=new Date(); return e<t?e:t; };
+  rows.push({name:L('목표일 초과 장기 업무','Overdue long-term items'),owner:L('팀','Team'),uom:'#',plan:'0',lo:0,hi:0,fmt:'',auto:true,
+    vals:weeks.map(w=>{ if(!live(w)) return null; const t=asOf(w); return Object.values(DB.projects).filter(p=>p.status!=='hold'&&(!p.startWk||p.startWk<=w)&&p.target&&parseD(p.target)<new Date(t.getFullYear(),t.getMonth(),t.getDate())&&!(p.status==='done'&&p.doneAt&&p.doneAt<=t.getTime())).length; })});
+  rows.push({name:L('기한 초과 Action','Overdue actions'),owner:L('팀','Team'),uom:'#',plan:'0',lo:0,hi:0,fmt:'',auto:true,
+    vals:weeks.map(w=>{ if(!live(w)) return null; const t=asOf(w); return Object.values(DB.actions).filter(a=>a.due&&parseD(a.due)<new Date(t.getFullYear(),t.getMonth(),t.getDate())&&(a.createdAt||0)<=t.getTime()&&!(a.status==='done'&&a.doneAt&&a.doneAt<=t.getTime())).length; })});
+  return rows;
+}
+function vDash(){
+  const st=settings(); const wk=S.dashWk; const cw=curWk(); const u=me();
+  const weeks=[...Array(7)].map((_,i)=>addWk(wk,i-6));
+  const rows=sicRows(weeks);
+  const agenda=(st.torText||'').split('\n').map(l=>l.split('|').map(x=>x.trim())).filter(a=>a[0]);
+  const days = s => { const d=parseD(s); return d?Math.max(0,Math.round((today0()-d)/864e5)):null; };
+  const dO=days(st.ehs?.lastOsha), dL=days(st.ehs?.lastLopc);
+  const bO=dO==null?null:Math.max(dO,+st.ehs?.bestOsha||0), bL=dL==null?null:Math.max(dL,+st.ehs?.bestLopc||0);
+  const pjs=Object.values(DB.projects).filter(p=>p.status!=='done'||(p.doneAt&&Date.now()-p.doneAt<28*864e5)).sort((a,b)=>(a.status==='done')-(b.status==='done')||(a.target||'9').localeCompare(b.target||'9'));
+  const lastLog = p => { const rs=Object.values(DB.reports).filter(r=>r.uid===p.uid&&r.status!=='draft'&&r.projectLog?.[p.id]).sort((a,b)=>b.wk.localeCompare(a.wk)); return rs[0]?{...rs[0].projectLog[p.id],wk:rs[0].wk}:null; };
+  const acts=Object.values(DB.actions).sort((a,b)=>(a.status==='done')-(b.status==='done')||(a.due||'9').localeCompare(b.due||'9'));
+  const openA=acts.filter(a=>a.status!=='done'); const lateA=openA.filter(a=>a.due&&dday(a.due)<0);
+  const na=S.nf.ac;
+  const COLS7='26px minmax(220px,1.7fr) 64px 40px 76px repeat(7,minmax(56px,1fr))';
+  return `<main class="wrap">
+  <div class="page-h"><div><div class="eyebrow">INTEGRATED PERFORMANCE SYSTEM · ${wkRange(wk)}</div><h1>${L('IPS 대시보드','IPS board')} · ${wkLabel(wk)}</h1></div>${wkNav(wk,'dwk')}</div>
+  <div style="display:flex;flex-direction:column;gap:18px">
+  <div class="layout" style="align-items:stretch">
+    <section class="card pad" style="flex:999 1 560px" aria-labelledby="torh">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline"><h2 id="torh">Weekly Review · TOR</h2><span class="mono small muted">${esc(st.torTime||'')}</span></div>
+      <ol class="tor">${agenda.map((a,i)=>`<li><div class="n">${i+1} · ${esc(a[1]||'')}${a[1]?L('분','m'):''}</div><b>${esc(a[0])}</b><div class="w">${esc(a[2]||'')}</div></li>`).join('')}</ol>
+      ${st.rules?`<div class="small muted" style="margin-top:10px">Ground rules · ${esc(st.rules)}</div>`:''}
+    </section>
+    <section class="hero" style="flex:1 1 300px;min-width:0" aria-labelledby="ehsh">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h2 id="ehsh" style="font-size:13px;letter-spacing:.06em">EH&amp;S SCOREBOARD</h2>${u.admin?`<button type="button" class="btn sm" style="background:transparent;color:var(--hero-ink);border-color:var(--hero-line)" data-act="nav" data-v="admin">${L('수정','Edit')}</button>`:''}</div>
+      <div class="ehs">
+        <div></div><div class="small m" style="text-align:right">${L('현재','Current')}</div><div class="small m" style="text-align:right">${L('최고 기록','Record')}</div>
+        <div>${L('무재해 일수','Days without recordable')}<div class="small m">OSHA Recordable</div></div><div class="big">${dO??'—'}</div><div class="rec">${bO??'—'}</div>
+        <div>${L('무누출 일수','Days without release')}<div class="small m">LOPC</div></div><div class="big">${dL??'—'}</div><div class="rec">${bL??'—'}</div>
+      </div>
+      ${dO==null||dL==null?`<div class="small m" style="margin-top:8px">${L('관리 화면에서 마지막 발생일을 입력하면 자동 계산됩니다.','Set last-incident dates in Admin.')}</div>`:''}
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--hero-line);font-size:13px">Safety Moment · <b>${esc(st.safety?.text||L('미정','Not set'))}</b>${st.safety?.who?` <span class="m">— ${esc(st.safety.who)}</span>`:''}</div>
+    </section>
+  </div>
+
+  <section class="card" aria-labelledby="sich">
+    <div class="sec-h"><div><h2 id="sich">Weekly SIC Report</h2><p>${L('모든 지표는 주간 보고 · 장기 업무 · Action Log에서 자동 집계됩니다. 범위는 관리 화면에서 바꿉니다.','All metrics are computed from reports, long-term work and the action log. Change ranges in Admin.')}</p></div>
+      <div class="legend"><span><i class="sw c-ok"></i>${L('범위 내','In range')}</span><span><i class="sw c-bad"></i>${L('범위 이탈 ▼','Out of range ▼')}</span><span><i class="sw c-na"></i>No data</span></div></div>
+    <div class="scroll"><div style="min-width:1000px">
+      <div class="row hd" style="grid-template-columns:${COLS7}"><div>#</div><div>SIC</div><div>Owner</div><div>UOM</div><div>Plan</div>${weeks.map(w=>`<div style="text-align:center;${w===wk?'color:var(--ink)':''}">${wkLabel(w)}</div>`).join('')}</div>
+      ${rows.map((s,i)=>`<div class="row" style="grid-template-columns:${COLS7};padding-block:6px">
+        <div class="mono small muted">${i+1}</div>
+        <div style="display:flex;gap:8px;align-items:center;min-width:0"><i class="dot ${s.auto?'auto':'man'}" aria-hidden="true"></i><span style="font-weight:600">${esc(s.name)}</span></div>
+        <div class="small">${esc(s.owner)}</div><div class="small muted">${s.uom}</div><div class="mono small">${esc(s.plan)}</div>
+        ${s.vals.map((v,j)=>{ const cur=j===6; if(v==null) return `<div class="cell c-na ${cur?'c-cur':''}">—</div>`; const ok=v>=s.lo&&v<=s.hi; return `<div class="cell ${ok?'c-ok':'c-bad'} ${cur?'c-cur':''}">${v}${s.fmt}${ok?'':' ▼'}</div>`; }).join('')}
+      </div>`).join('')}
+    </div></div>
+  </section>
+
+  <section class="card" aria-labelledby="pjb">
+    <div class="sec-h"><div><h2 id="pjb">${L('장기 업무 현황','Long-term work')}</h2><p>${L('목표일 순. 지연과 목표일 초과가 위로 보이게 정렬됩니다.','Sorted by target date.')}</p></div><span class="small muted">${L('진행','Open')} ${pjs.filter(p=>p.status==='open').length} · ${L('목표일 초과','Overdue')} <b style="color:var(--bad)">${pjs.filter(p=>p.status==='open'&&dday(p.target)<0).length}</b></span></div>
+    <div class="scroll"><div style="min-width:900px">
+      <div class="row hd" style="grid-template-columns:minmax(200px,1.5fr) 60px 90px 80px 160px 80px minmax(180px,1.4fr)"><div>${L('과제','Item')}</div><div>${L('담당','Owner')}</div><div>${L('목표일','Target')}</div><div>D-day</div><div>${L('진행률','Progress')}</div><div>${L('상태','Health')}</div><div>${L('최근 진행','Latest update')}</div></div>
+      ${pjs.map(p=>{const n=dday(p.target); const lg=lastLog(p); return `<div class="row" style="grid-template-columns:minmax(200px,1.5fr) 60px 90px 80px 160px 80px minmax(180px,1.4fr)">
+        <div style="min-width:0">${kindTag(p.kind,p.cat)} <b style="font-weight:600">${esc(p.title)}</b>${p.status==='hold'?` <span class="tag t-neutral">${L('보류','Hold')}</span>`:''}</div>
+        <div class="small">${esc(uname(p.uid))}</div><div class="mono small">${esc(fmtDate(p.target))||'—'}</div>
+        <div class="dd ${p.status==='done'?'fine':ddCls(n)}">${p.status==='done'?L('완료','Done'):ddLabel(n)}</div>
+        <div style="display:flex;gap:8px;align-items:center"><div class="bar" style="flex:1"><i style="width:${p.progress||0}%"></i></div><span class="mono small">${p.progress||0}%</span></div>
+        <div>${p.status==='done'?`<span class="tag t-ok">${L('완료','Done')}</span>`:lg?.health?stTag(HEALTH,lg.health):'<span class="muted small">—</span>'}</div>
+        <div class="small" style="min-width:0">${lg?.update?`<span class="mono muted">${wkLabel(lg.wk)}</span> ${esc(lg.update)}`:'<span class="muted">—</span>'}</div></div>`}).join('')||`<div class="empty">${L('없음','None')}</div>`}
+    </div></div>
+  </section>
+
+  <section class="card" aria-labelledby="ach">
+    <div class="sec-h"><div><h2 id="ach">Action Log</h2><p>${L('회의 · 피드백에서 나온 할 일. 팀 리뷰에서 ‘Action 등록’을 누르면 여기로 옵니다.','Follow-ups from meetings and feedback.')}</p></div><span class="small muted">Open ${openA.length} · ${L('기한 초과','Overdue')} <b style="color:var(--bad)">${lateA.length}</b></span></div>
+    <div class="scroll"><div style="min-width:860px">
+      <div class="row hd" style="grid-template-columns:62px minmax(220px,2fr) 80px 120px minmax(120px,1fr) 100px 44px"><div>#</div><div>Action</div><div>Owner</div><div>Due</div><div>${L('출처','Source')}</div><div>${L('상태','Status')}</div><div></div></div>
+      ${acts.map(a=>{const n=dday(a.due); const can=u.admin||a.owner===u.id; const late=a.status!=='done'&&n!=null&&n<0; return `<div class="row" style="grid-template-columns:62px minmax(220px,2fr) 80px 120px minmax(120px,1fr) 100px 44px">
+        <div class="mono small muted">${esc(a.no)}</div>
+        <div style="min-width:0">${u.admin?inp('ac:'+a.id,'title',a.title,{aria:'Action'}):`<b style="font-weight:600">${esc(a.title)}</b>`}</div>
+        <div>${u.admin?sel('ac:'+a.id,'owner',a.owner,staff().map(p=>[p.id,p.name]),{aria:'Owner'}):esc(uname(a.owner))}</div>
+        <div>${u.admin?inp('ac:'+a.id,'due',a.due,{type:'date',rr:true,aria:'Due'}):`<span class="mono small" style="${late?'color:var(--bad);font-weight:700':''}">${esc(fmtDate(a.due))}</span>`}</div>
+        <div class="small muted" style="min-width:0">${esc(a.source||'')}</div>
+        <div>${can?`<button type="button" class="btn sm ${a.status==='done'?'on':''}" data-act="ac-toggle" data-id="${a.id}" aria-pressed="${a.status==='done'}">${a.status==='done'?L('완료','Done'):late?L('기한 초과','Overdue'):L('진행','Open')}</button>`:`<span class="tag ${a.status==='done'?'t-ok':late?'t-bad':'t-main'}">${a.status==='done'?L('완료','Done'):late?L('기한 초과','Overdue'):L('진행','Open')}</span>`}</div>
+        <div>${u.admin?delBtn('ac-del',a.id,`data-id="${a.id}"`):''}</div></div>`}).join('')||`<div class="empty">${L('Action이 없습니다.','No actions.')}</div>`}
+      <div class="row" style="grid-template-columns:62px minmax(220px,2fr) 120px 150px 100px;background:var(--surface2)">
+        <div class="mono small muted">${L('새 항목','New')}</div>
+        ${inp('nf','ac.title',na.title,{ph:L('할 일','Action')})}
+        ${sel('nf','ac.owner',na.owner||(u.admin?staff()[0]?.id:u.id),(u.admin?staff():[u]).map(p=>[p.id,p.name]),{aria:'Owner'})}
+        ${inp('nf','ac.due',na.due,{type:'date',aria:'Due'})}
+        <button type="button" class="btn sm pri" data-act="ac-add">${L('추가','Add')}</button></div>
+    </div></div>
+  </section>
+  </div></main>`;
+}
+
+/* ───────── 화면: 관리 ───────── */
+function vAdmin(){
+  const st=settings(); const us=users();
+  return `<main class="wrap">
+  <div class="page-h"><div><h1>${L('관리','Admin')}</h1><div class="meta">${FS?L('Firebase 연결됨 · 모든 변경은 팀 전체에 바로 반영됩니다.','Connected to Firebase.'):L('로컬 데모 모드 · 이 브라우저에만 저장됩니다.','Local demo mode.')}</div></div></div>
+  <div style="display:flex;flex-direction:column;gap:18px">
+  <section class="card" aria-labelledby="ush">
+    <div class="sec-h"><div><h2 id="ush">${L('사용자','People')}</h2><p>${L('관리자는 보고를 쓰지 않고 팀 리뷰 · 피드백을 합니다. PIN은 4자리 숫자.','Admins review instead of reporting.')}</p></div></div>
+    <div class="scroll"><div style="min-width:700px">
+      <div class="row hd" style="grid-template-columns:minmax(120px,1fr) minmax(160px,1.4fr) 110px 80px 80px 44px"><div>${L('이름 · 이니셜','Name')}</div><div>${L('역할','Role')}</div><div>PIN</div><div>${L('관리자','Admin')}</div><div>${L('사용','Active')}</div><div></div></div>
+      ${us.map(x=>`<div class="row" style="grid-template-columns:minmax(120px,1fr) minmax(160px,1.4fr) 110px 80px 80px 44px">
+        ${inp('u:'+x.id,'name',x.name,{aria:L('이름','Name')})}${inp('u:'+x.id,'role',x.role,{aria:L('역할','Role')})}${inp('u:'+x.id,'pin',x.pin,{aria:'PIN',extra:'inputmode="numeric" maxlength="8"'})}
+        <div>${ck('u:'+x.id,'admin',x.admin,'',{dis:x.id===S.uid})}</div><div>${ck('u:'+x.id,'active',x.active!==false,'',{dis:x.id===S.uid})}</div>
+        <div>${x.id===S.uid?'':delBtn('u-del',x.id,`data-id="${x.id}"`)}</div></div>`).join('')}
+    </div></div>
+    <div class="sec-f"><button type="button" class="btn sm dash" data-act="u-add">+ ${L('사용자 추가','Add person')}</button></div>
+  </section>
+  <section class="card pad" aria-labelledby="tgh">
+    <h2 id="tgh">${L('목표 · 마감','Targets · due')}</h2>
+    <div class="kv" style="margin-top:12px">
+      <div><label>${L('계획 이행률 하한 (%)','Plan completion min (%)')}</label>${inp('set','targets.planMin',st.targets?.planMin,{type:'number',num:true})}</div>
+      <div><label>${L('루틴 수행률 하한 (%)','Routine completion min (%)')}</label>${inp('set','targets.routineMin',st.targets?.routineMin,{type:'number',num:true})}</div>
+      <div><label>${L('1인당 주간 Sub work 목표','Sub work per person / week')}</label>${inp('set','targets.subPer',st.targets?.subPer,{type:'number',num:true})}</div>
+      <div><label>${L('팀 주간 EHS Sub work 목표','Team EHS sub work / week')}</label>${inp('set','targets.ehsMin',st.targets?.ehsMin,{type:'number',num:true})}</div>
+      <div><label>${L('보고 마감 요일','Due day')}</label>${sel('set','dueDay',st.dueDay,[1,2,3,4,5].map(i=>[i,DOW[S.lang==='en'?'en':'ko'][i]]),{num:true})}</div>
+      <div><label>${L('보고 마감 시각 (시)','Due hour')}</label>${inp('set','dueHour',st.dueHour,{type:'number',num:true,extra:'min="0" max="23"'})}</div>
+    </div>
+  </section>
+  <section class="card pad" aria-labelledby="ehh">
+    <h2 id="ehh">EH&amp;S · Safety Moment</h2>
+    <div class="kv" style="margin-top:12px">
+      <div><label>${L('마지막 OSHA Recordable 발생일','Last OSHA recordable')}</label>${inp('set','ehs.lastOsha',st.ehs?.lastOsha,{type:'date'})}</div>
+      <div><label>${L('무재해 최고 기록 (일)','Record (days)')}</label>${inp('set','ehs.bestOsha',st.ehs?.bestOsha,{type:'number',num:true})}</div>
+      <div><label>${L('마지막 누출(LOPC) 발생일','Last LOPC')}</label>${inp('set','ehs.lastLopc',st.ehs?.lastLopc,{type:'date'})}</div>
+      <div><label>${L('무누출 최고 기록 (일)','Record (days)')}</label>${inp('set','ehs.bestLopc',st.ehs?.bestLopc,{type:'number',num:true})}</div>
+      <div style="grid-column:1/-1"><label>Safety Moment</label>${inp('set','safety.text',st.safety?.text,{ph:L('이번 주 안전 주제','This week’s safety topic')})}</div>
+      <div><label>${L('발표자','Presenter')}</label>${inp('set','safety.who',st.safety?.who)}</div>
+    </div>
+  </section>
+  <section class="card pad" aria-labelledby="trh">
+    <h2 id="trh">TOR · ${L('주간 회의','Weekly meeting')}</h2>
+    <div class="kv" style="margin-top:12px">
+      <div><label>${L('일시','When')}</label>${inp('set','torTime',st.torTime)}</div>
+      <div style="grid-column:1/-1"><label>${L('아젠다 · 한 줄에 하나 · 제목 | 분 | 담당','Agenda · one per line · title | min | who')}</label>${ta('set','torText',st.torText,{rows:6})}</div>
+      <div style="grid-column:1/-1"><label>Ground rules</label>${inp('set','rules',st.rules)}</div>
+    </div>
+  </section>
+  <section class="card pad" aria-labelledby="dth">
+    <h2 id="dth">${L('데이터','Data')}</h2>
+    <p class="muted small" style="margin:4px 0 12px">${L('JSON 백업 · 복원. 백업 파일 내려받기는 배포된 사이트에서 동작합니다.','JSON backup and restore.')}</p>
+    <div class="actions">
+      <button type="button" class="btn" data-act="export">${L('JSON 백업 내려받기','Download backup')}</button>
+      <button type="button" class="btn" data-act="copy-json">${L('JSON 복사','Copy JSON')}</button>
+      <label class="btn" for="impf">${L('백업 복원','Restore backup')}</label><input id="impf" type="file" accept="application/json" data-chg="import" hidden>
+      ${FS?'':`<button type="button" class="btn danger" data-act="reset-demo" data-cf>${S.confirm==='reset-demo:'?L('정말 초기화','Confirm reset'):L('샘플 데이터로 초기화','Reset to sample data')}</button>`}
+    </div>
+  </section>
+  </div></main>`;
+}
+
+/* ───────── 동작 ───────── */
+function goWeek(n,key){ const cw=curWk(); if(n===0) return cw; const t=addWk(key,n); return t>cw?cw:t; }
+async function act(a,d,el){
+  const u=me();
+  if(el.dataset.cf!==undefined){ const key=a+':'+(d.id||''); if(S.confirm!==key){ S.confirm=key; render(); return; } S.confirm=null; }
+  else if(S.confirm && a!=='nav'){ S.confirm=null; }
+  const r=S.draft;
+  switch(a){
+    case 'pick-user': S.loginPick=d.id; S.loginErr=''; render(); setTimeout(()=>$('#pin')?.focus(),0); return;
+    case 'lang': S.lang=d.v; try{localStorage.setItem('wr_lang',d.v)}catch(e){} render(); return;
+    case 'logout': S.uid=null; try{sessionStorage.removeItem('wr_uid')}catch(e){} S.loginPick=null; render(); return;
+    case 'nav': S.view=d.v; S.submitWarn=false; if(FS) await refreshAll(); render(); window.scrollTo(0,0); return;
+    case 'wk': S.wk=goWeek(+d.n,S.wk); S.fb=null; S.submitWarn=false; render(); return;
+    case 'dwk': S.dashWk=goWeek(+d.n,S.dashWk); render(); return;
+    case 'plan': {
+      const it=prevPlan(r).find(x=>x.id===d.id); r.planCheck=r.planCheck||{}; const pc=r.planCheck[d.id]=r.planCheck[d.id]||{}; pc.s=d.v;
+      r.nextPlan=r.nextPlan||[]; const cid='c_'+d.id; const has=r.nextPlan.some(x=>x.id===cid); const carry=d.v==='prog'||d.v==='late';
+      if(carry&&!has&&it) r.nextPlan.push({id:cid,date:'',text:it.text,kind:it.kind||'main',carried:true});
+      if(!carry&&has) r.nextPlan=r.nextPlan.filter(x=>x.id!==cid);
+      saveLater('reports',r); render(); return; }
+    case 'rout': r.routineLog=r.routineLog||{}; (r.routineLog[d.id]=r.routineLog[d.id]||{}).s=d.v; saveLater('reports',r); render(); return;
+    case 'health': r.projectLog=r.projectLog||{}; (r.projectLog[d.id]=r.projectLog[d.id]||{}).health=d.v; saveLater('reports',r); render(); return;
+    case 'extra-add': (r.extra=r.extra||[]).push({id:newId('x'),cat:'ship',text:'',detail:''}); saveLater('reports',r); render(); focusLast('extra'); return;
+    case 'extra-del': r.extra.splice(+d.i,1); saveLater('reports',r); render(); return;
+    case 'sub-add': (r.subs=r.subs||[]).push({id:newId('s'),cat:d.cat||'clean',text:'',detail:'',hint:d.hint||''}); saveLater('reports',r); render(); focusLast('subs'); return;
+    case 'sub-del': r.subs.splice(+d.i,1); saveLater('reports',r); render(); return;
+    case 'np-add': (r.nextPlan=r.nextPlan||[]).push({id:newId('n'),date:'',text:'',kind:'main'}); saveLater('reports',r); render(); focusLast('nextPlan'); return;
+    case 'np-del': r.nextPlan.splice(+d.i,1); saveLater('reports',r); render(); return;
+    case 'proj-form': S.showProj=!S.showProj; render(); return;
+    case 'proj-add': {
+      const f=S.nf.proj; if(!(f.title||'').trim()){ toast(L('과제명을 입력하세요','Enter a title')); return; }
+      if(!f.target){ toast(L('목표일을 입력하세요','Set a target date')); return; }
+      const p={id:newId('pj_'),uid:u.id,title:f.title.trim(),kind:f.kind||'main',cat:f.cat||'etc',start:ymd(today0()),target:f.target,progress:0,status:'open',startWk:S.wk<curWk()?S.wk:curWk(),createdAt:Date.now()};
+      put('projects',p); S.nf.proj={kind:'main',cat:'etc'}; S.showProj=false; toast(L('장기 업무를 등록했습니다','Long-term item added')); render(); return; }
+    case 'save': put('reports',r); toast(L('저장했습니다','Saved')); render(); return;
+    case 'submit': if(submitIssues(r).length){ S.submitWarn=true; render(); window.scrollTo({top:0,behavior:'smooth'}); return; } doSubmit(); return;
+    case 'submit-force': doSubmit(); return;
+    case 'submit-cancel': S.submitWarn=false; render(); return;
+    case 'ack': { const x=DB.reports[d.id]; if(x){ x.ackAt=Date.now(); put('reports',x); } render(); return; }
+    case 'hist': S.histWk=d.wk; render(); return;
+    case 'sel': S.sel=d.id; S.fb=null; render(); return;
+    case 'good': S.fb.good=S.fb.good||{}; S.fb.good[d.key]=!S.fb.good[d.key]; render(); return;
+    case 'act-from': {
+      const x=rep(S.sel,S.wk); const comment=S.fb.items?.[d.key];
+      const ac=newAction((comment?comment+' — ':'')+d.title, S.sel, ymd(new Date(Date.now()+7*864e5)), `${wkLabel(S.wk)} ${uname(S.sel)} ${L('보고 피드백','report feedback')}`);
+      toast(`${ac.no} ${L('등록됨 · IPS 대시보드 Action Log','added to Action Log')}`); return; }
+    case 'fb-send': case 'fb-return': {
+      const x=rep(S.sel,S.wk); if(!x) return; const f=clone(S.fb); delete f._rid;
+      f.by=u.name; f.at=Date.now(); x.feedback=f;
+      if(a==='fb-send'){ x.status='reviewed'; x.returned=false; toast(L('피드백을 보냈습니다','Feedback sent')); }
+      else { if(!(f.overall||'').trim()){ toast(L('반려 사유를 전체 피드백에 적어주세요','Write the reason in overall feedback')); return; } x.status='draft'; x.returned=true; toast(L('보완 요청으로 돌려보냈습니다','Returned for revision')); }
+      put('reports',x); S.fb=null; render(); return; }
+    case 'tasks-user': S.tasksUid=d.id; render(); return;
+    case 'rt-add': { const id=newId('rt_'); put('routines',{id,uid:S.tasksUid,title:'',kind:'main',cat:'etc',freq:'weekly',days:'',monthDay:1,std:'',active:true,startWk:curWk(),createdAt:Date.now()}); render(); focusLastIn(`[data-s="rt:${id}"][data-k="title"]`); return; }
+    case 'rt-del': del('routines',d.id); render(); return;
+    case 'pj-add': { const id=newId('pj_'); put('projects',{id,uid:S.tasksUid,title:'',kind:'main',cat:'etc',start:ymd(today0()),target:'',progress:0,status:'open',startWk:curWk(),createdAt:Date.now()}); render(); focusLastIn(`[data-s="pj:${id}"][data-k="title"]`); return; }
+    case 'pj-del': del('projects',d.id); render(); return;
+    case 'pj-reopen': { const p=DB.projects[d.id]; p.status='open'; delete p.doneAt; delete p.doneWk; if(p.progress>=100) p.progress=90; put('projects',p); render(); return; }
+    case 'ac-add': { const f=S.nf.ac; if(!(f.title||'').trim()){ toast(L('할 일을 입력하세요','Enter an action')); return; } const ac=newAction(f.title.trim(), f.owner||(u.admin?staff()[0]?.id:u.id), f.due||'', `${wkLabel(curWk())} ${L('회의','meeting')}`); S.nf.ac={}; toast(ac.no+L(' 추가됨',' added')); render(); return; }
+    case 'ac-toggle': { const x=DB.actions[d.id]; if(x.status==='done'){ x.status='open'; delete x.doneAt; } else { x.status='done'; x.doneAt=Date.now(); } put('actions',x); render(); return; }
+    case 'ac-del': del('actions',d.id); render(); return;
+    case 'u-add': { const id=newId('u_'); put('users',{id,name:L('새 사용자','New'),role:'',pin:String(Math.floor(1000+Math.random()*9000)),admin:false,active:true,order:users().length}); render(); return; }
+    case 'u-del': del('users',d.id); render(); return;
+    case 'export': { try{ const b=new Blob([JSON.stringify(DB,null,1)],{type:'application/json'}); const l=document.createElement('a'); l.href=URL.createObjectURL(b); l.download='jnfam-weekly-'+ymd(new Date())+'.json'; document.body.appendChild(l); l.click(); l.remove(); }catch(e){ toast(L('내려받기를 할 수 없는 환경입니다 · JSON 복사를 쓰세요','Download blocked here · use Copy JSON')); } return; }
+    case 'copy-json': { const txt=JSON.stringify(DB); navigator.clipboard?.writeText(txt).then(()=>toast(L('복사했습니다','Copied')),()=>toast(L('복사할 수 없습니다','Copy failed'))); return; }
+    case 'reset-demo': DB=seedDemo(); persistLocal(); S.draft=null; toast(L('샘플 데이터로 초기화했습니다','Reset to sample data')); render(); return;
+  }
+}
+function newAction(title,owner,due,source){
+  const nums=Object.values(DB.actions).map(a=>+String(a.no||'').replace(/\D/g,'')||0);
+  const no='A-'+String((nums.length?Math.max(...nums):0)+1).padStart(3,'0');
+  const ac={id:newId('ac_'),no,title,owner,due,source,status:'open',createdAt:Date.now()};
+  put('actions',ac); return ac;
+}
+function doSubmit(){
+  const r=S.draft; const u=me();
+  r.routineIds=routinesFor(u.id,r.wk).map(x=>x.id);
+  for(const p of projectsFor(u.id,r.wk)){
+    const lg=r.projectLog?.[p.id];
+    if(lg && lg.progress!=null && p.status!=='done'){ p.progress=lg.progress; if(lg.progress>=100){ p.status='done'; p.doneAt=Date.now(); p.doneWk=r.wk; } put('projects',p); }
+  }
+  r.status='submitted'; r.submittedAt=Date.now(); r.returned=false;
+  put('reports',r); S.submitWarn=false; toast(L('제출했습니다','Submitted')); render(); window.scrollTo(0,0);
+}
+function focusLast(arr){ setTimeout(()=>{ const els=document.querySelectorAll(`[data-s="r"][data-k^="${arr}."][data-k$=".text"]`); els[els.length-1]?.focus(); },0); }
+function focusLastIn(q){ setTimeout(()=>document.querySelector(q)?.focus(),0); }
+function importFile(el){
+  const f=el.files?.[0]; if(!f) return; const rd=new FileReader();
+  rd.onload=async()=>{ try{ const data=JSON.parse(rd.result); if(!data.users) throw 0; COLS.forEach(c=>data[c]=data[c]||{});
+      if(FS){ await FS.set(clone(data)); await refreshAll(); } else { DB=data; normalize(); persistLocal(); }
+      toast(L('복원했습니다','Restored')); render(); }catch(e){ toast(L('올바른 백업 파일이 아닙니다','Not a valid backup file')); } };
+  rd.readAsText(f);
+}
+
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el||el.disabled) return; e.preventDefault(); act(el.dataset.act,el.dataset,el); });
+document.addEventListener('submit',e=>{
+  if(e.target.id!=='loginForm') return; e.preventDefault();
+  const u=DB.users[S.loginPick]; const pin=$('#pin').value.trim();
+  if(!u){ S.loginErr=L('이름을 먼저 선택하세요','Choose your name first'); render(); return; }
+  if(String(u.pin)!==pin){ S.loginErr=L('PIN이 맞지 않습니다','Wrong PIN'); render(); setTimeout(()=>$('#pin')?.focus(),0); return; }
+  S.uid=u.id; S.loginErr=''; try{sessionStorage.setItem('wr_uid',u.id)}catch(e){}
+  S.view=u.admin?'review':'report'; S.wk=curWk(); render();
 });
 
-function getWeekKey(offset=0) {
-  const {mon} = getWeekRange(offset);
-  const y = mon.getFullYear();
-  const w = String(getWeekNum(mon)).padStart(2,'0');
-  return `${y}-W${w}`;
+/* ───────── 렌더 ───────── */
+function render(){
+  const app=$('#app');
+  if(!S.ready){ app.innerHTML=`<div class="wrap" style="padding-block:60px"><p class="muted">${L('불러오는 중…','Loading…')}</p></div>`; return; }
+  if(!S.uid || !DB.users[S.uid]){ S.uid=null; app.innerHTML=vLogin(); return; }
+  const a=document.activeElement; const keep=a&&a.dataset&&a.dataset.k?[a.dataset.s,a.dataset.k]:null;
+  const u=me();
+  if(!S.wk) S.wk=curWk(); if(!S.dashWk) S.dashWk=curWk();
+  const allowed=u.admin?['review','dash','tasks','admin']:['report','tasks','history','dash'];
+  if(!allowed.includes(S.view)) S.view=allowed[0];
+  const body={report:vReport,history:vHistory,review:vReview,tasks:vTasks,dash:vDash,admin:vAdmin}[S.view]();
+  app.innerHTML=vHeader()+body;
+  if(keep){ const el=document.querySelector(`[data-s="${CSS.escape(keep[0])}"][data-k="${CSS.escape(keep[1])}"]`); if(el && el.tagName==='SELECT') el.focus(); }
 }
 
-function getWeekLabel(offset=0) {
-  const {mon,sun} = getWeekRange(offset);
-  const monStr = mon.toISOString().slice(0,10);
-  const sunStr = sun.toISOString().slice(0,10);
-  return `${mon.getFullYear()} W${getWeekNum(mon)}  ·  ${fmtDate(monStr)} ~ ${fmtDate(sunStr)}`;
+/* ───────── 기본값 · 샘플 데이터 ───────── */
+function defaultSettings(){
+  return {id:'main', targets:{planMin:85,routineMin:90,subPer:2,ehsMin:1}, dueDay:5, dueHour:18,
+    ehs:{lastOsha:'',lastLopc:'',bestOsha:0,bestLopc:0}, safety:{text:'',who:''},
+    torTime:'매주 월 09:00 · 30분',
+    torText:'Safety Moment | 3 | 돌아가며\nSIC 리뷰 (빨간 칸만 원인) | 10 | 진행자\n지난 Action Log | 7 | Owner\nSub work 인정 | 5 | CEO\n새 Action 확정 | 5 | 전원',
+    rules:'정시 시작 · 준비해서 온다 · 짧고 요점만 · 회의 중 문제 해결 금지 → Action으로'};
 }
-
-window.openWrapupModal = (key=null) => {
-  editingWrapupKey = key;
-  const isEdit = key && wrapups[key];
-  const wu = isEdit ? wrapups[key] : null;
-  const offset = isEdit ? (wu.weekOffset||0) : curWeekOffset;
-
-  document.getElementById('wrapupModalTitle').textContent = isEdit ? '📝 Wrap-up 수정' : '📝 Weekly Wrap-up 작성';
-  document.getElementById('wrapup-week-label').textContent = '📅 ' + getWeekLabel(offset);
-  document.getElementById('wu-decisions').value  = wu?.decisions  || '';
-  document.getElementById('wu-directives').value = wu?.directives || '';
-  document.getElementById('wu-issues').value     = wu?.issues     || '';
-  document.getElementById('wu-done').value       = wu?.done       || '';
-  document.getElementById('wu-next').value       = wu?.next       || '';
-  document.getElementById('wu-notes').value      = wu?.notes      || '';
-  document.getElementById('wu-del-btn').style.display = isEdit ? 'block' : 'none';
-  document.getElementById('wrapupOverlay').classList.add('show');
-};
-
-window.closeWrapupModal = (e) => {
-  if(e.target === document.getElementById('wrapupOverlay'))
-    document.getElementById('wrapupOverlay').classList.remove('show');
-};
-
-window.saveWrapup = async () => {
-  const data = {
-    weekKey: editingWrapupKey ? wrapups[editingWrapupKey].weekKey : getWeekKey(curWeekOffset),
-    weekLabel: editingWrapupKey ? wrapups[editingWrapupKey].weekLabel : getWeekLabel(curWeekOffset),
-    weekOffset: editingWrapupKey ? (wrapups[editingWrapupKey].weekOffset||0) : curWeekOffset,
-    decisions:  document.getElementById('wu-decisions').value.trim(),
-    directives: document.getElementById('wu-directives').value.trim(),
-    issues:     document.getElementById('wu-issues').value.trim(),
-    done:       document.getElementById('wu-done').value.trim(),
-    next:       document.getElementById('wu-next').value.trim(),
-    notes:      document.getElementById('wu-notes').value.trim(),
-    savedAt:    new Date().toISOString(),
+function seedEmpty(){
+  const db={users:{},reports:{},routines:{},projects:{},actions:{},settings:{}};
+  db.users.u_ceo={id:'u_ceo',name:'CEO',role:'관리자',pin:'0000',admin:true,active:true,order:0};
+  db.settings.main=defaultSettings(); return db;
+}
+function seedDemo(){
+  const db={users:{},reports:{},routines:{},projects:{},actions:{},settings:{}};
+  const cw=curWk(); const now=Date.now(); let seq=0;
+  [['u_ceo','CEO','관리자 · CEO','0000',true],['u_js','JS','Production','1111',false],['u_mw','MW','Operations','2222',false],['u_tk','TK','Admin · Accounting','3333',false]]
+    .forEach((x,i)=>db.users[x[0]]={id:x[0],name:x[1],role:x[2],pin:x[3],admin:x[4],active:true,order:i});
+  const sw=addWk(cw,-4);
+  const R=(uid,title,kind,cat,freq,extra={})=>{ const id='rt_'+(++seq); db.routines[id]={id,uid,title,kind,cat,freq,days:'',monthDay:1,std:'',active:true,startWk:sw,createdAt:now+seq,...extra}; return id; };
+  R('u_js','Qcells ISO 출하 (HF · HCl · HNO3)','main','ship','weekly',{std:'주 4–6회'});
+  R('u_js','ISO 충진 생산','main','prod','weekly',{std:'주 4–5회'});
+  R('u_js','IBC 컨테이너 입고 · 하역','main','recv','weekly');
+  R('u_js','Scrubber 수위 점검','sub','ehs','weekly',{days:'화'});
+  R('u_js','BCS · 충진실 바닥 청소','sub','clean','biweekly');
+  R('u_mw','HF · HNO3 · HCl 출하 일정 관리','main','ship','weekly');
+  R('u_mw','수불부 작성 · 실재고 확인','main','admin','weekly',{days:'금'});
+  R('u_mw','입고 컨테이너 스케줄 확인','main','recv','weekly');
+  R('u_tk','AR 인보이스 발행 (Qcells shuttle · PVJC · ESF)','main','sales','weekly');
+  R('u_tk','Qcells logistic fee · Raw material invoice 업데이트','main','sales','weekly');
+  R('u_tk','QuickBooks AR/AP 업데이트','main','admin','weekly');
+  R('u_tk','분기 서류 CPA 송부','main','admin','monthly',{monthDay:wkDay(cw,2).getDate()});
+  const P=(uid,title,kind,cat,startOff,targetOff,progress,status='open')=>{ const id='pj_'+(++seq); const st=new Date(today0()); st.setDate(st.getDate()+startOff); const tg=new Date(today0()); tg.setDate(tg.getDate()+targetOff); db.projects[id]={id,uid,title,kind,cat,start:ymd(st),target:ymd(tg),progress,status,startWk:wkKey(st),createdAt:now+seq}; return id; };
+  const pj={
+    fire:P('u_tk','Fire license (office) 취득','main','admin',-60,40,45),
+    duty:P('u_tk','Duty 환급 (CBP)','main','admin',-50,30,90),
+    clean:P('u_tk','Clean room 구축 예산 확보','main','admin',-40,120,30,'hold'),
+    icp:P('u_tk','3rd party ICP-MS 업체 선정','main','etc',-14,10,20),
+    dip:P('u_js','DIP 작업 표준 지침 작성','sub','idea',-14,14,40),
+    ibc:P('u_mw','Empty IBC 120EA 배출','sub','clean',-24,-2,60)
   };
-  setSyncStatus('syncing');
-  if(editingWrapupKey) {
-    await update(ref(db,'wrapups/'+editingWrapupKey), data);
-  } else {
-    await push(wrapupsRef, data);
-  }
-  setSyncStatus('connected');
-  document.getElementById('wrapupOverlay').classList.remove('show');
-  showToast('✓ Wrap-up 저장됐습니다!');
-};
-
-window.deleteWrapup = async () => {
-  if(!confirm('이 Wrap-up을 삭제할까요?')) return;
-  setSyncStatus('syncing');
-  await remove(ref(db,'wrapups/'+editingWrapupKey));
-  setSyncStatus('connected');
-  document.getElementById('wrapupOverlay').classList.remove('show');
-  showToast('🗑 삭제됐습니다');
-};
-
-function renderWrapupList() {
-  const el = document.getElementById('wrapup-list');
-  if(!el) return;
-  const list = Object.entries(wrapups)
-    .filter(([,w])=>w&&w.weekKey)
-    .sort(([,a],[,b])=>b.weekKey.localeCompare(a.weekKey));
-
-  if(!list.length) {
-    el.innerHTML = `<div style="background:var(--white);border:2px dashed var(--border);border-radius:14px;padding:48px;text-align:center;color:var(--text3)">
-      <div style="font-size:36px;margin-bottom:12px">📝</div>
-      <div style="font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text2)">아직 Wrap-up이 없어요</div>
-      <div style="font-size:13px;margin-bottom:20px">미팅 후 이번 주 내용을 기록해 보세요</div>
-      <button class="btn-save" onclick="openWrapupModal()">+ 첫 번째 Wrap-up 작성</button>
-    </div>`;
-    return;
-  }
-
-  el.innerHTML = list.map(([key,wu]) => {
-    const sections = [
-      {icon:'📌', title:'핵심 결정사항', val:wu.decisions},
-      {icon:'📋', title:'지시사항', val:wu.directives},
-      {icon:'⚠️', title:'주요 이슈', val:wu.issues},
-      {icon:'✅', title:'완료된 사항', val:wu.done},
-      {icon:'📅', title:'다음 주 중점', val:wu.next},
-      {icon:'📝', title:'기타 메모', val:wu.notes},
-    ].filter(s=>s.val);
-
-    return `<div class="wu-card">
-      <div class="wu-card-header">
-        <div>
-          <div class="wu-week-tag">${wu.weekKey}</div>
-          <div style="font-size:12px;color:var(--text2);margin-top:6px">${wu.weekLabel||''}</div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="wu-date">${wu.savedAt?new Date(wu.savedAt).toLocaleDateString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):''}</div>
-          <button class="wu-edit-btn" onclick="openWrapupModal('${key}')">✏️ 수정</button>
-        </div>
-      </div>
-      <div class="wu-grid">
-        ${sections.map(s=>`
-          <div class="wu-section">
-            <div class="wu-section-title">${s.icon} ${s.title}</div>
-            <div class="wu-section-body">${s.val}</div>
-          </div>`).join('')}
-      </div>
-    </div>`;
-  }).join('');
+  const PJU={fire:['Sprinkler 업체 일정 확인','도면 수정본 접수','Vendor sprinkler progress check'],duty:['CBP 서류 제출','환급 대기 (50–60일)','환급 대기 중'],clean:['예산 승인 대기','예산 승인 대기','예산 승인 대기'],icp:['','후보 2곳 리스트업','견적 요청 발송'],dip:['','현재 작업 순서 기록','초안 작성 40%'],ibc:['업체 3곳 견적','Clean Management 단가 확인','일정 협의 중']};
+  const NP={
+    u_js:[[[1,'ESF HF IBC 출하 · 16 IBC','main'],[3,'PVJC HF IBC 출하 준비 · 10 IBC DIP','main'],[2,'ISO COT 정비 · Cleaning','sub']],
+          [[0,'ESF HF IBC 출하 · 16 IBC','main'],[1,'HNO3 IBC 입고 · 2CT','main'],[3,'PVJC HF IBC 출하 준비 · 30 IBC DIP','main'],[4,'HCl ISO COT 라벨 교체','sub']],
+          [[1,'ESF HF IBC 출하 · 16 IBC','main'],[1,'HCl IBC 입고 · 2CT','main'],[2,'PVJC HF IBC 출하 준비 · 32 IBC DIP','main'],[1,'Scrubber 수위 점검 주기 확정','sub'],[4,'공 IBC 배출 구역 정리','sub']]],
+    u_mw:[[[1,'ESF HF 16 IBC 출하','main'],[4,'Empty IBC 출하 일정 협의','main']],
+          [[0,'PVJC HF 30 IBC 출하','main'],[2,'HF 14 containers 입고 계획','main'],[4,'창고 통로 적치물 정리','sub']],
+          [[1,'ESF HF 16 IBC 출하','main'],[1,'HCl 2 containers 입고','main'],[2,'PVJC HF 32 IBC 출하 준비','main'],[4,'Empty IBC 출하 일정 확정 · 120 IBC','main']]],
+    u_tk:[[[0,'3분기 서류 CPA 송부','main'],[2,'PVJC 인보이스 발행','main']],
+          [[1,'ESF 인보이스 발행','main'],[2,'ICP-MS 교육 일정 확정','sub'],[3,'CPA 계약 조건 최종 확인','main']],
+          [[0,'ICP-MS 교육 진행','sub'],[2,'PVJC IBC 수배 · HF 납품용','main'],[3,'QuickBooks AR+AP 정보 CPA 전달','main'],[4,'3rd party ICP-MS 후보 조사','main']]]
+  };
+  const LATE={u_js:{1:[1,'late','운송사 일정 변경 · 다음 주 입고']},u_mw:{2:[1,'prog','2CT 중 1CT 입고, 나머지 이월']},u_tk:{1:[1,'late','ESF 수량 확정 대기']}};
+  const SUBS={
+    u_js:[[['clean','HF/HCl/HNO3 BCS 주변 청소','바닥 결정 제거 · 배수구 정리'],['ehs','Scrubber water 보충','수위 Low 근접 확인 후 보충']],
+          [['equip','충진 노즐 벨로우즈 장착','HF/HCl/HNO3 각 2EA'],['clean','HCl Drum 라벨 제거','288EA']],
+          [['ehs','Scrubber 수위 재점검','점검 주기 필요 → 다음 주 계획에 반영'],['equip','Dock door spring 상태 점검','이상 없음'],['clean','목재 팔레트 쓰레기 정리','팔레트 12개 배출']]],
+    u_mw:[[['clean','창고 통로 적치물 정리','']],[],[['ehs','비상구 앞 IBC 이동','통로 폭 확보'],['idea','수불부 · 실재고 차이 기록 양식 제안','차이 원인을 한 칸에 적도록']]],
+    u_tk:[[],[['edu','ICP-MS 교육 자료 준비','']],[['idea','Raw invoice 폴더 구조 정리 제안','월별 · 공급사별']]]
+  };
+  const EXTRA={u_js:[[],[],[['prod','HF ISO 충진 · 토요일 OT','1회 · 6h']]],u_mw:[[],[['ship','HF 14 containers 입고 대응','하역 인력 조정']],[]],u_tk:[[['sales','CPA 계약 조건 협의','finalize on agreement']],[],[]]};
+  const FB={
+    u_js:[{overall:'BCS 청소 좋습니다. 청소 범위를 사진으로 남겨주세요.'},{overall:'벨로우즈 장착 수고했습니다. 교체 주기도 정해봅시다.'},
+          {overall:'ESF IBC DIP 작업은 소요 시간도 같이 적어주세요. 출하 준비 공수 파악에 필요합니다.',sub:'Scrubber 점검 주기를 정해서 루틴으로 등록해 주세요.'}],
+    u_mw:[{overall:'통로 정리 좋습니다.'},{overall:'이번 주 Sub work가 없습니다. 창고 쪽에서 하나씩 찾아봅시다.'},
+          {overall:'Empty IBC 배출이 목표일을 넘겼습니다. 이번 주에 일정 확정해 주세요.'}],
+    u_tk:[{overall:'CPA 계약 조건 정리 좋습니다.'},{overall:'ICP-MS 교육 준비 좋습니다.'},null]
+  };
+  ['u_js','u_mw','u_tk'].forEach(uid=>{
+    let prevNP=[];
+    for(let w=0;w<3;w++){
+      const wk=addWk(cw,w-3); const nwk=addWk(wk,1);
+      const r={id:uid+'_'+wk,uid,wk,status:'submitted',planCheck:{},routineLog:{},projectLog:{},extra:[],subs:[],nextPlan:[],issues:'',help:false,createdAt:now};
+      prevNP.forEach((p,i)=>{ const lt=LATE[uid]?.[w]; r.planCheck[p.id]= lt&&lt[0]===i ? {s:lt[1],note:lt[2]} : {s:'done',note:''}; if(lt&&lt[0]===i) r.nextPlan.push({id:'c_'+p.id,date:'',text:p.text,kind:p.kind,carried:true}); });
+      const rts=Object.values(db.routines).filter(x=>x.uid===uid&&x.startWk<=wk&&(x.freq!=='biweekly'||wksBetween(x.startWk,wk)%2===0)&&(x.freq!=='monthly'||[...Array(7)].some((_,i)=>wkDay(wk,i).getDate()===x.monthDay)));
+      r.routineIds=rts.map(x=>x.id);
+      rts.forEach((x,i)=>{ r.routineLog[x.id]={s:(w===1&&i===rts.length-1)?'partial':'done',note:x.cat==='ship'?['4회','5회','6회'][w]:x.cat==='prod'?['4회','4회','5회'][w]:''}; });
+      Object.entries(pj).forEach(([k,id])=>{ const p=db.projects[id]; if(p.uid!==uid||p.startWk>wk) return; const txt=PJU[k][w]; if(!txt) return; r.projectLog[id]={progress:Math.max(0,p.progress-(2-w)*(k==='clean'?0:10)),update:txt,next:'',health:k==='ibc'&&w===2?'risk':k==='clean'?'risk':'ok'}; });
+      (SUBS[uid][w]||[]).forEach(s=>r.subs.push({id:'s'+(++seq),cat:s[0],text:s[1],detail:s[2]}));
+      (EXTRA[uid][w]||[]).forEach(s=>r.extra.push({id:'x'+(++seq),cat:s[0],text:s[1],detail:s[2]}));
+      NP[uid][w].forEach(n=>r.nextPlan.push({id:'n'+(++seq),date:ymd(wkDay(nwk,n[0])),text:n[1],kind:n[2]}));
+      if(uid==='u_mw'&&w===2){ r.issues='HF 14 containers 입고 주간에 하역 인력이 부족했습니다. 다음 대량 입고 때 임시 인력 검토 필요.'; r.help=true; }
+      const sub=wkDay(wk,4); sub.setHours(uid==='u_tk'&&w===0?20:16,30,0,0); if(uid==='u_tk'&&w===0) sub.setDate(sub.getDate()+3); r.submittedAt=sub.getTime();
+      const f=FB[uid][w];
+      if(f){ r.status='reviewed'; r.feedback={overall:f.overall,items:{},good:{},by:'CEO',at:r.submittedAt+2.7*864e5};
+        if(f.sub){ const s=r.subs[0]; if(s){ r.feedback.items['sub:'+s.id]=f.sub; r.feedback.good['sub:'+s.id]=true; } }
+        if(w<2) r.ackAt=r.feedback.at+36e5; }
+      db.reports[r.id]=r; prevNP=r.nextPlan;
+    }
+  });
+  const A=(no,title,owner,dueOff,src,status)=>{ const d=new Date(today0()); d.setDate(d.getDate()+dueOff); const id='ac_'+no; db.actions[id]={id,no:'A-'+no,title,owner,due:ymd(d),source:src,status,createdAt:now-10*864e5,doneAt:status==='done'?now-2*864e5:undefined}; };
+  A('001','Scrubber 점검 주기 확정 → 루틴 등록','u_js',1,`${wkLabel(addWk(cw,-1))} JS 보고 피드백`,'open');
+  A('002','Empty IBC 120EA 배출 일정 확정','u_mw',-3,`${wkLabel(addWk(cw,-1))} 회의`,'open');
+  A('003','3rd party ICP-MS 후보 3곳 비교표','u_tk',9,`${wkLabel(addWk(cw,-1))} TK 보고`,'open');
+  A('004','HCl drum 라벨 제거 완료 확인','u_js',-6,`${wkLabel(addWk(cw,-2))} 회의`,'done');
+  db.settings.main=Object.assign(defaultSettings(),{safety:{text:'HF 충진 노즐 분리 전 잔압 확인',who:'JS'}});
+  return db;
 }
 
-updateWeekBadge();
+/* ───────── 시작 ───────── */
+render();
+storeInit().then(()=>{ S.ready=true; render(); }).catch(err=>{ $('#app').innerHTML=`<div class="wrap" style="padding-block:60px"><p class="err">${L('데이터를 불러오지 못했습니다. 인터넷 연결 또는 Firebase 설정을 확인하세요.','Could not load data. Check the connection or Firebase config.')}</p></div>`; console.error(err); });
+})();
 </script>
-<style>.ytk-copyright{text-align:center;font-size:11px;line-height:1.4;color:#8a8f98;padding:10px 12px;font-family:inherit}@media print{.ytk-copyright{display:none}}</style>
-<div class="ytk-copyright">© 2025–2026 Young Tai Kang. All rights reserved. Unauthorized use, copying, modification, or distribution without the written permission of Young Tai Kang is prohibited.</div>
 </body>
 </html>

@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<!--
+  © 2025–2026 Young Tai Kang. All rights reserved.
+  Unauthorized use, copying, modification, or distribution without the written permission of Young Tai Kang is prohibited.
+-->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JNFAM Weekly Operation Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6fa;--white:#fff;--border:#e2e6ef;
+  --accent:#2563eb;--accent-l:#eff4ff;
+  --green:#16a34a;--green-l:#f0fdf4;
+  --red:#dc2626;--red-l:#fef2f2;
+  --orange:#ea580c;--orange-l:#fff7ed;
+  --yellow:#d97706;--yellow-l:#fffbeb;
+  --purple:#7c3aed;--purple-l:#f5f3ff;
+  --text:#1e2533;--text2:#5a6478;--text3:#9aa3b5;
+  --shadow:0 1px 4px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.05);
+  --shadow-lg:0 4px 12px rgba(0,0,0,.10),0 8px 28px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;min-height:100vh;}
+
+header{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;box-shadow:0 1px 6px rgba(0,0,0,.06);}
+.logo{font-size:16px;font-weight:900;color:var(--accent);display:flex;align-items:center;gap:8px;}
+.logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;}
+.logo-sub{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.1em;margin-top:2px;}
+.header-right{display:flex;gap:10px;align-items:center;}
+.sync-status{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:var(--text3);}
+.sync-dot.connected{background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite;}
+.sync-dot.syncing{background:var(--yellow);animation:pulse .5s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.week-badge{background:var(--accent-l);border:1px solid #bfdbfe;border-radius:20px;padding:5px 14px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);font-weight:600;}
+
+.tabs{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;display:flex;}
+.tab{padding:12px 18px;border:none;background:transparent;color:var(--text3);font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;font-weight:500;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700;}
+.main{padding:24px 28px;}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
+.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--shadow);}
+.kpi-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.08em;margin-bottom:8px;text-transform:uppercase;}
+.kpi-value{font-size:30px;font-weight:900;}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+
+/* FILTER PANEL */
+.filter-panel{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow);}
+.filter-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.filter-title{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;font-weight:600;}
+.filter-top-right{display:flex;gap:8px;align-items:center;}
+.btn-reset{padding:4px 12px;border-radius:6px;border:1px solid var(--border);background:var(--white);color:var(--text3);font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-reset:hover{border-color:var(--red);color:var(--red);}
+.filter-count-badge{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);font-weight:700;background:var(--accent-l);padding:3px 10px;border-radius:10px;border:1px solid #bfdbfe;}
+.filter-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.filter-row:last-child{margin-bottom:0;}
+.filter-lbl{font-size:11px;font-weight:700;color:var(--text2);min-width:64px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;}
+.chip-group{display:flex;flex-wrap:wrap;gap:6px;flex:1;}
+.chip{padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--white);color:var(--text2);transition:all .15s;user-select:none;}
+.chip:hover{border-color:var(--accent);color:var(--accent);}
+.chip.on{color:#fff;border-color:transparent;}
+.chip[data-g="status"].on{background:var(--accent);}
+.chip[data-g="type"][data-v="Customer"].on{background:var(--purple);}
+.chip[data-g="type"][data-v="Operation"].on{background:var(--green);}
+.chip[data-g="type"][data-v="Management"].on{background:var(--orange);}
+.chip[data-g="type"][data-v="EHS"].on{background:var(--red);}
+.chip[data-g="priority"][data-v="High"].on{background:var(--red);}
+.chip[data-g="priority"][data-v="Medium"].on{background:var(--yellow);}
+.chip[data-g="priority"][data-v="Low"].on{background:var(--text3);}
+.search-wrap{display:flex;gap:8px;align-items:center;flex:1;}
+.fsearch{flex:1;max-width:260px;background:var(--bg);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:7px 12px;font-family:'Noto Sans KR',sans-serif;font-size:12px;outline:none;}
+.fsearch::placeholder{color:var(--text3);}
+.fsearch:focus{border-color:var(--accent);}
+.btn-new{background:var(--accent);color:#fff;font-weight:700;border:none;border-radius:8px;padding:7px 16px;font-family:'Noto Sans KR',sans-serif;font-size:12px;cursor:pointer;}
+.btn-new:hover{background:#1d4ed8;}
+
+/* RESULT INFO */
+.result-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.result-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text3);}
+
+/* TABLE */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);}
+.table-head{display:grid;grid-template-columns:56px 100px 95px 85px 105px 1fr 70px 130px 60px 80px;background:var(--bg);border-bottom:1px solid var(--border);}
+.th{padding:10px 10px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase;border-right:1px solid var(--border);}
+.th:last-child{border-right:none;}
+.table-body{max-height:calc(100vh - 460px);overflow-y:auto;}
+.tr{display:grid;grid-template-columns:56px 100px 95px 85px 105px 1fr 70px 130px 60px 80px;border-bottom:1px solid var(--border);transition:background .15s;cursor:pointer;}
+.tr:hover{background:var(--accent-l);}
+.tr:last-child{border-bottom:none;}
+.td{padding:10px 10px;font-size:12px;border-right:1px solid var(--border);display:flex;align-items:center;overflow:hidden;}
+.td:last-child{border-right:none;}
+.td-txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* BADGES */
+.sbadge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap;}
+.s-inprog{background:var(--accent-l);color:var(--accent);border:1px solid #bfdbfe;}
+.s-done{background:var(--green-l);color:var(--green);border:1px solid #bbf7d0;}
+.s-pending{background:var(--yellow-l);color:var(--yellow);border:1px solid #fde68a;}
+.s-other{background:var(--bg);color:var(--text3);border:1px solid var(--border);}
+.p-high{color:var(--red);font-weight:700;}
+.p-med{color:var(--yellow);font-weight:700;}
+.p-low{color:var(--text3);}
+
+/* PBAR */
+.pbar-wrap{width:100%;background:var(--border);border-radius:4px;height:6px;}
+.pbar-fill{height:6px;border-radius:4px;transition:width .3s;}
+
+/* D-DAY */
+.dday{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;}
+.dd-late{color:var(--red);}.dd-soon{color:var(--yellow);}.dd-ok{color:var(--text3);}.dd-done{color:var(--green);}
+.delta-p{color:var(--green);font-weight:700;font-size:10px;}
+.delta-n{color:var(--red);font-weight:700;font-size:10px;}
+.delta-z{color:var(--text3);font-size:10px;}
+
+/* FILE LINK */
+.file-link{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--accent);text-decoration:none;padding:2px 8px;border-radius:5px;background:var(--accent-l);border:1px solid #bfdbfe;font-weight:600;transition:all .15s;}
+.file-link:hover{background:#dbeafe;text-decoration:underline;}
+.file-link-teams{color:#5059C9;background:#f0f0ff;border-color:#c7c8f9;}
+.file-link-teams:hover{background:#e0e0ff;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(30,37,51,.5);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(3px);}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--white);border:1px solid var(--border);border-radius:16px;width:720px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .2s ease;}
+@keyframes slideUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-hd{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:16px;font-weight:900;}
+.modal-close{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;padding:2px 8px;border-radius:6px;}
+.modal-close:hover{color:var(--text);background:var(--bg);}
+.modal-bd{padding:20px 22px;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.ff{grid-column:1/-1;}
+.flabel{font-size:10px;color:var(--text2);letter-spacing:.05em;margin-bottom:5px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;font-weight:600;display:flex;align-items:center;gap:6px;}
+.finput,.fselect,.ftextarea{width:100%;background:var(--bg);border:1.5px solid var(--border);color:var(--text);border-radius:8px;padding:9px 11px;font-family:'Noto Sans KR',sans-serif;font-size:13px;transition:border-color .2s;outline:none;}
+.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--accent);}
+.ftextarea{resize:vertical;min-height:70px;}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);}
+.btn-save{background:var(--accent);color:#fff;font-weight:700;border:none;border-radius:8px;padding:10px 22px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
+.btn-save:hover{background:#1d4ed8;}
+.btn-cancel{background:var(--white);border:1.5px solid var(--border);color:var(--text2);border-radius:8px;padding:10px 18px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
+.btn-cancel:hover{background:var(--bg);}
+.btn-del{background:var(--red-l);border:1px solid #fca5a5;color:var(--red);border-radius:8px;padding:10px 18px;font-family:'Noto Sans KR',sans-serif;font-size:13px;cursor:pointer;}
+.btn-del:hover{background:#fee2e2;}
+
+/* FILE ADD ROW */
+.file-add-row{display:flex;gap:8px;margin-bottom:8px;}
+.file-add-row .finput{flex:1;}
+.file-add-row .finput-name{width:140px;flex-shrink:0;}
+.btn-add-file{background:var(--green-l);border:1px solid #bbf7d0;color:var(--green);border-radius:8px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif;}
+.btn-add-file:hover{background:#dcfce7;}
+.file-list-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;}
+.file-list-item a{font-size:12px;color:var(--accent);font-weight:600;text-decoration:none;flex:1;}
+.file-list-item a:hover{text-decoration:underline;}
+.btn-remove-file{background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0 4px;border-radius:4px;}
+.btn-remove-file:hover{color:var(--red);background:var(--red-l);}
+
+/* DETAIL */
+.detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
+.detail-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
+.detail-lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:.05em;margin-bottom:6px;text-transform:uppercase;}
+.detail-val{font-size:14px;font-weight:600;}
+
+/* MEETING */
+.meeting-banner{background:linear-gradient(135deg,var(--accent-l),var(--green-l));border:1px solid #bfdbfe;border-radius:10px;padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--accent);font-weight:600;}
+.meeting-dot{width:10px;height:10px;border-radius:50%;background:var(--green);animation:pulse 1s infinite;}
+.meeting-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:18px;margin-bottom:12px;cursor:pointer;box-shadow:var(--shadow);transition:all .15s;}
+.meeting-card:hover{box-shadow:var(--shadow-lg);}
+.meeting-card.delayed{border-color:#fca5a5;background:var(--red-l);}
+.meeting-card.high-prio{border-color:#bfdbfe;}
+
+.week-nav{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.wnav-btn{width:32px;height:32px;border-radius:8px;background:var(--white);border:1.5px solid var(--border);color:var(--text);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);}
+.wnav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.week-title{font-size:16px;font-weight:900;}
+.dash-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:var(--shadow);}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.urgent-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .15s;}
+.urgent-item:hover{background:var(--accent-l);}
+.add-panel{max-width:700px;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;box-shadow:var(--shadow);}
+.panel-title{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);letter-spacing:.1em;margin-bottom:20px;text-transform:uppercase;}
+/* WRAP-UP CARDS */
+.wu-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:16px;box-shadow:var(--shadow);transition:all .15s;}
+.wu-card:hover{box-shadow:var(--shadow-lg);}
+.wu-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.wu-week-tag{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;color:var(--accent);background:var(--accent-l);padding:5px 14px;border-radius:20px;border:1px solid #bfdbfe;}
+.wu-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);}
+.wu-section{margin-bottom:14px;}
+.wu-section-title{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+.wu-section-body{font-size:13px;line-height:1.7;color:var(--text);white-space:pre-wrap;}
+.wu-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.wu-edit-btn{background:var(--bg);border:1px solid var(--border);color:var(--text2);border-radius:7px;padding:5px 14px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.wu-edit-btn:hover{border-color:var(--accent);color:var(--accent);}
+.loading{display:flex;align-items:center;justify-content:center;padding:48px;gap:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace;font-size:13px;}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{text-align:center;padding:48px;color:var(--text3);font-size:13px;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:700;transform:translateY(60px);opacity:0;transition:all .3s;z-index:300;box-shadow:var(--shadow-lg);}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.error{background:var(--red);}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo"><div class="logo-dot"></div>JNFAM WEEKLY REVIEW</div>
+    <div class="logo-sub">// OPERATION ACTION ITEMS · REAL-TIME SYNC</div>
+  </div>
+  <div class="header-right">
+    <div class="sync-status">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncText">연결 중...</span>
+    </div>
+    <div class="week-badge" id="weekBadge"></div>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('dashboard',this)">📊 대시보드</button>
+  <button class="tab" onclick="switchTab('items',this)">📋 Action Items</button>
+  <button class="tab" onclick="switchTab('meeting',this)">🎯 미팅 모드</button>
+  <button class="tab" onclick="switchTab('wrapup',this)">📝 Weekly Wrap-up</button>
+  <button class="tab" onclick="switchTab('add',this)">➕ 신규 등록</button>
+</div>
+
+<div class="main">
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard">
+    <div class="week-nav">
+      <button class="wnav-btn" onclick="changeWeek(-1)">‹</button>
+      <div class="week-title" id="weekTitle"></div>
+      <button class="wnav-btn" onclick="changeWeek(1)">›</button>
+    </div>
+    <div class="kpi-grid" id="kpiGrid"><div class="loading" style="grid-column:1/-1"><div class="spinner"></div>로딩 중...</div></div>
+    <div id="dashSummary"></div>
+  </div>
+
+  <!-- ACTION ITEMS -->
+  <div id="tab-items" style="display:none">
+    <div id="filter-panel-items"></div>
+    <div class="result-info">
+      <span class="result-count" id="items-count"></span>
+    </div>
+    <div class="table-wrap">
+      <div class="table-head">
+        <div class="th">ID</div><div class="th">고객/대상</div><div class="th">유형</div>
+        <div class="th">우선순위</div><div class="th">상태</div><div class="th">Task</div>
+        <div class="th">D-DAY</div><div class="th">진행률</div><div class="th">파일</div>
+        <div class="th">마감일</div>
+      </div>
+      <div class="table-body" id="itemsBody"><div class="loading"><div class="spinner"></div>로딩 중...</div></div>
+    </div>
+  </div>
+
+  <!-- MEETING MODE -->
+  <div id="tab-meeting" style="display:none">
+    <div class="meeting-banner">
+      <div class="meeting-dot"></div>
+      미팅 모드 — Action Items와 동일한 필터/데이터 · 지연→High→진행중→완료 순
+    </div>
+    <div id="filter-panel-meeting"></div>
+    <div class="kpi-grid" id="meetingKpi" style="margin-top:14px"></div>
+    <div id="meetingItems" style="margin-top:14px"></div>
+  </div>
+
+  <!-- WEEKLY WRAP-UP -->
+  <div id="tab-wrapup" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div style="font-size:18px;font-weight:900;margin-bottom:4px;">📝 Weekly Wrap-up</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);">주간 미팅 요약 · 핵심 결정사항 · 지시사항 기록</div>
+      </div>
+      <button class="btn-save" onclick="openWrapupModal()" style="padding:10px 20px">+ 이번 주 Wrap-up 작성</button>
+    </div>
+    <div id="wrapup-list"><div class="loading"><div class="spinner"></div>로딩 중...</div></div>
+  </div>
+
+    <!-- ADD -->
+  <div id="tab-add" style="display:none">
+    <div class="add-panel">
+      <div class="panel-title">// NEW ACTION ITEM 등록</div>
+      <div class="fgrid">
+        <div><div class="flabel">Work Type</div>
+          <select class="fselect" id="a-wtype"><option>Customer</option><option>Management</option><option>Operation</option><option>EHS</option></select></div>
+        <div><div class="flabel">Customer / 대상</div><input class="finput" id="a-cust" placeholder="고객사 또는 Internal"></div>
+        <div><div class="flabel">Stage</div>
+          <select class="fselect" id="a-stage"><option>Execution</option><option>Proposal</option><option>Negotiation</option><option>Audit</option><option>Support</option></select></div>
+        <div><div class="flabel">Category</div>
+          <select class="fselect" id="a-cat"><option>Sales</option><option>Operation</option><option>EHS</option><option>Logistics</option><option>Quality</option><option>Finance</option></select></div>
+        <div class="ff"><div class="flabel">Task 내용 *</div><textarea class="ftextarea" id="a-task" placeholder="Task 내용을 입력하세요"></textarea></div>
+        <div><div class="flabel">담당자 (Owner)</div><input class="finput" id="a-owner" placeholder="JNFAM"></div>
+        <div><div class="flabel">우선순위</div>
+          <select class="fselect" id="a-prio"><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></div>
+        <div><div class="flabel">시작일</div><input class="finput" type="date" id="a-start"></div>
+        <div><div class="flabel">마감일 *</div><input class="finput" type="date" id="a-due"></div>
+        <div><div class="flabel">상태</div>
+          <select class="fselect" id="a-status"><option>In Progress</option><option>Pending</option><option>Completed</option></select></div>
+        <div><div class="flabel">진행률 (%)</div><input class="finput" type="number" id="a-prog" min="0" max="100" value="0"></div>
+        <div class="ff"><div class="flabel">F/UP 내용</div><textarea class="ftextarea" id="a-fup" placeholder="이번 주 진행사항"></textarea></div>
+        <div class="ff"><div class="flabel">Risk / Issue</div><textarea class="ftextarea" id="a-risk" placeholder="리스크 또는 이슈사항"></textarea></div>
+        <div class="ff">
+          <div class="flabel">📎 Teams 파일 링크</div>
+          <div id="a-file-list" style="margin-bottom:8px"></div>
+          <div class="file-add-row">
+            <input class="finput finput-name" id="a-fname" placeholder="파일명 (예: 계약서.pdf)">
+            <input class="finput" id="a-furl" placeholder="Teams 공유 링크 붙여넣기">
+            <button class="btn-add-file" onclick="addFileRow('add')">+ 추가</button>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:6px">💡 Teams에서 파일 우클릭 → 링크 복사 → 여기에 붙여넣기</div>
+        </div>
+      </div>
+      <button class="btn-save" onclick="addItem()" style="width:100%;padding:12px;font-size:14px">+ Action Item 등록</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-hd">
+      <div class="modal-title" id="modalTitle">ACTION ITEM</div>
+      <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('show')">×</button>
+    </div>
+    <div class="modal-bd" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- WRAP-UP MODAL -->
+<div class="modal-overlay" id="wrapupOverlay" onclick="closeWrapupModal(event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:640px">
+    <div class="modal-hd">
+      <div class="modal-title" id="wrapupModalTitle">📝 Weekly Wrap-up 작성</div>
+      <button class="modal-close" onclick="document.getElementById('wrapupOverlay').classList.remove('show')">×</button>
+    </div>
+    <div class="modal-bd">
+      <div style="background:var(--accent-l);border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);font-weight:600;" id="wrapup-week-label"></div>
+      <div class="fgrid">
+        <div class="ff">
+          <div class="flabel">📌 핵심 결정사항 / Key Decisions</div>
+          <textarea class="ftextarea" id="wu-decisions" placeholder="이번 주 미팅에서 결정된 핵심 사항을 입력하세요&#10;예) - HWQ 납품 일정 5/20으로 확정&#10;     - Fire inspection 대응 예산 승인"></textarea>
+        </div>
+        <div class="ff">
+          <div class="flabel">📋 지시사항 / Action Directives</div>
+          <textarea class="ftextarea" id="wu-directives" placeholder="추가 지시사항이나 Follow-up 요청사항을 입력하세요&#10;예) - PVJC 담당자에게 이번 주 내 회신 요청&#10;     - 법인 전환 IRS 상태 다음 주 보고"></textarea>
+        </div>
+        <div class="ff">
+          <div class="flabel">⚠️ 주요 이슈 / Key Issues</div>
+          <textarea class="ftextarea" id="wu-issues" placeholder="해결해야 할 주요 이슈나 리스크를 입력하세요"></textarea>
+        </div>
+        <div class="ff">
+          <div class="flabel">✅ 완료된 사항 / Accomplishments</div>
+          <textarea class="ftextarea" id="wu-done" placeholder="이번 주 완료되거나 달성된 주요 성과를 입력하세요"></textarea>
+        </div>
+        <div class="ff">
+          <div class="flabel">📅 다음 주 중점사항 / Next Week Focus</div>
+          <textarea class="ftextarea" id="wu-next" placeholder="다음 주에 집중해야 할 사항을 입력하세요"></textarea>
+        </div>
+        <div class="ff">
+          <div class="flabel">📝 기타 메모 / Additional Notes</div>
+          <textarea class="ftextarea" id="wu-notes" placeholder="기타 메모사항"></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-del" id="wu-del-btn" style="display:none" onclick="deleteWrapup()">🗑 삭제</button>
+        <button class="btn-cancel" onclick="document.getElementById('wrapupOverlay').classList.remove('show')">닫기</button>
+        <button class="btn-save" onclick="saveWrapup()">💾 저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, push, update, remove }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyCTWXWap9qRC1RXY6lVOVFOzorJiUvqJWU",
+  authDomain:"jnfam-weekly.firebaseapp.com",
+  databaseURL:"https://jnfam-weekly-default-rtdb.firebaseio.com",
+  projectId:"jnfam-weekly",
+  storageBucket:"jnfam-weekly.firebasestorage.app",
+  messagingSenderId:"685753288571",
+  appId:"1:685753288571:web:7baaac23f5c1c9d0299fde"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const itemsRef = ref(db,'items');
+
+let items={}, curWeekOffset=0;
+const today=new Date(); today.setHours(0,0,0,0);
+
+// ── 필터 상태 (공유) ─────────────────────────
+// Action Items와 미팅 모드가 완전히 동일한 필터 상태 공유
+const filters = { status:new Set(), type:new Set(), priority:new Set(), search:'' };
+
+// 등록 폼의 임시 파일 목록
+let addFiles = [];
+
+// ── 날짜 유틸 ─────────────────────────────────
+function diffDays(dl){
+  if(!dl) return 999;
+  const d=new Date(dl+'T00:00:00'); d.setHours(0,0,0,0);
+  return Math.round((d-today)/86400000);
+}
+function fmtDate(d){
+  if(!d) return '';
+  return new Date(d+'T00:00:00').toLocaleDateString('ko-KR',{month:'short',day:'numeric'});
+}
+function getWeekNum(d){
+  const s=new Date(d.getFullYear(),0,1);
+  return Math.ceil(((d-s)/86400000+s.getDay()+1)/7);
+}
+function getWeekRange(offset=0){
+  const d=new Date(today), day=d.getDay();
+  const mon=new Date(d); mon.setDate(d.getDate()-(day===0?6:day-1)+offset*7);
+  const sun=new Date(mon); sun.setDate(mon.getDate()+6);
+  return {mon,sun};
+}
+
+// ── 동기화 ────────────────────────────────────
+function setSyncStatus(s){
+  document.getElementById('syncDot').className='sync-dot '+s;
+  document.getElementById('syncText').textContent=s==='connected'?'실시간 동기화 중':s==='syncing'?'저장 중...':'연결 끊김';
+}
+function updateWeekBadge(){
+  const {mon,sun}=getWeekRange(curWeekOffset);
+  const monStr=mon.toISOString().slice(0,10), sunStr=sun.toISOString().slice(0,10);
+  document.getElementById('weekBadge').textContent=`W${getWeekNum(mon)} · ${fmtDate(monStr)} ~ ${fmtDate(sunStr)}`;
+  const el=document.getElementById('weekTitle');
+  if(el) el.textContent=`${mon.getFullYear()} W${getWeekNum(mon)}  ${fmtDate(monStr)} ~ ${fmtDate(sunStr)}`;
+}
+
+// ── Firebase ──────────────────────────────────
+onValue(itemsRef, snap=>{
+  items=snap.val()||{};
+  setSyncStatus('connected');
+  renderAll();
+}, err=>{ setSyncStatus(''); showToast('연결 오류: '+err.message,true); });
+
+function renderAll(){
+  updateWeekBadge();
+  renderDashboard();
+  renderFilterPanel('items','filter-panel-items');
+  renderFilterPanel('meeting','filter-panel-meeting');
+  renderItems();
+  renderMeeting();
+  renderWrapupList();
+}
+
+// ── 공통 필터 패널 렌더 ───────────────────────
+function renderFilterPanel(tabName, containerId){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML=`
+    <div class="filter-panel">
+      <div class="filter-top">
+        <span class="filter-title">// FILTER</span>
+        <div class="filter-top-right">
+          <span class="filter-count-badge" id="fcount-${tabName}"></span>
+          <button class="btn-reset" onclick="resetFilters()">초기화</button>
+          ${tabName==='items'?`<button class="btn-new" onclick="switchTab('add',document.querySelectorAll('.tab')[3])">+ 신규 등록</button>`:''}
+        </div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-lbl">STATUS</span>
+        <div class="chip-group">
+          ${['In Progress','Completed','Pending'].map(v=>`<div class="chip${filters.status.has(v)?' on':''}" data-g="status" data-v="${v}" onclick="toggleChip('status','${v}')">${v}</div>`).join('')}
+        </div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-lbl">TYPE</span>
+        <div class="chip-group">
+          ${['Customer','Operation','Management','EHS'].map(v=>`<div class="chip${filters.type.has(v)?' on':''}" data-g="type" data-v="${v}" onclick="toggleChip('type','${v}')">${v}</div>`).join('')}
+        </div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-lbl">PRIORITY</span>
+        <div class="chip-group">
+          ${['High','Medium','Low'].map(v=>`<div class="chip${filters.priority.has(v)?' on':''}" data-g="priority" data-v="${v}" onclick="toggleChip('priority','${v}')">${v}</div>`).join('')}
+        </div>
+      </div>
+      <div class="filter-row">
+        <span class="filter-lbl">SEARCH</span>
+        <div class="search-wrap">
+          <input class="fsearch" placeholder="🔍 Task / 고객 / 담당자 검색..." value="${filters.search}" oninput="updateSearch(this.value)">
+        </div>
+      </div>
+    </div>`;
+  updateFilterCount(tabName);
+}
+
+function updateFilterCount(tabName){
+  const el=document.getElementById(`fcount-${tabName}`);
+  if(!el) return;
+  const total=filters.status.size+filters.type.size+filters.priority.size+(filters.search?1:0);
+  el.textContent=total>0?`${total}개 필터 적용`:'전체 표시';
+  el.style.display='inline';
+}
+
+// ── 필터 토글 (즉시 반영) ─────────────────────
+window.toggleChip = (group, val) => {
+  const set = filters[group];
+  set.has(val) ? set.delete(val) : set.add(val);
+  // 양쪽 패널 칩 동기화
+  document.querySelectorAll(`.chip[data-g="${group}"][data-v="${val}"]`).forEach(c=>{
+    c.classList.toggle('on', set.has(val));
+  });
+  updateFilterCount('items');
+  updateFilterCount('meeting');
+  renderItems();
+  renderMeeting();
+  renderWrapupList();
+};
+
+window.updateSearch = (val) => {
+  filters.search = val;
+  // 다른 패널 검색창도 동기화
+  document.querySelectorAll('.fsearch').forEach(el=>{ if(el.value!==val) el.value=val; });
+  updateFilterCount('items');
+  updateFilterCount('meeting');
+  renderItems();
+  renderMeeting();
+  renderWrapupList();
+};
+
+window.resetFilters = () => {
+  filters.status.clear(); filters.type.clear(); filters.priority.clear(); filters.search='';
+  renderFilterPanel('items','filter-panel-items');
+  renderFilterPanel('meeting','filter-panel-meeting');
+  renderItems();
+  renderMeeting();
+  renderWrapupList();
+};
+
+// ── 공통 필터 적용 ────────────────────────────
+function getFilteredList(){
+  let list=Object.entries(items).filter(([,i])=>i&&i.task).map(([k,i])=>({...i,_key:k}));
+  if(filters.status.size) list=list.filter(i=>filters.status.has(i.status));
+  if(filters.type.size)   list=list.filter(i=>filters.type.has(i.workType));
+  if(filters.priority.size) list=list.filter(i=>filters.priority.has(i.priority));
+  if(filters.search){
+    const q=filters.search.toLowerCase();
+    list=list.filter(i=>(i.task+i.customer+i.owner+'').toLowerCase().includes(q));
+  }
+  list.sort((a,b)=>(a.id||'').localeCompare(b.id||''));
+  return list;
+}
+
+// ── 배지/유틸 ─────────────────────────────────
+function sbadge(s){
+  const cls=s==='In Progress'?'s-inprog':s==='Completed'?'s-done':s==='Pending'?'s-pending':'s-other';
+  return `<span class="sbadge ${cls}">${s||'-'}</span>`;
+}
+function pcolor(prog){
+  return prog>=100?'var(--green)':prog>=70?'var(--accent)':prog>=30?'var(--yellow)':'var(--orange)';
+}
+function ddayHtml(i){
+  const dd=diffDays(i.dueDate);
+  const cls=i.status==='Completed'?'dd-done':dd<0?'dd-late':dd<=3?'dd-soon':'dd-ok';
+  const txt=i.status==='Completed'?'✓':dd<0?`-${-dd}d`:`D-${dd}`;
+  return `<span class="dday ${cls}">${txt}</span>`;
+}
+function filesHtml(files){
+  if(!files||!files.length) return '';
+  return files.map(f=>`<a class="file-link file-link-teams" href="${f.url}" target="_blank" rel="noopener" title="${f.url}">📎 ${f.name||'파일'}</a>`).join(' ');
+}
+
+// ── 대시보드 ──────────────────────────────────
+function renderDashboard(){
+  const list=Object.values(items).filter(i=>i&&i.task);
+  const total=list.length,done=list.filter(i=>i.status==='Completed').length;
+  const inprog=list.filter(i=>i.status==='In Progress').length;
+  const pending=list.filter(i=>i.status==='Pending').length;
+  const delayed=list.filter(i=>i.status!=='Completed'&&diffDays(i.dueDate)<0).length;
+  const rate=total?Math.round(done/total*100):0;
+
+  document.getElementById('kpiGrid').innerHTML=[
+    {label:'TOTAL',value:total,color:'var(--text)',sub:'전체 항목'},
+    {label:'IN PROGRESS',value:inprog,color:'var(--accent)',sub:'진행중'},
+    {label:'COMPLETED',value:done,color:'var(--green)',sub:'완료'},
+    {label:'PENDING',value:pending,color:'var(--yellow)',sub:'대기'},
+    {label:'DELAYED',value:delayed,color:'var(--red)',sub:'지연'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.color}">${k.value}</div><div class="kpi-sub">${k.sub}</div></div>`).join('');
+
+  const byType={};
+  list.forEach(i=>{ if(i.workType){if(!byType[i.workType])byType[i.workType]={total:0,done:0};byType[i.workType].total++;if(i.status==='Completed')byType[i.workType].done++;}});
+
+  document.getElementById('dashSummary').innerHTML=`
+    <div class="dash-grid">
+      <div class="dash-card">
+        <div class="filter-lbl" style="margin-bottom:12px">전체 완료율</div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <span style="font-size:36px;font-weight:900;color:var(--green)">${rate}%</span>
+          <span style="color:var(--text3);font-size:12px">${done} / ${total} 완료</span>
+        </div>
+        <div class="pbar-wrap"><div class="pbar-fill" style="width:${rate}%;background:var(--green)"></div></div>
+      </div>
+      <div class="dash-card">
+        <div class="filter-lbl" style="margin-bottom:12px">유형별 현황</div>
+        ${Object.entries(byType).map(([type,v])=>{
+          const r=v.total?Math.round(v.done/v.total*100):0;
+          return `<div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <span style="font-size:12px;color:var(--text2)">${type}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent)">${v.done}/${v.total}</span>
+            </div>
+            <div class="pbar-wrap"><div class="pbar-fill" style="width:${r}%;background:var(--accent)"></div></div>
+          </div>`;}).join('')}
+      </div>
+    </div>
+    <div class="dash-card">
+      <div class="filter-lbl" style="margin-bottom:12px">마감 임박 (D-7 이내)</div>
+      ${list.filter(i=>i.status!=='Completed'&&diffDays(i.dueDate)>=0&&diffDays(i.dueDate)<=7)
+        .sort((a,b)=>diffDays(a.dueDate)-diffDays(b.dueDate)).slice(0,5)
+        .map(i=>`<div class="urgent-item" onclick="openDetail('${Object.keys(items).find(k=>items[k]===i)}')">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:${diffDays(i.dueDate)<=3?'var(--yellow)':'var(--orange)'};min-width:40px;font-weight:700">D-${diffDays(i.dueDate)}</span>
+          <span style="flex:1;font-size:12px">${i.task}</span>
+          <span style="font-size:11px;color:var(--text3);margin-right:8px">${i.customer||''}</span>
+          ${sbadge(i.status)}
+        </div>`).join('')||'<div style="color:var(--text3);font-size:12px;padding:8px">마감 임박 항목 없음</div>'}
+    </div>`;
+}
+
+// ── Action Items 목록 ─────────────────────────
+function renderItems(){
+  const list=getFilteredList();
+  const cnt=document.getElementById('items-count');
+  if(cnt) cnt.textContent=`${list.length}건 표시중 / 전체 ${Object.values(items).filter(i=>i&&i.task).length}건`;
+  const body=document.getElementById('itemsBody');
+  if(!body) return;
+  if(!list.length){body.innerHTML='<div class="empty">조건에 맞는 항목이 없습니다</div>';return;}
+
+  body.innerHTML=list.map(i=>{
+    const prog=Number(i.progress)||0;
+    const delta=Number(i.weeklyDelta)||0;
+    const deltaHtml=delta>0?`<span class="delta-p">▲+${Math.round(delta*100)}%</span>`:delta<0?`<span class="delta-n">▼${Math.round(delta*100)}%</span>`:`<span class="delta-z">-</span>`;
+    const hasFiles=i.files&&i.files.length>0;
+    return `<div class="tr" onclick="openDetail('${i._key}')">
+      <div class="td"><span class="td-txt" style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3)">${i.id||'-'}</span></div>
+      <div class="td"><span class="td-txt">${i.customer||'-'}</span></div>
+      <div class="td"><span class="td-txt" style="font-size:11px;color:var(--text2)">${i.workType||'-'}</span></div>
+      <div class="td"><span class="td-txt ${i.priority==='High'?'p-high':i.priority==='Medium'?'p-med':'p-low'}">${i.priority||'-'}</span></div>
+      <div class="td">${sbadge(i.status)}</div>
+      <div class="td"><span class="td-txt">${i.task||''}</span></div>
+      <div class="td">${ddayHtml(i)}</div>
+      <div class="td" style="flex-direction:column;align-items:flex-start;gap:3px">
+        <div style="display:flex;align-items:center;gap:5px">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2)">${prog}%</span>
+          ${deltaHtml}
+        </div>
+        <div class="pbar-wrap" style="width:100%"><div class="pbar-fill" style="width:${prog}%;background:${pcolor(prog)}"></div></div>
+      </div>
+      <div class="td" style="justify-content:center">
+        ${hasFiles?`<span style="font-size:14px" title="${i.files.length}개 파일">📎 ${i.files.length}</span>`:'<span style="color:var(--text3);font-size:11px">-</span>'}
+      </div>
+      <div class="td"><span class="td-txt" style="font-size:11px;color:var(--text3)">${i.dueDate||'-'}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ── 미팅 모드 ─────────────────────────────────
+function renderMeeting(){
+  const list=getFilteredList();
+  const total=list.length,done=list.filter(i=>i.status==='Completed').length;
+  const inprog=list.filter(i=>i.status==='In Progress').length;
+  const delayed=list.filter(i=>i.status!=='Completed'&&diffDays(i.dueDate)<0).length;
+
+  document.getElementById('meetingKpi').innerHTML=[
+    {label:'TOTAL',value:list.length,color:'var(--text)'},
+    {label:'IN PROGRESS',value:inprog,color:'var(--accent)'},
+    {label:'COMPLETED',value:done,color:'var(--green)'},
+    {label:'DELAYED',value:delayed,color:'var(--red)'},
+    {label:'RATE',value:(total?Math.round(done/total*100):0)+'%',color:'var(--green)'},
+  ].map(k=>`<div class="kpi-card"><div class="kpi-label">${k.label}</div><div class="kpi-value" style="color:${k.color}">${k.value}</div></div>`).join('');
+
+  const sorted=[...list].sort((a,b)=>{
+    const score=i=>i.status==='Completed'?3:diffDays(i.dueDate)<0?0:i.priority==='High'?1:2;
+    return score(a)-score(b);
+  });
+
+  document.getElementById('meetingItems').innerHTML=sorted.map((i,idx)=>{
+    const dd=diffDays(i.dueDate),isDelayed=i.status!=='Completed'&&dd<0;
+    const prog=Number(i.progress)||0,delta=Number(i.weeklyDelta)||0;
+    return `<div class="meeting-card${isDelayed?' delayed':i.priority==='High'?' high-prio':''}" onclick="openDetail('${i._key}')">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px;flex:1">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:700;color:var(--text3);min-width:36px">${String(idx+1).padStart(2,'0')}</span>
+          <div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:5px">${i.task}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+              ${i.id?`<span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--text3)">${i.id}</span>`:''}
+              ${i.customer?`<span style="font-size:11px;color:var(--text2)">${i.customer}</span>`:''}
+              ${i.category?`<span style="font-size:10px;background:var(--bg);padding:2px 7px;border-radius:4px;border:1px solid var(--border);color:var(--text2)">${i.category}</span>`:''}
+              ${i.owner?`<span style="font-size:10px;background:var(--bg);padding:2px 7px;border-radius:4px;border:1px solid var(--border);color:var(--text2)">${i.owner}</span>`:''}
+              <span class="${i.priority==='High'?'p-high':i.priority==='Medium'?'p-med':'p-low'}" style="font-size:11px">${i.priority||''}</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+          ${sbadge(i.status)}
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:${isDelayed?'var(--red)':dd<=3?'var(--yellow)':'var(--text3)'}">${i.status==='Completed'?'완료됨':dd<0?`${-dd}일 지연`:`D-${dd}`}</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:${(i.files&&i.files.length)||i.risk?'12px':'0'}">
+        <div>
+          <div class="filter-lbl" style="margin-bottom:6px">PROGRESS</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:var(--accent)">${prog}%</span>
+            ${delta>0?`<span style="font-size:11px;color:var(--green);font-weight:700">▲ +${Math.round(delta*100)}%</span>`:delta<0?`<span style="font-size:11px;color:var(--red);font-weight:700">▼ ${Math.round(delta*100)}%</span>`:''}
+          </div>
+          <div class="pbar-wrap"><div class="pbar-fill" style="width:${prog}%;background:${pcolor(prog)}"></div></div>
+        </div>
+        <div>
+          <div class="filter-lbl" style="margin-bottom:6px">F/UP</div>
+          <div style="font-size:12px;line-height:1.6">${i.followup||`<span style="color:var(--text3)">내용 없음</span>`}</div>
+        </div>
+      </div>
+      ${i.files&&i.files.length?`
+        <div style="margin-top:12px;padding:12px 14px;background:var(--accent-l);border:1px solid #bfdbfe;border-radius:8px;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.06em;margin-bottom:8px;font-weight:700;">📎 관련 파일 (클릭하여 열기)</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            ${i.files.map(f=>`
+              <a class="file-link file-link-teams" href="${f.url}" target="_blank" rel="noopener"
+                style="padding:6px 14px;font-size:12px;display:inline-flex;align-items:center;gap:6px;"
+                onclick="event.stopPropagation()">
+                📄 ${f.name||'파일'}
+              </a>`).join('')}
+          </div>
+        </div>`:''}
+      ${i.risk?`<div style="margin-top:8px;padding:8px 12px;background:var(--red-l);border:1px solid #fca5a5;border-radius:6px;font-size:11px;color:var(--red)">⚠ ${i.risk}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── 파일 관리 (등록 폼) ───────────────────────
+window.addFileRow = (mode) => {
+  if(mode==='add'){
+    const name=document.getElementById('a-fname').value.trim();
+    const url=document.getElementById('a-furl').value.trim();
+    if(!url){showToast('파일 링크를 입력해주세요',true);return;}
+    addFiles.push({name:name||url.split('/').pop()||'파일',url});
+    document.getElementById('a-fname').value='';
+    document.getElementById('a-furl').value='';
+    renderAddFileList();
+  } else if(mode==='edit'){
+    const name=document.getElementById('e-fname').value.trim();
+    const url=document.getElementById('e-furl').value.trim();
+    if(!url){showToast('파일 링크를 입력해주세요',true);return;}
+    editFiles.push({name:name||url.split('/').pop()||'파일',url});
+    document.getElementById('e-fname').value='';
+    document.getElementById('e-furl').value='';
+    renderEditFileList();
+  }
+};
+
+function renderAddFileList(){
+  const el=document.getElementById('a-file-list');
+  if(!el) return;
+  el.innerHTML=addFiles.map((f,idx)=>`
+    <div class="file-list-item">
+      <span style="font-size:14px">📎</span>
+      <a href="${f.url}" target="_blank" rel="noopener">${f.name}</a>
+      <button class="btn-remove-file" onclick="removeAddFile(${idx})">×</button>
+    </div>`).join('');
+}
+
+window.removeAddFile = idx => { addFiles.splice(idx,1); renderAddFileList(); };
+
+let editFiles=[];
+function renderEditFileList(){
+  const el=document.getElementById('e-file-list');
+  if(!el) return;
+  el.innerHTML=editFiles.map((f,idx)=>`
+    <div class="file-list-item">
+      <span style="font-size:14px">📎</span>
+      <a href="${f.url}" target="_blank" rel="noopener">${f.name}</a>
+      <button class="btn-remove-file" onclick="removeEditFile(${idx})">×</button>
+    </div>`).join('');
+}
+window.removeEditFile = idx => { editFiles.splice(idx,1); renderEditFileList(); };
+
+// ── 상세 모달 ─────────────────────────────────
+window.openDetail = (key) => {
+  const i=items[key]; if(!i) return;
+  const prog=Number(i.progress)||0,delta=Number(i.weeklyDelta)||0,dd=diffDays(i.dueDate);
+  editFiles=[...(i.files||[])];
+  document.getElementById('modalTitle').textContent=`${i.id||''} — ACTION ITEM`;
+  document.getElementById('modalBody').innerHTML=`
+    <div class="detail-grid">
+      <div class="detail-card"><div class="detail-lbl">STATUS</div>${sbadge(i.status)}</div>
+      <div class="detail-card"><div class="detail-lbl">PRIORITY</div><div class="detail-val ${i.priority==='High'?'p-high':i.priority==='Medium'?'p-med':'p-low'}">${i.priority||'-'}</div></div>
+      <div class="detail-card"><div class="detail-lbl">D-DAY</div><div class="detail-val dday ${i.status==='Completed'?'dd-done':dd<0?'dd-late':dd<=3?'dd-soon':'dd-ok'}">${i.status==='Completed'?'완료':dd<0?`${-dd}일 지연`:`D-${dd}`}</div></div>
+    </div>
+    <div class="detail-card" style="margin-bottom:12px"><div class="detail-lbl">TASK</div><div style="font-size:15px;font-weight:600;margin-top:4px">${i.task||''}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div class="detail-card"><div class="detail-lbl">CUSTOMER</div><div class="detail-val">${i.customer||'-'}</div></div>
+      <div class="detail-card"><div class="detail-lbl">OWNER</div><div class="detail-val">${i.owner||'-'}</div></div>
+      <div class="detail-card"><div class="detail-lbl">WORK TYPE</div><div class="detail-val">${i.workType||'-'}</div></div>
+      <div class="detail-card"><div class="detail-lbl">CATEGORY</div><div class="detail-val">${i.category||'-'}</div></div>
+      <div class="detail-card"><div class="detail-lbl">START DATE</div><div class="detail-val">${i.startDate||'-'}</div></div>
+      <div class="detail-card"><div class="detail-lbl">DUE DATE</div><div class="detail-val">${i.dueDate||'-'}</div></div>
+    </div>
+    <div class="detail-card" style="margin-bottom:12px">
+      <div class="detail-lbl">PROGRESS</div>
+      <div style="display:flex;align-items:center;gap:12px;margin:8px 0">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:700;color:var(--accent)">${prog}%</span>
+        <span style="font-size:12px;color:var(--text3)">지난주: ${Number(i.lastProgress)||0}%</span>
+        ${delta>0?`<span style="color:var(--green);font-weight:700">▲ +${Math.round(delta*100)}%</span>`:delta<0?`<span style="color:var(--red);font-weight:700">▼ ${Math.round(delta*100)}%</span>`:''}
+      </div>
+      <div class="pbar-wrap" style="height:8px;border-radius:5px"><div class="pbar-fill" style="width:${prog}%;background:${pcolor(prog)}"></div></div>
+    </div>
+    ${i.followup?`<div class="detail-card" style="margin-bottom:12px"><div class="detail-lbl">F/UP</div><div style="font-size:13px;line-height:1.7;margin-top:4px">${i.followup}</div></div>`:''}
+    ${i.risk?`<div class="detail-card" style="margin-bottom:12px;border-color:#fca5a5;background:var(--red-l)"><div class="detail-lbl" style="color:var(--red)">⚠ RISK / ISSUE</div><div style="font-size:13px;line-height:1.7;margin-top:4px;color:var(--red)">${i.risk}</div></div>`:''}
+    ${i.files&&i.files.length?`<div class="detail-card" style="margin-bottom:12px">
+      <div class="detail-lbl">📎 첨부 파일</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${filesHtml(i.files)}</div>
+    </div>`:''}
+
+    <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:4px">
+      <div class="filter-lbl" style="margin-bottom:14px">// 주간 업데이트</div>
+      <div class="fgrid">
+        <div><div class="flabel">상태 변경</div>
+          <select class="fselect" id="edit-status">
+            ${['In Progress','Completed','Pending'].map(s=>`<option${s===i.status?' selected':''}>${s}</option>`).join('')}
+          </select></div>
+        <div><div class="flabel">진행률 (%)</div><input class="finput" type="number" id="edit-prog" min="0" max="100" value="${prog}"></div>
+        <div class="ff"><div class="flabel">이번 주 F/UP</div><textarea class="ftextarea" id="edit-fup">${i.followup||''}</textarea></div>
+        <div class="ff"><div class="flabel">Risk / Issue</div><textarea class="ftextarea" id="edit-risk">${i.risk||''}</textarea></div>
+        <div class="ff">
+          <div class="flabel">📎 Teams 파일 링크</div>
+          <div id="e-file-list" style="margin-bottom:8px"></div>
+          <div class="file-add-row">
+            <input class="finput finput-name" id="e-fname" placeholder="파일명 (예: 계약서.pdf)">
+            <input class="finput" id="e-furl" placeholder="Teams 공유 링크 붙여넣기">
+            <button class="btn-add-file" onclick="addFileRow('edit')">+ 추가</button>
+          </div>
+          <div style="font-size:11px;color:var(--text3);margin-top:6px">💡 Teams에서 파일 우클릭 → 링크 복사 → 여기에 붙여넣기</div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-del" onclick="deleteItem('${key}')">🗑 삭제</button>
+        <button class="btn-cancel" onclick="document.getElementById('modalOverlay').classList.remove('show')">닫기</button>
+        <button class="btn-save" onclick="updateItem('${key}')">💾 업데이트</button>
+      </div>
+    </div>`;
+  renderEditFileList();
+  document.getElementById('modalOverlay').classList.add('show');
+};
+
+window.closeModal = e=>{ if(e.target===document.getElementById('modalOverlay')) document.getElementById('modalOverlay').classList.remove('show'); };
+
+// ── CRUD ──────────────────────────────────────
+window.addItem = async () => {
+  const task=document.getElementById('a-task').value.trim();
+  const due=document.getElementById('a-due').value;
+  if(!task||!due){showToast('Task 내용과 마감일을 입력하세요',true);return;}
+  setSyncStatus('syncing');
+  const list=Object.values(items).filter(i=>i&&i.id);
+  const nextId=list.length?String(Number(list.map(i=>i.id).sort().pop())+1).padStart(3,'0'):'001';
+  await push(itemsRef,{
+    id:nextId,workType:document.getElementById('a-wtype').value,
+    customer:document.getElementById('a-cust').value.trim(),
+    stage:document.getElementById('a-stage').value,category:document.getElementById('a-cat').value,
+    task,owner:document.getElementById('a-owner').value.trim()||'JNFAM',
+    priority:document.getElementById('a-prio').value,
+    startDate:document.getElementById('a-start').value,dueDate:due,
+    status:document.getElementById('a-status').value,
+    progress:Number(document.getElementById('a-prog').value)||0,lastProgress:0,weeklyDelta:0,
+    followup:document.getElementById('a-fup').value.trim(),
+    risk:document.getElementById('a-risk').value.trim(),
+    files:[...addFiles],
+    createdAt:new Date().toISOString()
+  });
+  setSyncStatus('connected');
+  showToast('✓ Action Item 등록됐습니다!');
+  ['a-cust','a-task','a-owner','a-start','a-due','a-fup','a-risk'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('a-prog').value='0';
+  addFiles=[]; renderAddFileList();
+  switchTab('items',document.querySelectorAll('.tab')[1]);
+};
+
+window.updateItem = async (key) => {
+  const i=items[key]; if(!i) return;
+  const newProg=Number(document.getElementById('edit-prog').value)||0;
+  setSyncStatus('syncing');
+  await update(ref(db,'items/'+key),{
+    status:document.getElementById('edit-status').value,
+    progress:newProg,lastProgress:Number(i.progress)||0,
+    weeklyDelta:(newProg-(Number(i.progress)||0))/100,
+    followup:document.getElementById('edit-fup').value.trim(),
+    risk:document.getElementById('edit-risk').value.trim(),
+    files:[...editFiles],
+    updatedAt:new Date().toISOString()
+  });
+  setSyncStatus('connected');
+  document.getElementById('modalOverlay').classList.remove('show');
+  showToast('✓ 업데이트됐습니다!');
+};
+
+window.deleteItem = async (key) => {
+  if(!confirm('이 항목을 삭제할까요?')) return;
+  setSyncStatus('syncing');
+  await remove(ref(db,'items/'+key));
+  setSyncStatus('connected');
+  document.getElementById('modalOverlay').classList.remove('show');
+  showToast('🗑 삭제됐습니다');
+};
+
+// ── 탭 전환 ───────────────────────────────────
+window.switchTab = (name,btn) => {
+  ['dashboard','items','meeting','wrapup','add'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+};
+
+window.changeWeek = d => { curWeekOffset+=d; updateWeekBadge(); };
+
+function showToast(msg,isError=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(isError?' error':'')+' show';
+  setTimeout(()=>t.className='toast',2500);
+}
+
+// ── 초기 샘플 데이터 ──────────────────────────
+onValue(itemsRef, async snap=>{
+  if(!snap.exists()){
+    const s=[
+      {id:'001',workType:'Management',customer:'other',stage:'Execution',category:'EHS',task:'Biz licence update',owner:'JNFAM',priority:'High',startDate:'2026-03-20',dueDate:'2026-05-31',status:'In Progress',progress:91,lastProgress:90,weeklyDelta:0.01,followup:'담당 소방관에 현재 진행 사항 update 완료. 2차 Update 완료',risk:'Fire inspection action item 해결 후 처리(ID 002 연계)',files:[]},
+      {id:'002',workType:'EHS',customer:'Internal',stage:'Negotiation',category:'EHS',task:'Fire inspection C/A - Fire Monitoring system / Sprinkler installation / EPA enroll',owner:'JNFAM',priority:'High',startDate:'2026-04-10',dueDate:'2026-05-31',status:'In Progress',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'EPA 등록 완료. Fire Monitoring 완료. Splinker 견적 완료',risk:'Splinker 공사시 도면 업데이트와 신고 필요',files:[]},
+      {id:'003',workType:'Customer',customer:'HWQ',stage:'Execution',category:'Operation',task:'재가동에 따른 공급 준비 SOP/Training/Safety check',owner:'JNFAM',priority:'High',startDate:'2026-04-20',dueDate:'2026-05-19',status:'In Progress',progress:75,lastProgress:60,weeklyDelta:0.15,followup:'SOP update 완료. HWQ 재교육 완료. Trucker 교육 예정',risk:'',files:[]},
+      {id:'004',workType:'Customer',customer:'PVJC',stage:'Execution',category:'Sales',task:'HCL 운송 및 관련 서류 정리',owner:'JNFAM',priority:'Medium',startDate:'2026-04-15',dueDate:'2026-05-03',status:'Completed',progress:100,lastProgress:100,weeklyDelta:0,followup:'PVJC 입고 확인 및 CoA 통과. Invoice 가능 확인 완료',risk:'',files:[]},
+      {id:'005',workType:'Customer',customer:'PVJC',stage:'Execution',category:'Sales',task:'HF ISO Tank 운송 (ISO Tank line modification/SOP/Trucker training)',owner:'JNFAM',priority:'Medium',startDate:'2026-04-01',dueDate:'2026-05-22',status:'In Progress',progress:90,lastProgress:80,weeklyDelta:0.1,followup:'SOP 준비중. 업체별 Line 구분 완료. Trucker 교육 예정',risk:'Qcells vs PVJC 스펙 차이',files:[]},
+      {id:'006',workType:'Customer',customer:'PVJC',stage:'Proposal',category:'Sales',task:'31% H2O2 Proposal',owner:'JNFAM',priority:'Low',startDate:'2026-04-01',dueDate:'2026-05-31',status:'In Progress',progress:10,lastProgress:10,weeklyDelta:0,followup:'가격 제안 완료. 현재 내부 협의중',risk:'PVJC 내부 협의 필요',files:[]},
+      {id:'007',workType:'Customer',customer:'PVJC',stage:'Execution',category:'Sales',task:'IBC용 H2O2 Dispenser & Diptube 판매',owner:'JNFAM',priority:'Low',startDate:'2026-04-15',dueDate:'2026-06-06',status:'In Progress',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'PO 수령. ETA update, AS 주문 완료',risk:'',files:[]},
+      {id:'008',workType:'Management',customer:'Internal',stage:'Execution',category:'Operation',task:'JNFAM 법인 전환 (LLC => C-Corp)',owner:'JNFAM',priority:'Medium',startDate:'2025-12-10',dueDate:'2026-07-12',status:'Pending',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'IRS 진행중. 벌금 면제 확인',risk:'IRS 진행 연기중',files:[]},
+      {id:'009',workType:'Operation',customer:'Internal',stage:'Execution',category:'Operation',task:'RM Build up (Safety Inventory 확보)',owner:'JNFAM',priority:'High',startDate:'2026-03-20',dueDate:'2026-05-31',status:'In Progress',progress:80,lastProgress:70,weeklyDelta:0.1,followup:'HCl 1 CNT/HF 1CNT Inbound',risk:'',files:[]},
+      {id:'010',workType:'Customer',customer:'Suniva',stage:'Execution',category:'Sales',task:'H2SO4 Qual test',owner:'JNFAM',priority:'High',startDate:'2026-02-01',dueDate:'2026-05-09',status:'Completed',progress:100,lastProgress:90,weeklyDelta:0.1,followup:'황산 입고 완료 후 출하 준비 완료',risk:'',files:[]},
+      {id:'011',workType:'Customer',customer:'Suniva',stage:'Proposal',category:'Sales',task:'31% H2O2 Proposal',owner:'JNFAM',priority:'Medium',startDate:'2026-02-01',dueDate:'2026-05-29',status:'In Progress',progress:10,lastProgress:10,weeklyDelta:0,followup:'가격 제안 완료 후 Suniva 내부 협의중',risk:'',files:[]},
+      {id:'012',workType:'Customer',customer:'ESF (Korechem)',stage:'Audit',category:'Operation',task:'업체 승인 Audit (5/6~7)',owner:'JNF',priority:'High',startDate:'2026-05-06',dueDate:'2026-05-07',status:'In Progress',progress:75,lastProgress:70,weeklyDelta:0.05,followup:'Audit 지원',risk:'JNF audit',files:[]},
+      {id:'013',workType:'Customer',customer:'ESF (Korechem)',stage:'Negotiation',category:'Sales',task:'HF/HCl 공급 제안',owner:'JNFAM',priority:'High',startDate:'2026-01-06',dueDate:'2026-05-31',status:'In Progress',progress:50,lastProgress:40,weeklyDelta:0.1,followup:'협의 진행중. commitment-based pricing structure 제안',risk:'POR 대비 가격 이슈',files:[]},
+      {id:'014',workType:'Operation',customer:'Internal',stage:'Execution',category:'Operation',task:'Clean Room & ICP-MS Installation',owner:'JNFAM',priority:'High',startDate:'2025-05-08',dueDate:'2026-08-01',status:'Pending',progress:20,lastProgress:20,weeklyDelta:0,followup:'세부 견적 진행중',risk:'Capital issue / Fire inspection issue',files:[]},
+      {id:'015',workType:'Customer',customer:'Suniva',stage:'Proposal',category:'Sales',task:'Follow-up on APV Flexible Hose',owner:'JNFAM',priority:'High',startDate:'2026-04-30',dueDate:'2026-05-13',status:'In Progress',progress:40,lastProgress:0,weeklyDelta:0.4,followup:'담당자 Colin 요청 완료',risk:'',files:[]},
+    ];
+    for(const item of s) await push(itemsRef,{...item,createdAt:new Date().toISOString()});
+  }
+},{onlyOnce:true});
+
+
+// ── Wrap-up ───────────────────────────────────
+const wrapupsRef = ref(db, 'wrapups');
+let wrapups = {};
+let editingWrapupKey = null;
+
+onValue(wrapupsRef, snap => {
+  wrapups = snap.val() || {};
+  renderWrapupList();
+});
+
+function getWeekKey(offset=0) {
+  const {mon} = getWeekRange(offset);
+  const y = mon.getFullYear();
+  const w = String(getWeekNum(mon)).padStart(2,'0');
+  return `${y}-W${w}`;
+}
+
+function getWeekLabel(offset=0) {
+  const {mon,sun} = getWeekRange(offset);
+  const monStr = mon.toISOString().slice(0,10);
+  const sunStr = sun.toISOString().slice(0,10);
+  return `${mon.getFullYear()} W${getWeekNum(mon)}  ·  ${fmtDate(monStr)} ~ ${fmtDate(sunStr)}`;
+}
+
+window.openWrapupModal = (key=null) => {
+  editingWrapupKey = key;
+  const isEdit = key && wrapups[key];
+  const wu = isEdit ? wrapups[key] : null;
+  const offset = isEdit ? (wu.weekOffset||0) : curWeekOffset;
+
+  document.getElementById('wrapupModalTitle').textContent = isEdit ? '📝 Wrap-up 수정' : '📝 Weekly Wrap-up 작성';
+  document.getElementById('wrapup-week-label').textContent = '📅 ' + getWeekLabel(offset);
+  document.getElementById('wu-decisions').value  = wu?.decisions  || '';
+  document.getElementById('wu-directives').value = wu?.directives || '';
+  document.getElementById('wu-issues').value     = wu?.issues     || '';
+  document.getElementById('wu-done').value       = wu?.done       || '';
+  document.getElementById('wu-next').value       = wu?.next       || '';
+  document.getElementById('wu-notes').value      = wu?.notes      || '';
+  document.getElementById('wu-del-btn').style.display = isEdit ? 'block' : 'none';
+  document.getElementById('wrapupOverlay').classList.add('show');
+};
+
+window.closeWrapupModal = (e) => {
+  if(e.target === document.getElementById('wrapupOverlay'))
+    document.getElementById('wrapupOverlay').classList.remove('show');
+};
+
+window.saveWrapup = async () => {
+  const data = {
+    weekKey: editingWrapupKey ? wrapups[editingWrapupKey].weekKey : getWeekKey(curWeekOffset),
+    weekLabel: editingWrapupKey ? wrapups[editingWrapupKey].weekLabel : getWeekLabel(curWeekOffset),
+    weekOffset: editingWrapupKey ? (wrapups[editingWrapupKey].weekOffset||0) : curWeekOffset,
+    decisions:  document.getElementById('wu-decisions').value.trim(),
+    directives: document.getElementById('wu-directives').value.trim(),
+    issues:     document.getElementById('wu-issues').value.trim(),
+    done:       document.getElementById('wu-done').value.trim(),
+    next:       document.getElementById('wu-next').value.trim(),
+    notes:      document.getElementById('wu-notes').value.trim(),
+    savedAt:    new Date().toISOString(),
+  };
+  setSyncStatus('syncing');
+  if(editingWrapupKey) {
+    await update(ref(db,'wrapups/'+editingWrapupKey), data);
+  } else {
+    await push(wrapupsRef, data);
+  }
+  setSyncStatus('connected');
+  document.getElementById('wrapupOverlay').classList.remove('show');
+  showToast('✓ Wrap-up 저장됐습니다!');
+};
+
+window.deleteWrapup = async () => {
+  if(!confirm('이 Wrap-up을 삭제할까요?')) return;
+  setSyncStatus('syncing');
+  await remove(ref(db,'wrapups/'+editingWrapupKey));
+  setSyncStatus('connected');
+  document.getElementById('wrapupOverlay').classList.remove('show');
+  showToast('🗑 삭제됐습니다');
+};
+
+function renderWrapupList() {
+  const el = document.getElementById('wrapup-list');
+  if(!el) return;
+  const list = Object.entries(wrapups)
+    .filter(([,w])=>w&&w.weekKey)
+    .sort(([,a],[,b])=>b.weekKey.localeCompare(a.weekKey));
+
+  if(!list.length) {
+    el.innerHTML = `<div style="background:var(--white);border:2px dashed var(--border);border-radius:14px;padding:48px;text-align:center;color:var(--text3)">
+      <div style="font-size:36px;margin-bottom:12px">📝</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text2)">아직 Wrap-up이 없어요</div>
+      <div style="font-size:13px;margin-bottom:20px">미팅 후 이번 주 내용을 기록해 보세요</div>
+      <button class="btn-save" onclick="openWrapupModal()">+ 첫 번째 Wrap-up 작성</button>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(([key,wu]) => {
+    const sections = [
+      {icon:'📌', title:'핵심 결정사항', val:wu.decisions},
+      {icon:'📋', title:'지시사항', val:wu.directives},
+      {icon:'⚠️', title:'주요 이슈', val:wu.issues},
+      {icon:'✅', title:'완료된 사항', val:wu.done},
+      {icon:'📅', title:'다음 주 중점', val:wu.next},
+      {icon:'📝', title:'기타 메모', val:wu.notes},
+    ].filter(s=>s.val);
+
+    return `<div class="wu-card">
+      <div class="wu-card-header">
+        <div>
+          <div class="wu-week-tag">${wu.weekKey}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:6px">${wu.weekLabel||''}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="wu-date">${wu.savedAt?new Date(wu.savedAt).toLocaleDateString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):''}</div>
+          <button class="wu-edit-btn" onclick="openWrapupModal('${key}')">✏️ 수정</button>
+        </div>
+      </div>
+      <div class="wu-grid">
+        ${sections.map(s=>`
+          <div class="wu-section">
+            <div class="wu-section-title">${s.icon} ${s.title}</div>
+            <div class="wu-section-body">${s.val}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+updateWeekBadge();
+</script>
+<style>.ytk-copyright{text-align:center;font-size:11px;line-height:1.4;color:#8a8f98;padding:10px 12px;font-family:inherit}@media print{.ytk-copyright{display:none}}</style>
+<div class="ytk-copyright">© 2025–2026 Young Tai Kang. All rights reserved. Unauthorized use, copying, modification, or distribution without the written permission of Young Tai Kang is prohibited.</div>
+</body>
+</html>
